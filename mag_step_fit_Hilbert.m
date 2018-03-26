@@ -10,12 +10,12 @@ dt = 1/SampleRate;
 AnalysisCycles = 6;
 NSamples = floor(AnalysisCycles*SampleRate/F0);
 n = -NSamples/2:(NSamples/2-1); %discrete time vector
-tau_pp = 0.7; % relative time of step in percent of total time 
+tau_pp = 0.5; % relative time of step in percent of total time 
 tau_0 = (tau_pp - 0.5)*NSamples; %discrete time displacement
 n = n - tau_0;
 t = n*dt; %time vector
 Vm = 100; %70*sqrt(2);
-Ps = -120; %phase in degrees
+Ps = 0; %phase in degrees
 
 % Phase in radians
 Ph = Ps*pi/180;
@@ -53,7 +53,7 @@ Ain = (Ain - mean(Ain))./abs(Ain);
 nn = 1:(NSamples-1);
 %plot(nn,abs(f)); title('Instantaneous frequency (abs)')
 
-plot(nn,f); title('Instantaneous frequency (abs)')
+plot(nn,abs(f)); title('Instantaneous frequency (abs)')
 
 % figure
 % plot(f.^2); title('IF ^2');
