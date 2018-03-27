@@ -10,7 +10,7 @@ dt = 1/SampleRate;
 AnalysisCycles = 6;
 NSamples = floor(AnalysisCycles*SampleRate/F0);
 n = -NSamples/2:(NSamples/2-1); %discrete time vector
-tau_pp = 0.0; % relative time of step in percent of total time 
+tau_pp = 0.5; % relative time of step in percent of total time 
 tau_0 = (tau_pp - 0.5)*NSamples; %discrete time displacement
 n = n - tau_0;
 t = n*dt; %time vector
@@ -39,14 +39,26 @@ SNR = 97; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 Aruido = 0*Vm/10^(SNR/20);
 Signal = real(cSignal) + Aruido*(rand(1,length(t))-0.5);
 
-plot(Signal)
+%we should filter the signal...
+% N_FIR = 100;        % FIR filter order
+% Fp  = 500;       % 500 Hz passband-edge frequency
+% Fs  = SampleRate;       % 96 kHz sampling frequency
+% Rp  = 0.00057565; % Corresponds to 0.01 dB peak-to-peak ripple
+% Rst = 1e-4;       % Corresponds to 80 dB stopband attenuation
+% 
+% eqnum = firceqrip(N_FIR,Fp/(Fs/2),[Rp Rst],'passedge'); % eqnum = vec of coeffs
+% lowpassFIR = dsp.FIRFilter('Numerator',eqnum); %or eqNum200 or numMinOrder
+% %fvtool(lowpassFIR,'Fs',Fs,'Color','White')
+% Sig_filt = lowpassFIR(Signal);
+% figure; plot(Sig_filt,'r');
+% legend('Filtered Signal');
 
 %%%% Estimation of tau
 %addpath('.\common')
 %load filter_PB20_20Hz_5th % b20 a20 (elliptic lowpass filter with 20Hz passband and zero at 60 Hz)
 
 %Hilbert filter
-br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end
+br = floor(0.05*NSamples); % 5% of NSamples are taken off at the beggining and end
 z=hilbert(Signal');  % calculates the analytic signal associated with Signal
 Psi = unwrap(angle(z));
 
@@ -87,6 +99,23 @@ else
 end
 
 tau_error = (tau_e - tau)
+
+%trying to demodulate signal with nominal values
+% for phase
+demod = 1; %cos(KaS*pi/180);
+if imax_th>0
+    Sig_demod = [Signal(1:imax_th) Signal(imax_th+1:end)+demod];
+else 
+    Sig_demod = Signal;
+end
+plot(t,Signal)
+hold on; plot(t,Sig_demod); legend('Signal','Demodulated Signal')
+%now, recalculate hilbert with demodulated signal
+z=hilbert(Sig_demod');  % calculates the analytic signal associated with Signal
+Psi = unwrap(angle(z));
+f_hi=unwrap(angle(z(2:end,:).*conj(z(1:end-1,:))));  % Hilbert estimate of the instantaneous frequency of Signal
+f=f_hi-median(f_hi(br:end-br));
+
 
 %splittig Psi in two
 Psi_1 = Psi(br:imax_th-1-br);
