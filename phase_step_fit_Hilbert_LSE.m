@@ -4,7 +4,7 @@ clear all; close all; clc;
 
 %signal generation
 F0 = 60; %Hz nominal
-F1 = 60; %Hz fundamental
+F1 = 60.0; %Hz fundamental
 SampleRate = 4800; %Hz
 dt = 1/SampleRate;
 AnalysisCycles = 6;
@@ -20,7 +20,7 @@ Ps = 0; %phase in degrees
 % Phase in radians
 Ph = Ps*pi/180;
 
-KaS = 10;   % IEEE Std phase (angle) step index: 10 degrees
+KaS = -10;   % IEEE Std phase (angle) step index: 10 degrees
 KxS = 0;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
 
@@ -49,7 +49,7 @@ f=f_hi-median(f_hi(br:end-br));
 %Ain = (Ain - mean(Ain))./abs(Ain);
 
 [ifmax, imax] = max(abs(f(br:end-br)));
-imax_th = imax;
+imax_th = imax + br - 1;
 
 %estimation of tau
 if imax_th>0
@@ -64,11 +64,11 @@ end
 tau_error = (tau_e - tau)
 
 %splittig Signal in two
-imax_r = imax + br;
-Signal_1 = Signal(1:imax_r);
-Signal_2 = Signal(imax_r+1:end);
-t_1 = t(1:imax_r);
-t_2 = t(imax_r+1:end);
+imax_r = imax + br - 1;
+Signal_1 = Signal(1:imax_r-1);
+Signal_2 = Signal(imax_r+2:end);  %excluding samples around tau
+t_1 = t(1:imax_r-1);
+t_2 = t(imax_r+2:end);
 plot(t_1,Signal_1,t_2,Signal_2)
 
 %LSE of parameters 
@@ -91,4 +91,5 @@ MagCorr = 1;
 	SampleRate, ...
 	Signal_2);
 
-
+ferr1 = abs(F1 - Freq1)*100  %in [%]
+ferr2 = abs(F1 - Freq2)*100  %in [%]
