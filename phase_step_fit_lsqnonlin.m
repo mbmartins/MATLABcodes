@@ -92,7 +92,7 @@ x0 = xnom;  %x0 is fixed - first guess are the nominal values
 for n = 1:Niter;
     %first guess
     %          X1  w   ph  x2
-    par_var = [0.2 0.1 0.2 0.1]; % parameter variation in percent related to nominal
+    par_var = [0.02 0.01 0.02 0.01]; % parameter variation in percent related to nominal
     xr = xnom1.*(1+(par_var/100).*(rand(1,length(xnom1))-0.5));
     
     %regenerates the signal with the uncertainties
