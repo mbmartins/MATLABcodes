@@ -14,7 +14,7 @@ Psi = unwrap(angle(z));
 f_hi=unwrap(angle(z(2:end,:).*conj(z(1:end-1,:))));  % Hilbert estimate of the instantaneous frequency of Signal
 f=f_hi-median(f_hi(br:end-br));
 
-plot(t,abs(Signal))
+plot(t,Signal)
 
 %estimation of angular frequency (w = 2*pi*f) using hilbert
 % w is the slope of the linear curve

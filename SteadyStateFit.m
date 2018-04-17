@@ -58,7 +58,8 @@ dt = 1/SampleRate;
 tn = (-NSamples/2:NSamples/2-1)*dt;
 
 MaxIter = 50;
-FitCrit = 1e-5;   
+FitCrit = 1e-5;
+%FitCrit = 1e-7;
 dFreq(NPhases,MaxIter) = 0;
 erms(1:NPhases) = 1;
 
@@ -116,7 +117,7 @@ for p = 1:NPhases
         %residuals
 %         r = Samples(p,:) - S'*G';
 %         erms(p) = sqrt((1/NSamples)*sum(r.^2));
-        if dFreq(p,k)<FitCrit
+        if abs(dFreq(p,k))<FitCrit
             break
         end
     end
