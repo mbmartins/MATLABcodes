@@ -6,15 +6,17 @@ D = open('Digitalizacoes_02_05_2018.mat')
 
 p = 241 + 4*480;
 q = 240 + 5*480;
-WholeSignal = [D.Dig_t0.SS_0';];
-%                D.Dig_t2.MS_p_120';
-%                D.Dig_t3.MS_p_120';
-%                D.Dig_t4.MS_p_120';
-%                D.Dig_t5.MS_p_120';
-%                D.Dig_t6.MS_p_120';
-%                D.Dig_t7.MS_p_120';
-%                D.Dig_t8.MS_p_120';
-%                D.Dig_t9.MS_p_120';];
+WholeSignal = [D.Dig_t0.SS_0';
+%                 D.Dig_t1.PS_n_0';
+%                 D.Dig_t2.PS_n_0';
+%                 D.Dig_t3.PS_n_0';
+%                 D.Dig_t4.PS_n_0';
+%                 D.Dig_t5.PS_n_0';
+%                 D.Dig_t6.PS_n_0';
+%                 D.Dig_t7.PS_n_0';
+%                 D.Dig_t8.PS_n_0';
+%                 D.Dig_t9.PS_n_0';
+];
 
 for i=1:size(WholeSignal,1)           
 
@@ -48,14 +50,14 @@ for i=1:size(WholeSignal,1)
     imax_th = imax + br - 1;
 
     if imax_th>0
-        tau_e = imax_th*dt
+        tau_e = imax_th*dt;
     else
         tau_e = 0;
         tau = 0;
         imax_th = size(t,2)+1;
     end
 
-    tau_error(i) = (tau_e - tau)
+    tau_error(i) = (tau_e - tau);
     
     
     %Frequency estimation
@@ -71,25 +73,25 @@ for i=1:size(WholeSignal,1)
 
     %1st degree model matrix
     %calculating 2freqs
-    X1 = [t_1' ones(size(t_1))']; y = Psi_1;
-    beta = (X1'*X1)\X1'*y;
-    fest_1 = beta(1)/(2*pi)
-    ferr_1 = 100*(fest_1 - F1)/F1
-    res_1 = (X1*beta - y);
-
-    X2 = [t_2' ones(size(t_2))']; y = Psi_2;
-    beta = (X2'*X2)\X2'*y;
-    fest_2 = beta(1)/(2*pi)
-    ferr_2 = 100*(fest_2 - F1)/F1
-    res_2 = (X2*beta - y);
-
-    fest = mean([fest_1 fest_2])
-    ferr = 100*(fest - F1)/F1
-
-    figure
-    subplot(3,1,1); plot(t_1,Psi_1,'.',t_2,Psi_2,'.'); title('\Psi')
-    subplot(3,1,2); plot(t_1,res_1,'.',t_2,res_2,'.'); title('residuals = (X*\beta - y)')
-    subplot(3,1,3); plot(t(2:end),abs(f_hi)); title('Instantaneous frequency')
+%     X1 = [t_1' ones(size(t_1))']; y = Psi_1;
+%     beta = (X1'*X1)\X1'*y;
+%     fest_1 = beta(1)/(2*pi)
+%     ferr_1 = 100*(fest_1 - F1)/F1
+%     res_1 = (X1*beta - y);
+% 
+%     X2 = [t_2' ones(size(t_2))']; y = Psi_2;
+%     beta = (X2'*X2)\X2'*y;
+%     fest_2 = beta(1)/(2*pi)
+%     ferr_2 = 100*(fest_2 - F1)/F1
+%     res_2 = (X2*beta - y);
+% 
+%     fest = mean([fest_1 fest_2])
+%     ferr = 100*(fest - F1)/F1
+% 
+%     figure
+%     subplot(3,1,1); plot(t_1,Psi_1,'.',t_2,Psi_2,'.'); title('\Psi')
+%     subplot(3,1,2); plot(t_1,res_1,'.',t_2,res_2,'.'); title('residuals = (X*\beta - y)')
+%     subplot(3,1,3); plot(t(2:end),abs(f_hi)); title('Instantaneous frequency')
 
     %Other approach
     %calculating 1freq
@@ -97,13 +99,13 @@ for i=1:size(WholeSignal,1)
     t_m = [t_1 t_2]';
     X = [t_m'; ones(size(t_m))']';
     beta = (X'*X)\X'*y;
-    fest_m = beta(1)/(2*pi)
-    ferr_m = 100*(fest_m - F1)/F1
+    fest_m = beta(1)/(2*pi);
+    ferr_m(i,1) = 100*(fest_m - F1)/F1;
     res_m = (X*beta - y);
-    figure
-    subplot(3,1,1); plot(t_m,Psi); title('\Psi')
-    subplot(3,1,2); plot(t_m,res_m,'.'); title('residuals = (X*\beta - y)')
-    subplot(3,1,3); plot(t(2:end),abs(f_hi)); title('Instantaneous frequency')
+%    figure
+%     subplot(3,1,1); plot(t_m,Psi); title('\Psi')
+%     subplot(3,1,2); plot(t_m,res_m,'.'); title('residuals = (X*\beta - y)')
+%     subplot(3,1,3); plot(t(2:end),abs(f_hi)); title('Instantaneous frequency')
     
 end
 % subplot(2,1,1)
