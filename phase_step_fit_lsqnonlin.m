@@ -136,4 +136,5 @@ MEAN_ERR = mean(errors)
 STDEV_ERR = std(errors)
 %hold on; plot(X(2),X(1),'rx', x0(2), x0(1), 'ro')
 
+freq_err = ERR_MAX(2)
     

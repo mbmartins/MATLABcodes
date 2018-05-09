@@ -35,8 +35,8 @@ Theta(i,:) = (Wf(i)*t) ...                         % Fundamental
                  + Ph(i);               % phase shift
 Theta(i,t >= 0) = Theta(i,t >= 0) + (KaS(i) * pi/180);
 cSignal = (Ain.*exp(-1i.*Theta));
-SNR = 97; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
-Aruido = 0*Vm/10^(SNR/20);
+SNR = 90; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+Aruido = Vm/10^(SNR/20);
 Signal = real(cSignal) + Aruido*(rand(1,length(t))-0.5);
 
 %we should filter the signal...
