@@ -13,11 +13,10 @@ n = -NSamples/2:(NSamples/2-1); %discrete time vector
 
 Vm = 100; %70*sqrt(2);
 Xm = Vm;
-Ps = 120; %phase in degrees
-% Phase in radians
-Ph = Ps*pi/180;
+Ps = 0; %phase in degrees
+Ph = Ps*pi/180;% Phase in radians
 KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
-KxS = 0.1;   % magnitude step index: 0.1 
+KxS = -0.1;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
 SNR = 90.5; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 Aruido = Vm/10^(SNR/20);
@@ -40,7 +39,8 @@ for ti = 1:9
     % Phase step
     % Model: f(x) = x1*cos(w*t + phi + x2*u(t - tau)) 
     if KaS ~= 0
-        f = @(x) x(1)*cos(x(2)*t + x(3) + x(4)*(pi/180)*u);
+        %f = @(x) x(1)*cos(x(2)*t + x(3) + x(4)*(pi/180)*u);
+        f = @(x) x(1)*cos(x(2)*t + x(3) + 2*pi + x(4)*(pi/180)*u);
         xnom1 = [Vm 2*pi*F1 Ph KaS];
     else
         %mag
@@ -54,12 +54,13 @@ for ti = 1:9
 
     % Nonlinear fit
     % Monte Carlo analysis
-    xnom = xnom1;
     Niter = 1000;
-    x0 = xnom;  %x0 is fixed - first guess are the nominal values
+    x0 = xnom1;  %x0 is fixed - first guess are the nominal values
     
     for k = 1:Niter
         %first guess
+        k
+        %incertezas dos parametros na geração do sinal
         if KaS ~= 0
         % phase         X1  w    ph   x3 (KaS)
             par_var = [0.02 0.01 0.01 0.02]; % parameter variation in percent related to nominal
@@ -71,12 +72,20 @@ for ti = 1:9
         rng('shuffle');
         rn = (rand(1,length(xnom1))-0.5);
         xr = xnom1.*(1+(par_var/100).*rn);
-        if KaS ~= 0
-            if xr(3) == 0   %correção para fase zero
-                xr(3) = xr(3) + (par_var(3)/100)*rn(3)*120; 
-            end
-        end
-        utau = 2;  %number of dts - incerteza da estimação de tau 
+        
+%         %incertezas para fase zero (em relação a 120 graus)
+%         if KaS ~= 0
+%             if xr(3) == 0   
+%                 xr(3) = xr(3) + (par_var(3)/100)*rn(3)*60/pi; %rad
+%             end
+%         else
+%             if xr(4) == 0   
+%                 xr(4) = xr(4) + (par_var(4)/100)*rn(3)*60/pi; %rad
+%             end
+%         end
+        
+        %incertezas na estimação de tau
+        utau = 2;  %number of dts 
         u = zeros(length(Xm),length(t));
         tau = dt*randi([-utau utau],1);
         u(length(Xm),t >= tau) = u(length(Xm),t >= tau) + 1;
@@ -123,9 +132,18 @@ for ti = 1:9
         OPTIONS.StepTolerance = 1e-12;
         [X,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err,x0,[],[],OPTIONS);
         Y = f(X);
+        
         errors(k,:) = (xr - X)./xr;
-        if xr(3) == 0
-           errors(k,:) = (xr - X)./120; 
+        
+        %erros para fase zero
+        if KaS ~= 0
+            if xr(3) == 0
+                errors(k,3) = (xr(3) - X(3))./(60/pi);  %fase zero em relação a 120 graus
+            end
+        else
+            if xr(4) == 0
+                errors(k,4) = (xr(4) - X(4))./(60/pi);  %fase zero em relação a 120 graus
+            end
         end
     end
 
@@ -183,5 +201,9 @@ for ti = 1:9
     K_stddev(ti,1) = STDEV_ERR(ik);    
     
 %    Freq_err_per_std(ti,1) = ERR_MAX(2)/STDEV_ERR(2);
+
+    %Fasor referencia com valores nominais
+    %Xe = xnom(1)*
+    %Phie
     
 end    
