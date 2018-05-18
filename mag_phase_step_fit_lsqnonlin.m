@@ -131,8 +131,8 @@ for ti = 1:9
             %phase step
             Xe_r = xr(1);
             Xe = X(1);
-            Phe_r = xr(3)*tau_pp + (xr(3) + xr(4))*(1 - tau_pp);
-            Phe = X(3)*tau_est + (X(3)+X(4))*(1 - tau_est);
+            Phe_r = xr(3)*tau_pp + (xr(3) + xr(4)*(pi/180))*(1 - tau_pp);
+            Phe = X(3)*tau_est + (X(3)+X(4)*(pi/180))*(1 - tau_est);
         else
             %mag step
             Xe_r = xr(1)*tau_pp + xr(1)*(1+xr(2))*(1 - tau_pp);
@@ -209,10 +209,10 @@ for ti = 1:9
 end    
 
 
-if KaS ~= 0
-    plot(errors(:,3),errors(:,4),'.')
-    title('Phase Step: Correlation \phi vs X3')
-else
-    plot(errors(:,1),errors(:,2),'.')
-    title('Mag Step: Correlation \epsilon _{x_1} vs \epsilon _{x_2}')
-end
+% if KaS ~= 0
+%     plot(errors(:,3),errors(:,4),'.')
+%     title('Phase Step: Correlation \phi vs X3')
+% else
+%     plot(errors(:,1),errors(:,2),'.')
+%     title('Mag Step: Correlation \epsilon _{x_1} vs \epsilon _{x_2}')
+% end
