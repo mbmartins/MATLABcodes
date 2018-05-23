@@ -16,7 +16,7 @@ Xm = Vm;
 Ps = 360; %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
 KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
-KxS = -0.1;   % magnitude step index: 0.1 
+KxS = 0.1;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
 SNR = 90.5; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 Aruido = Vm/10^(SNR/20);
@@ -67,7 +67,7 @@ for ti = 1:9
             par_var = [0.02 0.01 0.01 0.02]; % parameter variation in percent related to nominal
         else
         % mag          x1  x2(KxS)  wf    ph  
-            par_var = [0.02 0.02     0.01  0.01]; % parameter variation in percent related to nominal            
+            par_var = [1   1     0.01  3]; % parameter variation in percent related to nominal            
         end
 
         rng('shuffle');
