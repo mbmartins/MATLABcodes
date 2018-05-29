@@ -58,8 +58,8 @@ dt = 1/SampleRate;
 tn = (-NSamples/2:NSamples/2-1)*dt;
 
 MaxIter = 50;
-FitCrit = 1e-5;
-%FitCrit = 1e-7;
+%FitCrit = 1e-5;
+FitCrit = 1e-8;
 dFreq(NPhases,MaxIter) = 0;
 erms(1:NPhases) = 1;
 
