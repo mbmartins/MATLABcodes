@@ -2,36 +2,37 @@
 % using MATLAB optimization toolbox 
 clear all; close all; clc;
 
-D = open('Resultados2_29_05.mat')
+D = open('Resultados_30_05.mat')
 
 % p = 241 + 4*480 +1;
 % q = 240 + 5*480 +1;
 
-WholeSignal = [D.DadosS1.CM4';
+WholeSignal = [D.DadosS1.Cm60_5000';
 ];
 
 % Nominal values
 F0 = 60; %Hz nominal
-F1 = 60; %Hz fundamental
+F1 = F0; %Hz fundamental
 Vm = 1; %70*sqrt(2) =~ 100;
 Xm = Vm;
-Ps = 360; %phase in degrees (use 360 instead of zero)
-Ph = Ps*pi/180;% Phase in radians
+%Ps = 360; %phase in degrees (use 360 instead of zero)
+%Ph = Ps*pi/180;% Phase in radians
 Wf = 2*pi*F1;  % fundamental frequency
 
-dt = 2.08333333e-4;
+%dt = 2.0833e-4;  %-> observar que o DMM trunca neste valor!!!!
+dt = 2.0e-4;
 SampleRate = 1/dt; %Hz
 
 p = 1;
-window = floor(SampleRate/10);
+Fps = 10;  %frames per second
+window = floor(SampleRate/Fps);
 q = window;
-
 
 AnalysisCycles = 6;
 
-for pin = 1:10
-    p = (pin-1)*window+1
-    q = p + window -1
+for pin = 1:Fps
+    p = (pin-1)*window+1;
+    q = p + window -1;
     Signal = WholeSignal(1,p:q);
     NSamples = length(Signal);
 %     T = NSamples*dt;
@@ -57,12 +58,12 @@ for pin = 1:10
 %        Y = f(X);
     
     %Steady State LS fit
-    SignalParams(1) = F1;
+    SignalParams(1) = F1; %F1;
     SignalParams(2) = 0;
     SignalParams(3) = 0;
     SignalParams(7) = 0;
     SignalParams(8) = 0;
-    DelayCorr = 0;
+    DelayCorr = -3500.0; %   %[in nanosecond]
     MagCorr = 1;
     [Synx(pin,:),Freq(pin,:),ROCOF(pin,:)] = SteadyStateFit ( ...
                         SignalParams, ...
@@ -87,6 +88,10 @@ for pin = 1:10
     Delay_SS(pin,:) = Phase_SS(pin)/(360*Freq(pin)) % in [s]
     %Delay_LM(pin,:) = Phase_LM(pin)/(360*Freq_LM(pin)) % in [s]
 end
+
+mean_delay = mean(Delay_SS)
+
+delay_corr = Delay_SS - mean(Delay_SS)
 
 % tn = 0:dt:NSamples*dt-dt;
 % Signal_est = Mag_SS(pin,:)*cos(2*pi*Freq(pin,:).*tn + Phase_SS(pin,:)*pi/180)
