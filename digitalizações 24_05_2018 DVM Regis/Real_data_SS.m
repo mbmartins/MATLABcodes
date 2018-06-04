@@ -2,12 +2,12 @@
 % using MATLAB optimization toolbox 
 clear all; close all; clc;
 
-D = open('Resultados_30_05.mat')
+D = open('Steps_30_05.mat')
 
 % p = 241 + 4*480 +1;
 % q = 240 + 5*480 +1;
 
-WholeSignal = [D.DadosS1.Cm60_5000';
+WholeSignal = [D.Dadost9.PS_p_120';
 ];
 
 % Nominal values
@@ -30,8 +30,8 @@ q = window;
 
 AnalysisCycles = 6;
 
-for pin = 1:Fps
-    p = (pin-1)*window+1;
+for pin = 1:Fps-1
+    p = (pin-1)*window+window/2+1;
     q = p + window -1;
     Signal = WholeSignal(1,p:q);
     NSamples = length(Signal);
@@ -63,7 +63,7 @@ for pin = 1:Fps
     SignalParams(3) = 0;
     SignalParams(7) = 0;
     SignalParams(8) = 0;
-    DelayCorr = -3500.0; %   %[in nanosecond]
+    DelayCorr = 0; %-3500.0; %   %[in nanosecond]
     MagCorr = 1;
     [Synx(pin,:),Freq(pin,:),ROCOF(pin,:)] = SteadyStateFit ( ...
                         SignalParams, ...
