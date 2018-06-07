@@ -1,0 +1,508 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>Example 1: Polynomial approximation + total variation filtering</title>
+      <meta name="generator" content="MATLAB 7.8">
+      <meta name="date" content="2012-06-21">
+      <meta name="m-file" content="Example1"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h1>Example 1: Polynomial approximation + total variation filtering</h1>
+         <!--introduction-->
+         <p>Example: Simultaneous least-square polynomial approximation and total variation filtering.</p><pre>Ivan Selesnick,
+Polytechnic Institute of NYU
+December 2011
+Email: selesi@poly.edu
+Reference: Polynomial Smoothing of Time Series with Additive Step Discontinuities
+I. W. Selesnick, S. Arnold, and V. R. Dantham</pre>
+         <!--/introduction--><h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#1">Start</a></li>
+               <li><a href="#2">Create test signals</a></li>
+               <li><a href="#3">Polynomial approximation</a></li>
+               <li><a href="#4">TV filtering of noisy step data</a></li>
+               <li><a href="#6">Least-square filtering of noisy step data</a></li>
+               <li><a href="#7">Create noisy signal</a></li>
+               <li><a href="#8">PATV: Polynomial approximation + total variation filter</a></li>
+               <li><a href="#13">Lambda too small</a></li>
+               <li><a href="#14">Lambda too large</a></li>
+               <li><a href="#15">C-PATV: Constrained formulation</a></li>
+               <li><a href="#17">Enhanced PATV</a></li>
+            </ul>
+         </div>
+         <h2>Start<a name="1"></a></h2><pre class="codeinput">clear
+close <span class="string">all</span>
+printme = @(filename) print(<span class="string">'-dpdf'</span>, sprintf(<span class="string">'figures/Example1_%s'</span>, filename));
+</pre><h2>Create test signals<a name="2"></a></h2><pre class="codeinput">N = 100;                            <span class="comment">% N : length of data</span>
+n = (1:N)';
+s1 = n &lt; 0.3*N;                     <span class="comment">% s1 : step function</span>
+s2 = 2-2*((n-N/2)/(N/2)).^2;
+s2 = s2 + n/N;                      <span class="comment">% s2 : polynomial function</span>
+
+randn(<span class="string">'state'</span>,0);                   <span class="comment">% Initialize randn so that example can be exactly reproduced</span>
+noise = randn(N,1);
+sigma = 0.26;
+noise = noise / sqrt((1/N)*sum(noise.^2)) * sigma;      <span class="comment">% Gaussian (normal) noise</span>
+</pre><h2>Polynomial approximation<a name="3"></a></h2>
+         <p>Show polynomial approximation of noisy polynomial data</p><pre class="codeinput">a = polyfit(n,s2+noise,2);
+s2pf = polyval(a, n);
+
+figure(1)
+clf
+plot(n, s2 + noise, <span class="string">'.k'</span>, n, s2pf);
+title(<span class="string">'Polynomial approximation to noisy polynomial data'</span>)
+printme(<span class="string">'polyfit'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_01.png" alt=""> <h2>TV filtering of noisy step data<a name="4"></a></h2><pre class="codeinput">lambda = 1.6;                           <span class="comment">% lambda : regularization parameter for TV filter</span>
+Nit = 100;                              <span class="comment">% Nit : number of iterations for TV filter algorithm</span>
+[x_tv, cost] = TVfilt(s1+noise, lambda, Nit, 1.5, 10);
+
+figure(1)
+plot(cost)
+title(<span class="string">'TV filter - Cost function history'</span>)
+xlabel(<span class="string">'Iteration'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_02.png" alt=""> <p>Output of TV filter</p><pre class="codeinput">figure(1)
+plot(n, s1 + noise, <span class="string">'.k'</span>, n, x_tv);
+title(<span class="string">'(a) Total variation filtering of noisy step data'</span>);
+printme(<span class="string">'TV_filter'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_03.png" alt=""> <h2>Least-square filtering of noisy step data<a name="6"></a></h2><pre class="codeinput">lambda = 10;                            <span class="comment">% lambda : regularzation parameter for least squares filter</span>
+e = ones(N-1, 1);
+D = spdiags([e -e], [0 1], N-1, N);     <span class="comment">% D : first-order different matrix (sparse)</span>
+H = speye(N) + lambda*(D'*D);           <span class="comment">% H : I + lambda D'*D (sparse)</span>
+x_l2 = H \ (s1+noise);
+
+figure(1)
+plot(n, s1 + noise, <span class="string">'.k'</span>, n, x_l2);
+title(<span class="string">'(b) Least-squares filtering of noisy step data'</span>);
+printme(<span class="string">'L2_filtered'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_04.png" alt=""> <h2>Create noisy signal<a name="7"></a></h2>
+         <p>Create polynomial signal with additive step discontinuity</p><pre class="codeinput">s = s1 + s2;                <span class="comment">% s : polynomial signal with additive step discontinuity</span>
+y = s + noise;              <span class="comment">% y : noisy signal</span>
+
+figure(1)
+plot(n, y, <span class="string">'.k'</span>)
+title(<span class="string">'(a) Noisy data'</span>);
+printme(<span class="string">'data'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_05.png" alt=""> <h2>PATV: Polynomial approximation + total variation filter<a name="8"></a></h2>
+         <p>Example</p><pre class="codeinput"><span class="comment">% parameters</span>
+d = 2;                          <span class="comment">% d : degree of approximation polynomial</span>
+lambda = 3;                     <span class="comment">% lambda : regularization parameter</span>
+
+Nit = 100;                      <span class="comment">% Nit : number of iterations</span>
+mu0 = 20;                       <span class="comment">% mu0 : ADMM parameter</span>
+mu1 = 0.2;                      <span class="comment">% mu1 : ADMM parameter</span>
+[x, p, cost] = patv(y, d, lambda, Nit, mu0, mu1);
+
+<span class="comment">% display cost function history</span>
+figure(1)
+plot(cost)
+title(<span class="string">'PATV algorithm - Cost function history'</span>);
+xlabel(<span class="string">'Iteration'</span>)
+printme(<span class="string">'PATV_convergence'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_06.png" alt=""> <p>Display calculated TV component</p><pre class="codeinput">figure(1)
+plot(n, x, <span class="string">'k'</span>)
+title(<span class="string">'(b) Calculated TV component (PATV)'</span>);
+printme(<span class="string">'PATV_TV_component'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_07.png" alt=""> <p>Display TV-compensated data</p><pre class="codeinput">figure(2)
+clf
+plot(n, y - x, <span class="string">'.k'</span>)
+title(<span class="string">'(c) TV-compensated data (PATV)'</span>);
+printme(<span class="string">'PATV_TV_compensated_data'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_08.png" alt=""> <p>Display estimated signal</p><pre class="codeinput">figure(1)
+plot(n, y,<span class="string">'.k'</span>, n, x+p, <span class="string">'black'</span>)
+title(<span class="string">'(d) Estimated signal (PATV)'</span>);
+legend(<span class="string">'Data'</span>,<span class="string">'Estimated signal'</span>, <span class="string">'Location'</span>,<span class="string">'south'</span>)
+printme(<span class="string">'PATV'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_09.png" alt=""> <p>Display first-order difference of TV component. Note: there are 3 non-zero values</p><pre class="codeinput">figure(2)
+stem(abs(diff(x)),<span class="string">'marker'</span>,<span class="string">'none'</span>)
+title(<span class="string">'|diff(x)|'</span>);
+</pre><img vspace="5" hspace="5" src="Example1_10.png" alt=""> <h2>Lambda too small<a name="13"></a></h2>
+         <p>When lambda is too small, the noise is not fully reduced</p><pre class="codeinput">lambda = 0.2;
+[x, p, cost] = patv(y, d, lambda, Nit, mu0, mu1);
+
+figure(1)
+plot(n, y,<span class="string">'.k'</span>, n, x+p, <span class="string">'black'</span>)
+title(<span class="string">'(a) Estimated signal (PATV with  \lambda too small)'</span>);
+legend(<span class="string">'Data'</span>,<span class="string">'Estimated signal'</span>, <span class="string">'Location'</span>,<span class="string">'south'</span>)
+printme(<span class="string">'PATV_lambda_small'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_11.png" alt=""> <h2>Lambda too large<a name="14"></a></h2>
+         <p>When lambda is too large, the step discontinuity is under-estimated</p><pre class="codeinput">lambda = 7;
+[x, p, cost] = patv(y, d, lambda, Nit, mu0, mu1);
+
+figure(2)
+plot(n, y,<span class="string">'.k'</span>, n, x+p, <span class="string">'black'</span>)
+legend(<span class="string">'Data'</span>,<span class="string">'Estimated signal'</span>, <span class="string">'Location'</span>,<span class="string">'south'</span>)
+title(<span class="string">'(b) Estimated signal (PATV with  \lambda too large)'</span>);
+printme(<span class="string">'PATV_lambda_large'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_12.png" alt=""> <h2>C-PATV: Constrained formulation<a name="15"></a></h2><pre class="codeinput">r = sqrt(N) * sqrt(sum((1/N)*(noise.^2)));      <span class="comment">% r : constraint parameter</span>
+Nit = 50;                           <span class="comment">% Nit : number of iterations</span>
+mu0 = 3.5;                          <span class="comment">% mu0 : ADMM parameter</span>
+mu1 = 0.5;                          <span class="comment">% mu1 : ADMM parameter</span>
+[x_constr, p_constr, cost, constr] = cpatv(y, d, r, Nit, mu0, mu1);
+
+<span class="comment">% check constraint:</span>
+e  =  y - x_constr -  p_constr;
+sqrt((1/N)*sum ( e.^2))             <span class="comment">% This value should be r/sqrt(N).</span>
+
+<span class="comment">% Cost function versus constraint function histories</span>
+figure(1)
+plot(constr, cost,<span class="string">'.-'</span>);
+xlabel(<span class="string">'Constraint'</span>)
+ylabel(<span class="string">'Cost'</span>)
+title(<span class="string">'Cost vs. Constraint (C-PATV)'</span>)
+ax3 = axis;
+line([1 1]*r, ax3(3:4), <span class="string">'linestyle'</span>, <span class="string">'--'</span>)
+axis(ax3)
+printme(<span class="string">'CPATV_convergence'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+    0.2600
+
+</pre><img vspace="5" hspace="5" src="Example1_13.png" alt=""> <p>Display estimated signal</p><pre class="codeinput">figure(1)
+plot(n, y,<span class="string">'.k'</span>, n, x_constr+p_constr, <span class="string">'black'</span>) <span class="comment">% , 'MarkerSize',MS)</span>
+title(<span class="string">'Estimated signal (C-PATV)'</span>);
+legend(<span class="string">'Data'</span>,<span class="string">'Estimated signal'</span>, <span class="string">'Location'</span>,<span class="string">'south'</span>)
+printme(<span class="string">'CPATV'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_14.png" alt=""> <h2>Enhanced PATV<a name="17"></a></h2>
+         <p>Lp quasi-norm minimization with p &lt; 1 leads to fewer extraneous steps in the estimated signal</p><pre class="codeinput">lambda = 3;                     <span class="comment">% lambda : regularization parameter</span>
+
+Nit = 100;                      <span class="comment">% Nit : number of iterations</span>
+mu0 = 20;                       <span class="comment">% mu0 : ADMM parameter</span>
+mu1 = 0.2;                      <span class="comment">% mu1 : ADMM parameter</span>
+
+p = 0.7;                        <span class="comment">% p : power (Lp quasi-norm)</span>
+E = 0.02;                       <span class="comment">% E : small number</span>
+
+[x, p, cost] = patv_Lp(y, d, lambda, p, E, Nit, mu0, mu1);
+
+figure(1), clf
+plot(n, y,<span class="string">'.k'</span>, n, x+p, <span class="string">'black'</span>)
+title(<span class="string">'Estimated signal (Enhanced PATV)'</span>);
+legend(<span class="string">'Data'</span>,<span class="string">'Estimated signal'</span>, <span class="string">'Location'</span>,<span class="string">'south'</span>)
+printme(<span class="string">'enhanced_PATV'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_15.png" alt=""> <p>It can be seen that enhanced PATV leads to fewer extraneous steps in the calculated TV component.</p><pre class="codeinput">figure(1)
+plot(x)
+hold <span class="string">off</span>
+title(<span class="string">'Calculated TV component (Enhanced PATV)'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_16.png" alt=""> <pre class="codeinput">figure(2)
+stem(abs(diff(x)), <span class="string">'marker'</span>,<span class="string">'none'</span>)
+hold <span class="string">off</span>
+title(<span class="string">'|diff(x1)|'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_17.png" alt=""> <p class="footer"><br>
+            Published with MATLAB&reg; 7.8<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+%% Example 1: Polynomial approximation + total variation filtering
+% Example: Simultaneous least-square polynomial approximation and total variation
+% filtering.
+%
+%  Ivan Selesnick,
+% Polytechnic Institute of NYU
+% December 2011
+% Email: selesi@poly.edu
+% Reference: Polynomial Smoothing of Time Series with Additive Step Discontinuities
+% I. W. Selesnick, S. Arnold, and V. R. Dantham
+
+%% Start
+
+clear
+close all
+printme = @(filename) print('-dpdf', sprintf('figures/Example1_%s', filename));
+
+
+%% Create test signals
+
+N = 100;                            % N : length of data
+n = (1:N)';
+s1 = n < 0.3*N;                     % s1 : step function
+s2 = 2-2*((n-N/2)/(N/2)).^2;
+s2 = s2 + n/N;                      % s2 : polynomial function
+
+randn('state',0);                   % Initialize randn so that example can be exactly reproduced
+noise = randn(N,1);
+sigma = 0.26;
+noise = noise / sqrt((1/N)*sum(noise.^2)) * sigma;      % Gaussian (normal) noise
+
+%% Polynomial approximation
+% Show polynomial approximation of noisy polynomial data
+
+a = polyfit(n,s2+noise,2);
+s2pf = polyval(a, n);
+
+figure(1)
+clf
+plot(n, s2 + noise, '.k', n, s2pf);
+title('Polynomial approximation to noisy polynomial data')
+printme('polyfit')
+
+
+%% TV filtering of noisy step data
+
+lambda = 1.6;                           % lambda : regularization parameter for TV filter
+Nit = 100;                              % Nit : number of iterations for TV filter algorithm
+[x_tv, cost] = TVfilt(s1+noise, lambda, Nit, 1.5, 10);
+
+figure(1)
+plot(cost)
+title('TV filter - Cost function history')
+xlabel('Iteration')
+
+%%
+% Output of TV filter
+
+figure(1)
+plot(n, s1 + noise, '.k', n, x_tv);
+title('(a) Total variation filtering of noisy step data'); 
+printme('TV_filter')
+
+
+%% Least-square filtering of noisy step data
+
+lambda = 10;                            % lambda : regularzation parameter for least squares filter
+e = ones(N-1, 1);
+D = spdiags([e -e], [0 1], N-1, N);     % D : first-order different matrix (sparse)
+H = speye(N) + lambda*(D'*D);           % H : I + lambda D'*D (sparse)
+x_l2 = H \ (s1+noise);
+
+figure(1)
+plot(n, s1 + noise, '.k', n, x_l2);
+title('(b) Least-squares filtering of noisy step data'); 
+printme('L2_filtered')
+
+
+%% Create noisy signal
+% Create polynomial signal with additive step discontinuity
+
+s = s1 + s2;                % s : polynomial signal with additive step discontinuity
+y = s + noise;              % y : noisy signal
+
+figure(1)
+plot(n, y, '.k')
+title('(a) Noisy data');
+printme('data')
+
+
+%% PATV: Polynomial approximation + total variation filter 
+% Example
+
+% parameters
+d = 2;                          % d : degree of approximation polynomial
+lambda = 3;                     % lambda : regularization parameter
+
+Nit = 100;                      % Nit : number of iterations
+mu0 = 20;                       % mu0 : ADMM parameter
+mu1 = 0.2;                      % mu1 : ADMM parameter
+[x, p, cost] = patv(y, d, lambda, Nit, mu0, mu1);
+
+% display cost function history
+figure(1)
+plot(cost)
+title('PATV algorithm - Cost function history');
+xlabel('Iteration')
+printme('PATV_convergence')
+
+
+%%
+% Display calculated TV component
+
+figure(1)
+plot(n, x, 'k')
+title('(b) Calculated TV component (PATV)');
+printme('PATV_TV_component')
+
+%%
+% Display TV-compensated data
+
+figure(2)
+clf
+plot(n, y - x, '.k')
+title('(c) TV-compensated data (PATV)');
+printme('PATV_TV_compensated_data')
+
+%%
+% Display estimated signal
+
+figure(1)
+plot(n, y,'.k', n, x+p, 'black') 
+title('(d) Estimated signal (PATV)');
+legend('Data','Estimated signal', 'Location','south')
+printme('PATV')
+
+%%
+% Display first-order difference of TV component.
+% Note: there are 3 non-zero values
+
+figure(2)
+stem(abs(diff(x)),'marker','none')
+title('|diff(x)|');
+
+
+%% Lambda too small
+% When lambda is too small, the noise is not fully reduced
+
+lambda = 0.2;
+[x, p, cost] = patv(y, d, lambda, Nit, mu0, mu1);
+
+figure(1)
+plot(n, y,'.k', n, x+p, 'black') 
+title('(a) Estimated signal (PATV with  \lambda too small)'); 
+legend('Data','Estimated signal', 'Location','south')
+printme('PATV_lambda_small')
+
+
+
+%% Lambda too large
+% When lambda is too large, the step discontinuity is under-estimated
+
+lambda = 7;
+[x, p, cost] = patv(y, d, lambda, Nit, mu0, mu1);
+
+figure(2)
+plot(n, y,'.k', n, x+p, 'black') 
+legend('Data','Estimated signal', 'Location','south')
+title('(b) Estimated signal (PATV with  \lambda too large)'); 
+printme('PATV_lambda_large')
+
+
+
+%% C-PATV: Constrained formulation
+
+r = sqrt(N) * sqrt(sum((1/N)*(noise.^2)));      % r : constraint parameter
+Nit = 50;                           % Nit : number of iterations
+mu0 = 3.5;                          % mu0 : ADMM parameter
+mu1 = 0.5;                          % mu1 : ADMM parameter
+[x_constr, p_constr, cost, constr] = cpatv(y, d, r, Nit, mu0, mu1);
+
+% check constraint:
+e  =  y - x_constr -  p_constr;
+sqrt((1/N)*sum ( e.^2))             % This value should be r/sqrt(N).
+
+% Cost function versus constraint function histories
+figure(1)
+plot(constr, cost,'.-');
+xlabel('Constraint')
+ylabel('Cost')
+title('Cost vs. Constraint (C-PATV)')
+ax3 = axis;
+line([1 1]*r, ax3(3:4), 'linestyle', 'REPLACE_WITH_DASH_DASH')
+axis(ax3)
+printme('CPATV_convergence')
+
+%%
+% Display estimated signal
+
+figure(1)
+plot(n, y,'.k', n, x_constr+p_constr, 'black') % , 'MarkerSize',MS)
+title('Estimated signal (C-PATV)');
+legend('Data','Estimated signal', 'Location','south')
+printme('CPATV')
+
+%% Enhanced PATV
+% Lp quasi-norm minimization with p < 1 leads to fewer extraneous steps in the
+% estimated signal
+
+lambda = 3;                     % lambda : regularization parameter
+
+Nit = 100;                      % Nit : number of iterations
+mu0 = 20;                       % mu0 : ADMM parameter
+mu1 = 0.2;                      % mu1 : ADMM parameter
+
+p = 0.7;                        % p : power (Lp quasi-norm)
+E = 0.02;                       % E : small number
+
+[x, p, cost] = patv_Lp(y, d, lambda, p, E, Nit, mu0, mu1);
+
+figure(1), clf
+plot(n, y,'.k', n, x+p, 'black')
+title('Estimated signal (Enhanced PATV)');
+legend('Data','Estimated signal', 'Location','south')
+printme('enhanced_PATV')
+
+%%
+% It can be seen that enhanced PATV leads to fewer extraneous steps
+% in the calculated TV component.
+
+figure(1)
+plot(x)
+hold off
+title('Calculated TV component (Enhanced PATV)')
+
+%%
+
+figure(2)
+stem(abs(diff(x)), 'marker','none')
+hold off
+title('|diff(x1)|')
+
+
+
+##### SOURCE END #####
+-->
+   </body>
+</html>

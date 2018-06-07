@@ -1,0 +1,390 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>Example 2: Local polynomial approximation + total variation filtering</title>
+      <meta name="generator" content="MATLAB 7.8">
+      <meta name="date" content="2012-06-21">
+      <meta name="m-file" content="Example2"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h1>Example 2: Local polynomial approximation + total variation filtering</h1>
+         <!--introduction-->
+         <p>Simultaneous local least-square polynomial approximation and total variation filtering</p><pre>Ivan Selesnick,
+Polytechnic Institute of NYU
+December 2011
+Email: selesi@poly.edu
+Reference: Polynomial Smoothing of Time Series with Additive Step Discontinuities
+I. W. Selesnick, S. Arnold, and V. R. Dantham</pre>
+         <!--/introduction--><h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#1">Start</a></li>
+               <li><a href="#2">Create signals</a></li>
+               <li><a href="#3">LoPATV filtering</a></li>
+               <li><a href="#6">Result of LoPATV filtering</a></li>
+               <li><a href="#8">Enhanced LoPATV</a></li>
+            </ul>
+         </div>
+         <h2>Start<a name="1"></a></h2><pre class="codeinput">clear
+<span class="comment">% close all</span>
+
+printme = @(filename) print(<span class="string">'-dpdf'</span>, sprintf(<span class="string">'figures/Example2_%s'</span>, filename));
+</pre><h2>Create signals<a name="2"></a></h2>
+         <p>Create simulated signal (smooth signal with additive step discontinuities)</p><pre class="codeinput">N = 300;
+n = (1:N)';
+
+s1 = 2*(n &lt; 0.3*N) + 1*(n &gt; 0.6*N);         <span class="comment">% step function</span>
+s2 = sin(0.021*pi*n);                       <span class="comment">% smooth function</span>
+s = s1 + s2;                                <span class="comment">% total signal</span>
+
+randn(<span class="string">'state'</span>,0);                           <span class="comment">% Initialize randn so that example can be exactly reproduced</span>
+sigma = 0.3;
+noise = sigma*randn(N,1);
+y = s + noise;                              <span class="comment">% noisy signal</span>
+
+figure(2)
+clf
+subplot(2,1,1)
+plot(y,<span class="string">'.k'</span>)
+title(<span class="string">'Noisy data'</span>);
+
+printme(<span class="string">'data'</span>)
+</pre><img vspace="5" hspace="5" src="Example2_01.png" alt=""> <h2>LoPATV filtering<a name="3"></a></h2>
+         <p>Apply local polynomial approximation + TV filtering (LoPATV filter) to noisy data</p><pre class="codeinput">deg = 2;            <span class="comment">% deg : degree of polynomial</span>
+P = 40;             <span class="comment">% P : block overlap</span>
+L = 50;             <span class="comment">% L : block length</span>
+lambda = 8;         <span class="comment">% lambda : regularization parameter</span>
+
+(N-L)/(L-P)+1       <span class="comment">% This is the number of blocks - it should be an</span>
+                    <span class="comment">% integer, otherwise the data will be truncated</span>
+
+Nit = 500;          <span class="comment">% Nit : number of iterations</span>
+mu0 = 10;           <span class="comment">% mu0 : augmented Lagrangian parameter</span>
+mu = 1;             <span class="comment">% mu : augmented Lagrangian parameter</span>
+
+[x, p, cost] = lopatv(y, L, P, deg, lambda, Nit, mu0, mu);
+
+rmse_lopatv = sqrt(mean((s - x - p).^2));
+
+fprintf(<span class="string">'LoPATV: RMSE = %f\n'</span>, rmse_lopatv)
+</pre><pre class="codeoutput">
+ans =
+
+    26
+
+LoPATV: RMSE = 0.086840
+</pre><p>Display cost function history. The cost function flattens out as the algorithm converges.</p><pre class="codeinput">figure(1)
+clf
+plot(cost)
+title(<span class="string">'Cost function history (LoPATV filtering algorithm)'</span>)
+xlabel(<span class="string">'Iteration'</span>)
+printme(<span class="string">'LoPATV_convergence'</span>)
+</pre><img vspace="5" hspace="5" src="Example2_02.png" alt=""> <p>Display TV component and TV-compensated data</p><pre class="codeinput">figure(1)
+clf
+subplot(2,1,1)
+plot(x, <span class="string">'black'</span>)
+title(<span class="string">'Calculated TV component (LoPATV)'</span>);
+
+subplot(2,1,2)
+plot(y - x, <span class="string">'k.'</span>)
+title(<span class="string">'TV-compensated data (LoPATV)'</span>);
+
+printme(<span class="string">'LoPATV_TV'</span>)
+</pre><img vspace="5" hspace="5" src="Example2_03.png" alt=""> <h2>Result of LoPATV filtering<a name="6"></a></h2><pre class="codeinput">txt = sprintf(<span class="string">'Estimated signal (LoPATV) (RMSE = %.3f)'</span>, rmse_lopatv);
+
+figure(2), clf
+subplot(2,1,1)
+plot(x + p, <span class="string">'color'</span>,<span class="string">'black'</span>)
+title(txt)
+printme(<span class="string">'LoPATV'</span>)
+</pre><img vspace="5" hspace="5" src="Example2_04.png" alt=""> <p>Display with noisy data</p><pre class="codeinput">txt = sprintf(<span class="string">'Estimated signal (LoPATV) (RMSE = %.3f)'</span>, rmse_lopatv);
+
+figure(2), clf
+subplot(2,1,1)
+plot(n, y, <span class="string">'.r'</span>, n, x + p, <span class="string">'black'</span>)
+title(txt)
+printme(<span class="string">'LoPATV_color'</span>)
+</pre><img vspace="5" hspace="5" src="Example2_05.png" alt=""> <h2>Enhanced LoPATV<a name="8"></a></h2>
+         <p>Lp minimization</p><pre class="codeinput">mu0 = 50;
+mu = .1;
+Nit = 200;
+
+lambda = 8;
+P = 40;     <span class="comment">% P - block overlap</span>
+L = 50;     <span class="comment">% L - block length</span>
+
+deg = 2;    <span class="comment">% deg - degree of polynomial</span>
+pow = 0.7;
+E = 0.05;
+
+[x, p, cost] = lopatv_Lp(y, L, P, deg, lambda, Nit, mu0, mu, pow, E);
+
+rmse_lopatv_Lp = sqrt(mean((s - x - p).^2));
+
+fprintf(<span class="string">'Enhanced LoPATV: RMSE = %.2e\n'</span>, rmse_lopatv_Lp)
+
+<span class="comment">% Display result</span>
+txt = sprintf(<span class="string">'Estimated signal (Enhanced LoPATV) (RMSE = %.3f)'</span>, rmse_lopatv_Lp);
+figure(1)
+clf
+subplot(2,1,1)
+plot(x + p, <span class="string">'black'</span>)
+title(txt)
+printme(<span class="string">'LoPATV_Lp'</span>)
+</pre><pre class="codeoutput">Enhanced LoPATV: RMSE = 8.20e-02
+</pre><img vspace="5" hspace="5" src="Example2_06.png" alt=""> <p>Display result with noisy data</p><pre class="codeinput">figure(1)
+clf
+subplot(2,1,1)
+plot(n, y,<span class="string">'.r'</span>, n, x + p, <span class="string">'black'</span>)
+title(txt)
+printme(<span class="string">'LoPATV_Lp_color'</span>)
+</pre><img vspace="5" hspace="5" src="Example2_07.png" alt=""> <p>Piecewise constant component (TV component)</p><pre class="codeinput">figure(2)
+clf
+subplot(2,1,1)
+plot(x, <span class="string">'black'</span>)
+title(<span class="string">'Calculated TV component (Enhanced LoPATV)'</span>);
+subplot(2,1,2)
+stem(abs(diff(x)),<span class="string">'marker'</span>,<span class="string">'none'</span>, <span class="string">'color'</span>,<span class="string">'black'</span>)
+title(<span class="string">'First-order difference'</span>);
+printme(<span class="string">'LoPATV_TV'</span>)
+</pre><img vspace="5" hspace="5" src="Example2_08.png" alt=""> <p class="footer"><br>
+            Published with MATLAB&reg; 7.8<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+%% Example 2: Local polynomial approximation + total variation filtering
+% Simultaneous local least-square polynomial approximation and total variation filtering 
+%
+%  Ivan Selesnick,
+% Polytechnic Institute of NYU
+% December 2011
+% Email: selesi@poly.edu
+% Reference: Polynomial Smoothing of Time Series with Additive Step Discontinuities
+% I. W. Selesnick, S. Arnold, and V. R. Dantham
+
+%% Start
+
+clear
+% close all
+
+printme = @(filename) print('-dpdf', sprintf('figures/Example2_%s', filename));   
+
+%% Create signals
+% Create simulated signal (smooth signal with additive step discontinuities)
+
+N = 300;
+n = (1:N)';
+
+s1 = 2*(n < 0.3*N) + 1*(n > 0.6*N);         % step function
+s2 = sin(0.021*pi*n);                       % smooth function
+s = s1 + s2;                                % total signal
+
+randn('state',0);                           % Initialize randn so that example can be exactly reproduced
+sigma = 0.3;
+noise = sigma*randn(N,1);
+y = s + noise;                              % noisy signal
+
+figure(2)
+clf
+subplot(2,1,1)
+plot(y,'.k')
+title('Noisy data');
+
+printme('data')
+
+%% LoPATV filtering
+% Apply local polynomial approximation + TV filtering (LoPATV filter)
+% to noisy data
+
+deg = 2;            % deg : degree of polynomial
+P = 40;             % P : block overlap
+L = 50;             % L : block length
+lambda = 8;         % lambda : regularization parameter
+
+(N-L)/(L-P)+1       % This is the number of blocks - it should be an
+                    % integer, otherwise the data will be truncated
+
+Nit = 500;          % Nit : number of iterations
+mu0 = 10;           % mu0 : augmented Lagrangian parameter
+mu = 1;             % mu : augmented Lagrangian parameter
+
+[x, p, cost] = lopatv(y, L, P, deg, lambda, Nit, mu0, mu);
+
+rmse_lopatv = sqrt(mean((s - x - p).^2));
+
+fprintf('LoPATV: RMSE = %f\n', rmse_lopatv)
+
+%%
+% Display cost function history. The cost function
+% flattens out as the algorithm converges.
+
+figure(1)
+clf
+plot(cost)
+title('Cost function history (LoPATV filtering algorithm)')
+xlabel('Iteration')
+printme('LoPATV_convergence')
+
+
+%%
+% Display TV component and TV-compensated data
+
+figure(1)
+clf
+subplot(2,1,1)
+plot(x, 'black')
+title('Calculated TV component (LoPATV)');
+
+subplot(2,1,2)
+plot(y - x, 'k.')
+title('TV-compensated data (LoPATV)');
+
+printme('LoPATV_TV')
+
+
+%% Result of LoPATV filtering
+
+txt = sprintf('Estimated signal (LoPATV) (RMSE = %.3f)', rmse_lopatv);
+
+figure(2), clf
+subplot(2,1,1)
+plot(x + p, 'color','black')
+title(txt)
+printme('LoPATV')
+
+
+%%
+% Display with noisy data
+
+txt = sprintf('Estimated signal (LoPATV) (RMSE = %.3f)', rmse_lopatv);
+
+figure(2), clf
+subplot(2,1,1)
+plot(n, y, '.r', n, x + p, 'black')
+title(txt)
+printme('LoPATV_color')
+
+
+
+%% Enhanced LoPATV 
+% Lp minimization
+
+mu0 = 50;
+mu = .1;
+Nit = 200;
+
+lambda = 8;
+P = 40;     % P - block overlap
+L = 50;     % L - block length
+
+deg = 2;    % deg - degree of polynomial
+pow = 0.7;
+E = 0.05;
+
+[x, p, cost] = lopatv_Lp(y, L, P, deg, lambda, Nit, mu0, mu, pow, E);
+
+rmse_lopatv_Lp = sqrt(mean((s - x - p).^2));
+
+fprintf('Enhanced LoPATV: RMSE = %.2e\n', rmse_lopatv_Lp)
+
+% Display result
+txt = sprintf('Estimated signal (Enhanced LoPATV) (RMSE = %.3f)', rmse_lopatv_Lp);
+figure(1)
+clf
+subplot(2,1,1)
+plot(x + p, 'black') 
+title(txt)
+printme('LoPATV_Lp')
+
+%%
+% Display result with noisy data
+
+figure(1)
+clf
+subplot(2,1,1)
+plot(n, y,'.r', n, x + p, 'black')
+title(txt)
+printme('LoPATV_Lp_color')
+
+%%
+% Piecewise constant component (TV component)
+
+figure(2)
+clf
+subplot(2,1,1)
+plot(x, 'black')
+title('Calculated TV component (Enhanced LoPATV)');
+subplot(2,1,2)
+stem(abs(diff(x)),'marker','none', 'color','black')
+title('First-order difference');
+printme('LoPATV_TV')
+
+
+##### SOURCE END #####
+-->
+   </body>
+</html>

@@ -1,0 +1,371 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>Example 3: Filtering biosensor data using the LoPATV algorithm</title>
+      <meta name="generator" content="MATLAB 7.8">
+      <meta name="date" content="2012-06-21">
+      <meta name="m-file" content="Example3"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h1>Example 3: Filtering biosensor data using the LoPATV algorithm</h1>
+         <!--introduction-->
+         <p>Filtering of biosensor data using local least-square polynomial approximation and total variation filtering (LoPATV filter)</p><pre>Ivan Selesnick,
+Polytechnic Institute of NYU
+December 2011
+Email: selesi@poly.edu
+Reference: Polynomial Smoothing of Time Series with Additive Step Discontinuities
+I. W. Selesnick, S. Arnold, and V. R. Dantham</pre>
+         <!--/introduction--><h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#1">Start</a></li>
+               <li><a href="#2">Load data</a></li>
+               <li><a href="#3">LoPATV filtering</a></li>
+               <li><a href="#6">Enhanced LoPATV filtering</a></li>
+            </ul>
+         </div>
+         <h2>Start<a name="1"></a></h2><pre class="codeinput">clear
+close <span class="string">all</span>
+
+printme = @(filename) print(<span class="string">'-dpdf'</span>, sprintf(<span class="string">'figures/Example3_%s'</span>, filename));
+</pre><h2>Load data<a name="2"></a></h2><pre class="codeinput">load <span class="string">wgm_data.txt</span>       <span class="comment">% load WGM sensor data</span>
+
+y = wgm_data;
+N = length(y);          <span class="comment">% N : 1500</span>
+n = 1:N;
+t = (0:N-1)/5;          <span class="comment">% t : time axis (sampling rate is 5 samples/second)</span>
+
+figure(1)
+clf
+plot(t, y, <span class="string">'black'</span>)
+title(<span class="string">'Biosensor data'</span>);
+xlabel(<span class="string">'Time (seconds)'</span>)
+ylabel(<span class="string">'wavelenth (fm)'</span>)
+printme(<span class="string">'data'</span>)
+</pre><img vspace="5" hspace="5" src="Example3_01.png" alt=""> <h2>LoPATV filtering<a name="3"></a></h2>
+         <p>Local polynomial approximation + total variation filter</p><pre class="codeinput">lambda = 600;       <span class="comment">% lambda : TV regularization parameter</span>
+L = 200;            <span class="comment">% L : block length</span>
+P = 150;            <span class="comment">% P : block overlap</span>
+deg = 1;            <span class="comment">% deg : degree of polynomial</span>
+
+(N-L)/(L-P)+1       <span class="comment">% This is the number of blocks - it should be an</span>
+                    <span class="comment">% integer, otherwise the data will be truncated</span>
+
+mu0 = 500;
+mu = .05;
+Nit = 300;
+
+[x, s, cost] = lopatv(y, L, P, deg, lambda, Nit, mu0, mu);
+<span class="comment">% x : TV component (approximate step signal)</span>
+<span class="comment">% s : smooth low-pass signal</span>
+<span class="comment">% cost : cost function history</span>
+
+figure(1)
+plot(cost, <span class="string">'black'</span>)
+title(<span class="string">'Cost function history'</span>)
+xlabel(<span class="string">'Iteration'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+    27
+
+</pre><img vspace="5" hspace="5" src="Example3_02.png" alt=""> <p>Display filtered data</p><pre class="codeinput">txt = sprintf(<span class="string">'deg %d, L = %d, P = %d, lam = %.f'</span>, deg, L, P, lambda);
+
+figure(1)
+clf
+plot(t, x+s, <span class="string">'black'</span>)
+xlabel(<span class="string">'Time (seconds)'</span>)
+ylabel(<span class="string">'wavelenth (fm)'</span>)
+title(<span class="string">'LoPATV filtered data'</span>)
+text(0.99, 0.01, txt, <span class="string">'units'</span>, <span class="string">'normalized'</span>, <span class="string">'horizontalalignment'</span>, <span class="string">'right'</span>, <span class="string">'verticalalignment'</span>, <span class="string">'bottom'</span>, <span class="string">'fontsize'</span>, 12);
+printme(<span class="string">'LoPATV'</span>)
+</pre><img vspace="5" hspace="5" src="Example3_03.png" alt=""> <p>Display step signal</p><pre class="codeinput">figure(2)
+clf
+subplot(2,1,1)
+plot(t, x, <span class="string">'black'</span>)
+title(<span class="string">'Calculated TV component (LoPATV)'</span>);
+ylim([-30 21])
+ylabel(<span class="string">'wavelength (fm)'</span>)
+xlabel(<span class="string">'Time (seconds)'</span>)
+
+subplot(2,1,2)
+stem(t(1:end-1), diff(x), <span class="string">'marker'</span>,<span class="string">'none'</span>, <span class="string">'color'</span>, <span class="string">'black'</span>)
+title(<span class="string">'First-order difference'</span>);
+ylim([-5 16])
+ylabel(<span class="string">'wavelength (fm)'</span>)
+xlabel(<span class="string">'Time (seconds)'</span>)
+
+printme(<span class="string">'LoPATV_steps'</span>)
+</pre><img vspace="5" hspace="5" src="Example3_04.png" alt=""> <h2>Enhanced LoPATV filtering<a name="6"></a></h2>
+         <p>Lp quasi-norm minimization</p><pre class="codeinput">p = 0.7;
+E = 1e-8;
+lambda = 900;
+
+[x, s, cost] = lopatv_Lp(y, L, P, deg, lambda, Nit, mu0, mu, p, E);
+
+figure(1)
+clf
+plot(t, s+x, <span class="string">'black'</span>);
+xlabel(<span class="string">'Time (seconds)'</span>)
+ylabel(<span class="string">'wavelength (fm)'</span>)
+title(<span class="string">'Enhanced LoPATV filtered data'</span>)
+
+txt = sprintf(<span class="string">'deg %d, L = %d, P = %d, lam = %.f, p = %.1f, e = %.2g'</span>, deg, L, P, lambda, p, E);
+h = text(0.98, 0.01, txt, <span class="string">'units'</span>, <span class="string">'normalized'</span>, <span class="string">'horizontalalignment'</span>, <span class="string">'right'</span>, <span class="string">'verticalalignment'</span>, <span class="string">'bottom'</span>, <span class="string">'fontsize'</span>, 12);
+
+printme(<span class="string">'enhanced_LoPATV'</span>)
+</pre><img vspace="5" hspace="5" src="Example3_05.png" alt=""> <pre class="codeinput">figure(1)
+clf
+plot(t, y, <span class="string">'color'</span>, <span class="string">'red'</span>);
+line(t, x+s,<span class="string">'linewidth'</span>,1,<span class="string">'color'</span>,<span class="string">'black'</span>)
+legend(<span class="string">'Data'</span>,<span class="string">'Enhanced LoPATV filtered data'</span>, <span class="string">'location'</span>,<span class="string">'southeast'</span>)
+xlabel(<span class="string">'Time (seconds)'</span>)
+ylabel(<span class="string">'wavelength (fm)'</span>)
+title(<span class="string">'Enhanced LoPATV filtered data'</span>)
+printme(<span class="string">'enhanced_LoPATV_fig2'</span>)
+</pre><img vspace="5" hspace="5" src="Example3_06.png" alt=""> <p>Display step signal</p><pre class="codeinput">figure(2)
+clf
+subplot(2,1,1)
+plot(t, x, <span class="string">'black'</span>)
+title(<span class="string">'x(t)'</span>);
+ylim([-30 21])
+ylabel(<span class="string">'wavelength (fm)'</span>)
+xlabel(<span class="string">'Time (seconds)'</span>)
+title(<span class="string">'Calculated TV component (enhanced LoPATV)'</span>);
+
+subplot(2,1,2)
+stem(t(1:end-1), diff(x),<span class="string">'marker'</span>,<span class="string">'none'</span>, <span class="string">'color'</span>, <span class="string">'black'</span>)
+title(<span class="string">'First-order difference'</span>);
+xlabel(<span class="string">'Time (seconds)'</span>)
+ylim([-5 16])
+ylabel(<span class="string">'wavelength (fm)'</span>)
+
+printme(<span class="string">'enhanced_LoPATV_steps'</span>)
+</pre><img vspace="5" hspace="5" src="Example3_07.png" alt=""> <p class="footer"><br>
+            Published with MATLAB&reg; 7.8<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+%% Example 3: Filtering biosensor data using the LoPATV algorithm
+% Filtering of biosensor data using local least-square polynomial
+% approximation and total variation filtering (LoPATV filter)
+%
+%  Ivan Selesnick,
+% Polytechnic Institute of NYU
+% December 2011
+% Email: selesi@poly.edu
+% Reference: Polynomial Smoothing of Time Series with Additive Step Discontinuities
+% I. W. Selesnick, S. Arnold, and V. R. Dantham
+
+%% Start
+
+clear
+close all
+
+printme = @(filename) print('-dpdf', sprintf('figures/Example3_%s', filename));
+
+
+%% Load data
+
+load wgm_data.txt       % load WGM sensor data
+
+y = wgm_data;
+N = length(y);          % N : 1500
+n = 1:N;
+t = (0:N-1)/5;          % t : time axis (sampling rate is 5 samples/second)
+
+figure(1)
+clf
+plot(t, y, 'black')
+title('Biosensor data');
+xlabel('Time (seconds)')
+ylabel('wavelenth (fm)')
+printme('data')
+
+
+%% LoPATV filtering
+% Local polynomial approximation + total variation filter 
+
+lambda = 600;       % lambda : TV regularization parameter
+L = 200;            % L : block length
+P = 150;            % P : block overlap
+deg = 1;            % deg : degree of polynomial
+
+(N-L)/(L-P)+1       % This is the number of blocks - it should be an
+                    % integer, otherwise the data will be truncated
+
+mu0 = 500;
+mu = .05;
+Nit = 300;
+
+[x, s, cost] = lopatv(y, L, P, deg, lambda, Nit, mu0, mu);
+% x : TV component (approximate step signal)
+% s : smooth low-pass signal
+% cost : cost function history
+
+figure(1)
+plot(cost, 'black')
+title('Cost function history')
+xlabel('Iteration')
+
+%%
+% Display filtered data
+
+txt = sprintf('deg %d, L = %d, P = %d, lam = %.f', deg, L, P, lambda);
+
+figure(1)
+clf
+plot(t, x+s, 'black')
+xlabel('Time (seconds)')
+ylabel('wavelenth (fm)')
+title('LoPATV filtered data')
+text(0.99, 0.01, txt, 'units', 'normalized', 'horizontalalignment', 'right', 'verticalalignment', 'bottom', 'fontsize', 12);
+printme('LoPATV')
+
+%%
+% Display step signal
+
+figure(2)
+clf
+subplot(2,1,1)
+plot(t, x, 'black')
+title('Calculated TV component (LoPATV)');
+ylim([-30 21])
+ylabel('wavelength (fm)')
+xlabel('Time (seconds)')
+
+subplot(2,1,2)
+stem(t(1:end-1), diff(x), 'marker','none', 'color', 'black')
+title('First-order difference');
+ylim([-5 16])
+ylabel('wavelength (fm)')
+xlabel('Time (seconds)')
+
+printme('LoPATV_steps')
+
+
+%% Enhanced LoPATV filtering
+% Lp quasi-norm minimization
+
+p = 0.7;
+E = 1e-8;
+lambda = 900;
+
+[x, s, cost] = lopatv_Lp(y, L, P, deg, lambda, Nit, mu0, mu, p, E);
+
+figure(1)
+clf
+plot(t, s+x, 'black');
+xlabel('Time (seconds)')
+ylabel('wavelength (fm)')
+title('Enhanced LoPATV filtered data')
+
+txt = sprintf('deg %d, L = %d, P = %d, lam = %.f, p = %.1f, e = %.2g', deg, L, P, lambda, p, E);
+h = text(0.98, 0.01, txt, 'units', 'normalized', 'horizontalalignment', 'right', 'verticalalignment', 'bottom', 'fontsize', 12);
+
+printme('enhanced_LoPATV')
+
+%%
+
+figure(1)
+clf
+plot(t, y, 'color', 'red');
+line(t, x+s,'linewidth',1,'color','black')
+legend('Data','Enhanced LoPATV filtered data', 'location','southeast')
+xlabel('Time (seconds)')
+ylabel('wavelength (fm)')
+title('Enhanced LoPATV filtered data')
+printme('enhanced_LoPATV_fig2')
+
+%%
+% Display step signal
+
+figure(2)
+clf
+subplot(2,1,1)
+plot(t, x, 'black')
+title('x(t)');
+ylim([-30 21])
+ylabel('wavelength (fm)')
+xlabel('Time (seconds)')
+title('Calculated TV component (enhanced LoPATV)');
+
+subplot(2,1,2)
+stem(t(1:end-1), diff(x),'marker','none', 'color', 'black')
+title('First-order difference');
+xlabel('Time (seconds)')
+ylim([-5 16])
+ylabel('wavelength (fm)')
+
+printme('enhanced_LoPATV_steps')
+
+
+
+##### SOURCE END #####
+-->
+   </body>
+</html>
