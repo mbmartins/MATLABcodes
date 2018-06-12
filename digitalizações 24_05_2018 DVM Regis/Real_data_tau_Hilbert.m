@@ -15,15 +15,15 @@ p = 1 + 4*window + floor(window/2);
 q = p + window - 1;
 
 WholeSignal = [
-D.Dadost1.MS_p_0';
-D.Dadost2.MS_p_0';
-D.Dadost3.MS_p_0';
-D.Dadost4.MS_p_0';
-D.Dadost5.MS_p_0';   %%%%%
-D.Dadost6.MS_p_0';
-D.Dadost7.MS_p_0';
-D.Dadost8.MS_p_0';
-D.Dadost9.MS_p_0';
+ D.Dadost1.MS_n_n120';
+ D.Dadost2.PS_p_0';
+% D.Dadost3.PS_p_0';
+% D.Dadost4.MS_n_n120';
+% D.Dadost5.MS_n_n120';   %%%%%
+% D.Dadost6.MS_n_n120';
+% D.Dadost7.MS_n_n120';
+% D.Dadost8.MS_n_n120';
+% D.Dadost9.MS_n_n120';
 ];
 
 %nominal values
@@ -33,15 +33,15 @@ AnalysisCycles = 6;
 Pss = [360 120 -120];
 Ps = Pss(1); %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
-KaS = 0;
-KxS = 0.1;
+KaS = 10;
+KxS = 0;
 Vm = 1;
 
 %Ph_corr_sec = 3.500; %us
 %Ph_corr_deg = Ph_corr_sec*1e-6*F1;
-Ph_corr_deg = 0.0;
+Ph_corr_deg = 0.079;
 Ph_corr = Ph_corr_deg*pi/180;
-Mag_corr = 0.9;
+Mag_corr = 0.996;
 Vm = Vm*Mag_corr;
 Ph = Ph + Ph_corr;
 
@@ -85,22 +85,26 @@ for k=1:size(WholeSignal,1)
     if KaS ~= 0  %phase step
         %f = @(x) x(1)*cos(x(2)*t + x(3) + x(4)*(pi/180)*u);
         f = @(x) x(1)*cos(x(2)*t + x(3) + x(4)*(pi/180)*u);
+        f2 = @(x) x(1)*cos(2*pi*F1*t + x(3) + x(4)*(pi/180)*u);
         xr = [Vm 2*pi*F1 Ph KaS];
     else    %mag step
-        %f = @(x) x(1)*(1+x(2)*u).*cos(x(3)*t + x(4));
-        %f = @(x) x(1)*(1+x(2)*u).*cos(2*pi*F1*t + x(4));
         f = @(x) x(1)*(1+x(2)*u).*cos(x(3)*t + x(4));
+        f2 = @(x) x(1)*(1+x(2)*u).*cos(2*pi*F1*t + x(4));
+        %f = @(x) Vm*(1+KxS*u).*cos(x(3)*t + Ph);
         xr = [Vm KxS 2*pi*F1 Ph];
     end
     Ynom = f(xr);
     err = @(x) (Signal - f(x));
+    err2 = @(x) (Signal - f2(x));
     
-        % Levenberg-marquardt from optimization toolbox
+    % Levenberg-marquardt from optimization toolbox
     tol = 1e-7;
     OPTIONS = optimoptions('lsqnonlin', 'Algorithm','levenberg-marquardt','OptimalityTolerance',tol);
     OPTIONS.StepTolerance = 1e-12;
     [X,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err,xr,[],[],OPTIONS);
     Y = f(X);
+    
+    [X2,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err2,xr,[],[],OPTIONS);
 
     plot(t,Signal,'b.',t,Y,'r',t,Ynom,'g'); legend('Signal','Y_{LM}','Y_{nom}')
     
@@ -111,25 +115,32 @@ for k=1:size(WholeSignal,1)
         %phase step
         Xe_r(k) = xr(1);
         Xe(k) = X(1);
+        Xe_F1(k) = X(1);
         Phe_r(k) = xr(3)*tau_pp + (xr(3) + xr(4)*(pi/180))*(1 - tau_pp);  % [rad]
         Phe_r_deg(k) = Phe_r(k)*180/pi; % [deg]
         Phe(k) = X(3)*tau_est + (X(3)+X(4)*(pi/180))*(1 - tau_est);       % [rad]
+        Phe_F1(k) = X2(3)*tau_est + (X2(3)+X2(4)*(pi/180))*(1 - tau_est);       % [rad]
         Freq(k) = X(2)/(2*pi);
     else
         %mag step
         Xe_r(k) = xr(1)*tau_pp + xr(1)*(1+xr(2))*(1 - tau_pp);
         Xe(k) = X(1)*tau_est + X(1)*(1+X(2))*(1-tau_est);
+        Xe_F1(k) = X2(1)*tau_est + X2(1)*(1+X2(2))*(1-tau_est);
+        
         Phe_r(k) = xr(4);   %  [rad]
         Phe_r_deg(k) = xr(4)*180/pi; % [deg]
         Phe(k) = X(4);   %  [rad]
+        Phe_F1(k) = X2(4);   %  [rad]
         Freq(k) = X(3)/(2*pi);
     end
 
     if Ps>350
         Phe_deg = (Phe - 2*pi)*180/pi;
+        Phe_deg_F1 = (Phe_F1 - 2*pi)*180/pi;
         Phe_r_deg(k) = Phe_r_deg(k) - 360;
     else
         Phe_deg = Phe*180/pi;
+        Phe_deg_F1 = Phe_F1*180/pi;
     end
 
 
