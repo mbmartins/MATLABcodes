@@ -2,7 +2,7 @@
 % using MATLAB optimization toolbox 
 clear all; close all; clc;
 
-D = open('Steps_30_05.mat')
+D = open('Steps_complete.mat')
 
 dt = 2.0e-4;
 SampleRate = 1/dt; %Hz
@@ -13,23 +13,25 @@ q = window;
 
 p = 1 + 4*window + floor(window/2);
 q = p + window - 1;
+
 WholeSignal = [
 D.Dadost1.MS_p_0';
 D.Dadost2.MS_p_0';
 D.Dadost3.MS_p_0';
 D.Dadost4.MS_p_0';
-D.Dadost5.MS_p_120';   %%%%%
+D.Dadost5.MS_p_0';   %%%%%
 D.Dadost6.MS_p_0';
 D.Dadost7.MS_p_0';
 D.Dadost8.MS_p_0';
-D.Dadost9.PS_p_120';
+D.Dadost9.MS_p_0';
 ];
 
 %nominal values
 F0 = 60; %Hz nominal
-F1 = 60.0003; %Hz fundamental
+F1 = 60; %Hz fundamental
 AnalysisCycles = 6;
-Ps = 120; %phase in degrees
+Pss = [360 120 -120];
+Ps = Pss(1); %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
 KaS = 0;
 KxS = 0.1;
@@ -39,11 +41,11 @@ Vm = 1;
 %Ph_corr_deg = Ph_corr_sec*1e-6*F1;
 Ph_corr_deg = 0.0;
 Ph_corr = Ph_corr_deg*pi/180;
-Mag_corr = 0.90563;
+Mag_corr = 0.9;
 Vm = Vm*Mag_corr;
 Ph = Ph + Ph_corr;
 
-for k=1:5   %size(WholeSignal,1)           
+for k=1:size(WholeSignal,1)           
 
     Signal = WholeSignal(k,p:q);
     NSamples = length(Signal);
@@ -86,7 +88,8 @@ for k=1:5   %size(WholeSignal,1)
         xr = [Vm 2*pi*F1 Ph KaS];
     else    %mag step
         %f = @(x) x(1)*(1+x(2)*u).*cos(x(3)*t + x(4));
-        f = @(x) x(1)*(1+x(2)*u).*cos(2*pi*F1*t + x(4));
+        %f = @(x) x(1)*(1+x(2)*u).*cos(2*pi*F1*t + x(4));
+        f = @(x) x(1)*(1+x(2)*u).*cos(x(3)*t + x(4));
         xr = [Vm KxS 2*pi*F1 Ph];
     end
     Ynom = f(xr);

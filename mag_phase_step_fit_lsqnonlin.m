@@ -5,7 +5,7 @@ clear all; close all; clc;
 %signal generation
 F0 = 60; %Hz
 F1 = 60; %Hz
-SampleRate = 4800; %Hz
+SampleRate = 5000; %Hz
 dt = 1/SampleRate;
 AnalysisCycles = 6;
 NSamples = floor(AnalysisCycles*SampleRate/F0);
@@ -13,7 +13,7 @@ n = -NSamples/2:(NSamples/2-1); %discrete time vector
 
 Vm = 1; %70*sqrt(2) =~ 100;
 Xm = Vm;
-Ps = 120; %phase in degrees
+Ps = 360; %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
 KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
 KxS = 0.1;   % magnitude step index: 0.1 
@@ -67,12 +67,13 @@ for ti = 5:5
             par_var = [0.02 0.01 0.01 0.02]; % parameter variation in percent related to nominal
         else
         % mag          x1  x2(KxS)  wf    ph  
-            par_var = [1   1     0.02  3]; % parameter variation in percent related to nominal            
+            par_var = [1   1     0.002  3]; % parameter variation in percent related to nominal            
         end
 
         rng('shuffle');
         rn = (rand(1,length(xnom))-0.5);
         xr = xnom.*(1+(par_var/100).*rn);
+        freq_rand = xr(3)/(2*pi)
         
         %incertezas na estimação de tau
         utau = 2;  %number of dts 
@@ -110,8 +111,8 @@ for ti = 5:5
         y0 = f(x0);
         x = xnom;
         %estimated signal
-%         y = f(xnom1);
-%         plot(t,Signal,'.b',t,y,'r')
+%          y = f(xnom);
+%          plot(t,Signal,'.b',t,y,'r')
      
         % figure
         % plot(t,Signal - y0,'r')
@@ -141,7 +142,8 @@ for ti = 5:5
             SampleRate, ...
             Signal ...
             );
-        FE_SS(k) = Wf/(2*pi) - Freq(k);
+        FE_SS(k) = Wf/(2*pi) - Freq(k);   %[Hz]
+        FE_LM(k) = Wf/(2*pi) - X(3)/(2*pi);   %[Hz]
         
         %Fasor medio
         T = NSamples*dt;

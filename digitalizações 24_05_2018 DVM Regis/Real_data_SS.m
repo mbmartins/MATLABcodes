@@ -2,12 +2,12 @@
 % using MATLAB optimization toolbox 
 clear all; close all; clc;
 
-D = open('Steps_30_05.mat')
+D = open('Steps_complete.mat')
 
 % p = 241 + 4*480 +1;
 % q = 240 + 5*480 +1;
 
-WholeSignal = [D.Dadost9.PS_p_120';
+WholeSignal = [D.Dadost3.PS_p_0';
 ];
 
 % Nominal values
