@@ -17,9 +17,9 @@ q = p + window - 1;
 WholeSignal = [
  D.Dadost1.MS_n_n120';
  D.Dadost2.PS_p_0';
-% D.Dadost3.PS_p_0';
-% D.Dadost4.MS_n_n120';
-% D.Dadost5.MS_n_n120';   %%%%%
+ D.Dadost3.PS_p_0';
+ D.Dadost4.MS_n_n120';
+ D.Dadost5.MS_n_0';   %%%%%
 % D.Dadost6.MS_n_n120';
 % D.Dadost7.MS_n_n120';
 % D.Dadost8.MS_n_n120';
@@ -33,8 +33,8 @@ AnalysisCycles = 6;
 Pss = [360 120 -120];
 Ps = Pss(1); %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
-KaS = 10;
-KxS = 0;
+KaS = 0;
+KxS = -0.1;
 Vm = 1;
 
 %Ph_corr_sec = 3.500; %us
@@ -45,7 +45,7 @@ Mag_corr = 0.996;
 Vm = Vm*Mag_corr;
 Ph = Ph + Ph_corr;
 
-for k=1:size(WholeSignal,1)           
+for k=1:5   %size(WholeSignal,1)           
 
     Signal = WholeSignal(k,p:q);
     NSamples = length(Signal);
