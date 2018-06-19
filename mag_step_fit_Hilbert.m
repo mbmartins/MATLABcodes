@@ -5,23 +5,23 @@ clear all; close all; clc;
 %signal generation
 F0 = 60; %Hz
 F1 = 60; %Hz
-SampleRate = 4800; %Hz
+SampleRate = 5000; %Hz
 dt = 1/SampleRate;
 AnalysisCycles = 6;
 NSamples = floor(AnalysisCycles*SampleRate/F0);
 n = -NSamples/2:(NSamples/2-1); %discrete time vector
-tau_pp = 0.5; % relative time of step in percent of total time 
+tau_pp = 0.3; % relative time of step in percent of total time 
 tau_0 = (tau_pp - 0.5)*NSamples; %discrete time displacement
 n = n - tau_0;
 t = n*dt; %time vector
-Vm = 100; %70*sqrt(2);
+Vm = 0.9; %70*sqrt(2);
 Ps = 0; %phase in degrees
 
 % Phase in radians
 Ph = Ps*pi/180;
 
 KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
-KxS = 0.1;   % magnitude step index: 0.1 
+KxS = 0.3;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
 
 Xm = Vm; %for now, single phase; TODO: 6-channels
@@ -37,30 +37,34 @@ Theta(i,t >= 0) = Theta(i,t >= 0) + (KaS(i) * pi/180);
 cSignal = (Ain.*exp(-1i.*Theta));
 SNR = 90; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 Aruido = Vm/10^(SNR/20);
-Signal = real(cSignal) + Aruido*(rand(1,length(t))-0.5);
 
-plot(Signal)
+%Monte carlo for tau_error
+for k = 1:1
+    
+    Signal = real(cSignal) + Aruido*(rand(1,length(t))-0.5);
+    %plot(Signal)
+    %%%% Estimation of tau
+    br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end
+    z=hilbert(Signal');  % calculates the analytic signal associated with Signal
+    f=angle(z(2:end,:).*conj(z(1:end-1,:)));  % Hilbert estimate of the instantaneous frequency of xds_f
+    f=f-median(f(br:end-br));
+    Ain = (Ain - mean(Ain))./abs(Ain);
+    nn = 1:(NSamples-1);
+    %figure
+    %plot(nn,abs(f)); title('Instantaneous frequency (abs)')
+    % figure
+    % plot(f.^2); title('IF ^2');
 
-%%%% Estimation of tau
-%addpath('.\common')
-%load filter_PB20_20Hz_5th % b20 a20 (elliptic lowpass filter with 20Hz passband and zero at 60 Hz)
-br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end
-z=hilbert(Signal');  % calculates the analytic signal associated with Signal
-f=phase(z(2:end,:).*conj(z(1:end-1,:)));  % Hilbert estimate of the instantaneous frequency of xds_f
-f=f-median(f(br:end-br));
+    [ifmax, imax] = max(abs(f(br:end-br)));
+
+    tau_e = (br + imax - 1)*dt;
+    tau = (tau_0 + NSamples/2)*dt;
+
+    tau_error(k) = tau_e - tau;
+end
+
 figure
-Ain = (Ain - mean(Ain))./abs(Ain);
-nn = 1:(NSamples-1);
-%plot(nn,abs(f)); title('Instantaneous frequency (abs)')
-
+subplot(2,1,1)
 plot(nn,abs(f)); title('Instantaneous frequency (abs)')
-
-% figure
-% plot(f.^2); title('IF ^2');
-
-[ifmax, imax] = max(abs(f(br:end-br)));
-
-tau_e = (br + imax - 1)*dt
-tau = (tau_0 + NSamples/2)*dt
-
-tau_error = abs(tau_e - tau)
+subplot(2,1,2)
+plot(t,Signal); title('Signal with Magnitude Step')
