@@ -2,26 +2,45 @@
 % using MATLAB optimization toolbox 
 clear all; close all; clc;
 
+%Monte carlo for tau_error
+for k = 1:1000
 %signal generation
 F0 = 60; %Hz
 F1 = 60; %Hz
+UF1 = 0.04; %uncertainty of frequency in %
+F1 = F1 + F1*2*UF1/100*(rand-0.5);
+
 SampleRate = 5000; %Hz
 dt = 1/SampleRate;
 AnalysisCycles = 6;
 NSamples = floor(AnalysisCycles*SampleRate/F0);
 n = -NSamples/2:(NSamples/2-1); %discrete time vector
-tau_pp = 0.3; % relative time of step in percent of total time 
+tau_pp_set = 0.1:0.1:0.9; % relative time of step in percent of total time 
+tau_pp = tau_pp_set(randi(9));
 tau_0 = (tau_pp - 0.5)*NSamples; %discrete time displacement
 n = n - tau_0;
 t = n*dt; %time vector
 Vm = 0.9; %70*sqrt(2);
-Ps = 0; %phase in degrees
+UVm = 1;
+Vm = Vm + Vm*2*UVm/100*(rand-0.5);
+
+Ps = 180; %phase in degrees
+UPs = 100;
+Ps = Ps + Ps*2*UPs/100*(rand-0.5);
+
+Ps_deg(k) = Ps;
 
 % Phase in radians
 Ph = Ps*pi/180;
 
 KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
-KxS = 0.3;   % magnitude step index: 0.1 
+UKa = 1;
+KaS = KaS + KaS*2*UKa/100*(rand-0.5);
+
+KxS = 0.1;   % magnitude step index: 0.1 
+UKx = 1;
+KxS = KxS + KxS*2*UKx/100*(rand-0.5);
+
 Wf = 2*pi*F1;  % fundamental frequency
 
 Xm = Vm; %for now, single phase; TODO: 6-channels
@@ -35,12 +54,10 @@ Theta(i,:) = (Wf(i)*t) ...                         % Fundamental
                  + Ph(i);               % phase shift
 Theta(i,t >= 0) = Theta(i,t >= 0) + (KaS(i) * pi/180);
 cSignal = (Ain.*exp(-1i.*Theta));
-SNR = 90; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+SNR = 65; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 Aruido = Vm/10^(SNR/20);
 
-%Monte carlo for tau_error
-for k = 1:1
-    
+  
     Signal = real(cSignal) + Aruido*(rand(1,length(t))-0.5);
     %plot(Signal)
     %%%% Estimation of tau
@@ -63,8 +80,11 @@ for k = 1:1
     tau_error(k) = tau_e - tau;
 end
 
-figure
-subplot(2,1,1)
-plot(nn,abs(f)); title('Instantaneous frequency (abs)')
-subplot(2,1,2)
-plot(t,Signal); title('Signal with Magnitude Step')
+max_dt = max(tau_error)/dt
+min_dt = min(tau_error)/dt
+
+% figure
+% subplot(2,1,1)
+% plot(nn,abs(f)); title('Instantaneous frequency (abs)')
+% subplot(2,1,2)
+% plot(t,Signal); title('Signal with Magnitude Step')
