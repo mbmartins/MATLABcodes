@@ -7,7 +7,7 @@ for k = 1:1000
 %signal generation
 F0 = 60; %Hz
 F1 = 60; %Hz
-UF1 = 0.04; %uncertainty of frequency in %
+UF1 = 0.05; %uncertainty of frequency in %
 F1 = F1 + F1*2*UF1/100*(rand-0.5);
 
 SampleRate = 5000; %Hz
@@ -82,6 +82,10 @@ end
 
 max_dt = max(tau_error)/dt
 min_dt = min(tau_error)/dt
+
+hist((tau_error/dt))
+xlabel('\tau error [\Deltat]')
+ylabel('Occurrences')
 
 % figure
 % subplot(2,1,1)
