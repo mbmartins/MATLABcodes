@@ -15,15 +15,15 @@ p = 1 + 4*window + floor(window/2);
 q = p + window - 1;
 
 WholeSignal = [
- D.Dadost1.MS_n_n120';
- D.Dadost2.PS_p_0';
- D.Dadost3.PS_p_0';
- D.Dadost4.MS_n_n120';
- D.Dadost5.MS_n_0';   %%%%%
-% D.Dadost6.MS_n_n120';
-% D.Dadost7.MS_n_n120';
-% D.Dadost8.MS_n_n120';
-% D.Dadost9.MS_n_n120';
+ D.Dadost1.MS_p_120';
+ D.Dadost2.MS_p_120';
+ D.Dadost3.MS_p_120';
+ D.Dadost4.MS_p_120';
+ D.Dadost5.MS_p_120';   %%%%%
+ D.Dadost6.MS_p_120';
+ D.Dadost7.MS_p_120';
+ D.Dadost8.MS_p_120';
+ D.Dadost9.MS_p_120';
 ];
 
 %nominal values
@@ -31,10 +31,10 @@ F0 = 60; %Hz nominal
 F1 = 60; %Hz fundamental
 AnalysisCycles = 6;
 Pss = [360 120 -120];
-Ps = Pss(1); %phase in degrees
+Ps = Pss(2); %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
 KaS = 0;
-KxS = -0.1;
+KxS = 0.1;
 Vm = 1;
 
 %Ph_corr_sec = 3.500; %us
@@ -45,7 +45,7 @@ Mag_corr = 0.996;
 Vm = Vm*Mag_corr;
 Ph = Ph + Ph_corr;
 
-for k=1:5   %size(WholeSignal,1)           
+for k=1:size(WholeSignal,1)           
 
     Signal = WholeSignal(k,p:q);
     NSamples = length(Signal);
@@ -95,7 +95,7 @@ for k=1:5   %size(WholeSignal,1)
     end
     Ynom = f(xr);
     err = @(x) (Signal - f(x));
-    err2 = @(x) (Signal - f2(x));
+%    err2 = @(x) (Signal - f2(x));
     
     % Levenberg-marquardt from optimization toolbox
     tol = 1e-7;
@@ -104,7 +104,7 @@ for k=1:5   %size(WholeSignal,1)
     [X,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err,xr,[],[],OPTIONS);
     Y = f(X);
     
-    [X2,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err2,xr,[],[],OPTIONS);
+%    [X2,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err2,xr,[],[],OPTIONS);
 
     plot(t,Signal,'b.',t,Y,'r',t,Ynom,'g'); legend('Signal','Y_{LM}','Y_{nom}')
     
@@ -125,22 +125,22 @@ for k=1:5   %size(WholeSignal,1)
         %mag step
         Xe_r(k) = xr(1)*tau_pp + xr(1)*(1+xr(2))*(1 - tau_pp);
         Xe(k) = X(1)*tau_est + X(1)*(1+X(2))*(1-tau_est);
-        Xe_F1(k) = X2(1)*tau_est + X2(1)*(1+X2(2))*(1-tau_est);
+%        Xe_F1(k) = X2(1)*tau_est + X2(1)*(1+X2(2))*(1-tau_est);
         
         Phe_r(k) = xr(4);   %  [rad]
         Phe_r_deg(k) = xr(4)*180/pi; % [deg]
         Phe(k) = X(4);   %  [rad]
-        Phe_F1(k) = X2(4);   %  [rad]
+%        Phe_F1(k) = X2(4);   %  [rad]
         Freq(k) = X(3)/(2*pi);
     end
 
     if Ps>350
         Phe_deg = (Phe - 2*pi)*180/pi;
-        Phe_deg_F1 = (Phe_F1 - 2*pi)*180/pi;
+%        Phe_deg_F1 = (Phe_F1 - 2*pi)*180/pi;
         Phe_r_deg(k) = Phe_r_deg(k) - 360;
     else
         Phe_deg = Phe*180/pi;
-        Phe_deg_F1 = Phe_F1*180/pi;
+%        Phe_deg_F1 = Phe_F1*180/pi;
     end
 
 
