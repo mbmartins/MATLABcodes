@@ -7,7 +7,7 @@ D = open('Steps_complete.mat')
 % p = 241 + 4*480 +1;
 % q = 240 + 5*480 +1;
 
-WholeSignal = [D.Dadost2.PS_p_0';
+WholeSignal = [D.Dadost1.MS_n_0';
 ];
 
 % Nominal values
