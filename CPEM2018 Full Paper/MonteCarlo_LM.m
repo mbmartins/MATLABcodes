@@ -13,15 +13,15 @@ n = -NSamples/2:(NSamples/2-1); %discrete time vector
 
 Vm = 1; %70*sqrt(2) =~ 100;
 Xm = Vm;
-Ps = 360; %phase in degrees
+Ps = -120; %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
-KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
-KxS = 0.1;   % magnitude step index: 0.1 
+KaS = -10;   % IEEE Std phase (angle) step index: 10 degrees
+KxS = 0;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
-SNR = 90.5; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+SNR = 97; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 Aruido = Vm/10^(SNR/20);
     
-for ti = 5:5
+for ti = 1:9
     
     tau_pp = 0.1*ti; % relative time of step in percent of total time 
     tau_0 = (tau_pp - 0.5)*NSamples; %discrete time displacement
@@ -64,15 +64,15 @@ for ti = 5:5
         %incertezas dos parametros na geração do sinal
         if KaS ~= 0
         % phase         X1  w    ph   x3 (KaS)
-            par_var = [0.02 0.01 0.01 0.02]; % parameter variation in percent related to nominal
+            par_var = [1   0.05 1 1]; % parameter variation in percent related to nominal
         else
         % mag          x1  x2(KxS)  wf    ph  
-            par_var = [1   1     0.002  3]; % parameter variation in percent related to nominal            
+            par_var = [1   1     0.05  1]; % parameter variation in percent related to nominal            
         end
 
         rng('shuffle');
         rn = (rand(1,length(xnom))-0.5);
-        xr = xnom.*(1+(par_var/100).*rn);
+        xr = xnom.*(1+2*(par_var/100).*rn);
         freq_rand = xr(3)/(2*pi)
         
         %incertezas na estimação de tau
@@ -176,7 +176,9 @@ for ti = 5:5
 
     %Erros do fasor medio em [%]
     Phasor_mag_errmax(ti,1) = max(Phasor_mag_error)*100;
+    Phasor_mag_errmax_abs(ti,1) = max(abs(Phasor_mag_error))*100;
     Phasor_ph_errmax(ti,1) = max(Phasor_ph_error)*100;
+    Phasor_ph_errmax_abs(ti,1) = max(abs(Phasor_ph_error))*100;
     Phasor_mag_errmin(ti,1) = min(Phasor_mag_error)*100;
     Phasor_ph_errmin(ti,1) = min(Phasor_ph_error)*100;
     Phasor_mag_errmean(ti,1) = mean(Phasor_mag_error)*100;
@@ -229,6 +231,7 @@ for ti = 5:5
     
 end    
 
+beep
 
 % if KaS ~= 0
 %     plot(errors(:,3),errors(:,4),'.')
