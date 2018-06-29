@@ -13,15 +13,15 @@ n = -NSamples/2:(NSamples/2-1); %discrete time vector
 
 Vm = 1; %70*sqrt(2) =~ 100;
 Xm = Vm;
-Ps = -120; %phase in degrees
+Ps = 120; %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
-KaS = -10;   % IEEE Std phase (angle) step index: 10 degrees
+KaS = 10;   % IEEE Std phase (angle) step index: 10 degrees
 KxS = 0;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
-SNR = 97; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+SNR = 90.5; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 Aruido = Vm/10^(SNR/20);
     
-for ti = 1:9
+for ti = 5:5
     
     tau_pp = 0.1*ti; % relative time of step in percent of total time 
     tau_0 = (tau_pp - 0.5)*NSamples; %discrete time displacement
