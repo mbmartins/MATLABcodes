@@ -13,12 +13,12 @@ n = -NSamples/2:(NSamples/2-1); %discrete time vector
 
 Vm = 1; %70*sqrt(2) =~ 100;
 Xm = Vm;
-Ps = 120; %phase in degrees
+Ps = 0; %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
-KaS = 10;   % IEEE Std phase (angle) step index: 10 degrees
-KxS = 0;   % magnitude step index: 0.1 
+KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
+KxS = 0.1;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
-SNR = 90.5; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+SNR = 83; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 Aruido = Vm/10^(SNR/20);
     
 for ti = 5:5
@@ -105,7 +105,9 @@ for ti = 5:5
                              + Ph(i);               % phase shift
             Theta(i,t >= 0) = Theta(i,t >= 0) + (KaS_(i) * pi/180);
             cSignal = (Ain.*exp(-1i.*Theta));
-            Signal = real(cSignal) + Aruido*(rand(1,length(t))-0.5);
+            noise = Aruido*(rand(1,length(t))-0.5);
+            Signal = real(cSignal) + noise;
+            SNR = snr(Signal,noise)
             %err = @(x) (Signal - f(x)).^2;
             err = @(x) (Signal - f(x));
         y0 = f(x0);
