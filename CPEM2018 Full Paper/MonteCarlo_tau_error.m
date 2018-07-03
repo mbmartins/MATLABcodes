@@ -64,7 +64,7 @@ rSignal = real(cSignal);
 var_noise = ((std(rSignal))/(10^(SNR/20)))^2;
 std_noise = (std(rSignal))/(10^(SNR/20));
 noise = std_noise*randn(1,length(rSignal));  
-noise_un = std_noise*rand(1,length(rSignal));
+%noise_un = std_noise*rand(1,length(rSignal));
 
     Signal =  rSignal + noise;
     SNR_hist(k) = snr(Signal,noise);
