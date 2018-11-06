@@ -7,7 +7,15 @@ D = open('Steps_complete.mat')
 % p = 241 + 4*480 +1;
 % q = 240 + 5*480 +1;
 
-WholeSignal = [D.Dadost1.MS_n_0';
+WholeSignal = [ D.Dadost1.PS_p_120';
+                D.Dadost2.PS_p_120';
+                D.Dadost3.PS_p_120';
+                D.Dadost4.PS_p_120';
+                D.Dadost5.PS_p_120';
+                D.Dadost6.PS_p_120';
+                D.Dadost7.PS_p_120';
+                D.Dadost8.PS_p_120';
+                D.Dadost9.PS_p_120';
 ];
 
 % Nominal values
@@ -29,11 +37,11 @@ window = floor(SampleRate/Fps);
 q = window;
 
 AnalysisCycles = 6;
-
+for s = 1:9
 for pin = 1:Fps-1
     p = (pin-1)*window+window/2+1;
     q = p + window -1;
-    Signal = WholeSignal(1,p:q);
+    Signal = WholeSignal(s,p:q);
     NSamples = length(Signal);
 %     T = NSamples*dt;
 %     tau_pp = 0; % relative time of step in percent of total time 
@@ -65,7 +73,7 @@ for pin = 1:Fps-1
     SignalParams(8) = 0;
     DelayCorr = 0; %-3500.0; %   %[in nanosecond]
     MagCorr = 1;
-    [Synx(pin,:),Freq(pin,:),ROCOF(pin,:)] = SteadyStateFit ( ...
+    [Synx(pin,:),Freq(pin,s),ROCOF(pin,:)] = SteadyStateFit ( ...
                         SignalParams, ...
                         DelayCorr, ...
                         MagCorr, ...
@@ -79,14 +87,15 @@ for pin = 1:Fps-1
     
 %    errors(pin,:) = (X - xr)*100./xr; % error in [%]
     
-    Mag_SS(pin,:) = abs(Synx(pin))*sqrt(2);
+    Mag_SS(pin,s) = abs(Synx(pin))*sqrt(2);
 %    Mag_LM(pin,:) = X(1);
     
-    Phase_SS(pin,:) = angle(Synx(pin))*180/pi;  %in degrees
+    Phase_SS(pin,s) = angle(Synx(pin))*180/pi;  %in degrees
 %    Phase_LM(pin,:) = (X(3)-2*pi)*180/pi; % in degrees
     
     Delay_SS(pin,:) = Phase_SS(pin)/(360*Freq(pin)) % in [s]
     %Delay_LM(pin,:) = Phase_LM(pin)/(360*Freq_LM(pin)) % in [s]
+end
 end
 
 mean_delay = mean(Delay_SS)

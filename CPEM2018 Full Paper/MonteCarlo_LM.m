@@ -13,15 +13,15 @@ n = -NSamples/2:(NSamples/2-1); %discrete time vector
 
 Vm = 1; %70*sqrt(2) =~ 100;
 Xm = Vm;
-Ps = 120; %phase in degrees
+Ps = -120; %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
-KaS = 10;   % IEEE Std phase (angle) step index: 10 degrees
+KaS = -10;   % IEEE Std phase (angle) step index: 10 degrees
 KxS = 0;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
-SNR = 90.5; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
-Aruido = Vm/10^(SNR/20);
-    
-for ti = 5:5
+SNR = 90; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+%Aruido = Vm/10^(SNR/20);
+
+for ti = 1:9
     
     tau_pp = 0.1*ti; % relative time of step in percent of total time 
     tau_0 = (tau_pp - 0.5)*NSamples; %discrete time displacement
@@ -105,7 +105,13 @@ for ti = 5:5
                              + Ph(i);               % phase shift
             Theta(i,t >= 0) = Theta(i,t >= 0) + (KaS_(i) * pi/180);
             cSignal = (Ain.*exp(-1i.*Theta));
-            Signal = real(cSignal) + Aruido*(rand(1,length(t))-0.5);
+
+            rSignal = real(cSignal);
+            var_noise = ((std(rSignal))/(10^(SNR/20)))^2;
+            std_noise = (std(rSignal))/(10^(SNR/20));
+            noise = std_noise*randn(1,length(rSignal));
+            Signal = rSignal + noise;
+            SNR_hist = snr(Signal,noise);
             %err = @(x) (Signal - f(x)).^2;
             err = @(x) (Signal - f(x));
         y0 = f(x0);
@@ -191,6 +197,7 @@ for ti = 5:5
     Mag_errmin(ti,1) = ERR_MIN(1);
     Mag_errmed(ti,1) = MEAN_ERR(1);
     Mag_stddev(ti,1) = STDEV_ERR(1);
+    Mag_errmax_abs(ti,1) = max(abs([ERR_MAX(1),ERR_MIN(1)]));
     
     %Erros de frequencia em [%]
     if KaS ~= 0
@@ -202,6 +209,7 @@ for ti = 5:5
     Freq_errmin(ti,1) = ERR_MIN(ifreq);
     Freq_errmed(ti,1) = MEAN_ERR(ifreq);
     Freq_stddev(ti,1) = STDEV_ERR(ifreq);
+    Freq_errmax_abs(ti,1) = max(abs([ERR_MAX(ifreq),ERR_MIN(ifreq)]));
     
     %Erros de fase em [%]
     if KaS ~= 0
@@ -213,6 +221,7 @@ for ti = 5:5
     Ph_errmin(ti,1) = ERR_MIN(iph);
     Ph_errmed(ti,1) = MEAN_ERR(iph);
     Ph_stddev(ti,1) = STDEV_ERR(iph);    
+    Ph_errmax_abs(ti,1) = max(abs([ERR_MAX(iph),ERR_MIN(iph)]));
     
     %Erros de degrau (KxS ou KaS) em [%]
     if KaS ~= 0
@@ -224,6 +233,7 @@ for ti = 5:5
     K_errmin(ti,1) = ERR_MIN(ik);
     K_errmed(ti,1) = MEAN_ERR(ik);
     K_stddev(ti,1) = STDEV_ERR(ik);    
+    K_errmax_abs(ti,1) = max(abs([ERR_MAX(ik),ERR_MIN(ik)]));
     
     %Freq_err_per_std(ti,1) = ERR_MAX(2)/STDEV_ERR(2);
 

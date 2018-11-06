@@ -2,12 +2,20 @@
 % using MATLAB optimization toolbox 
 clear all; close all; clc;
 
+UF1 = 0.0; %uncertainty of frequency in [%]
+UVm = 0; %uncertainty of magnitude in [%]
+UKa = 0; %uncertainty of magnitude in [%]
+UKx = 0; %uncertainty of magnitude in [%]
+UPs = 0; %uncertainty of phase in degrees
+Pin = 0; %initial phase in degrees
+
+SNR = 80;  %signal noise ratio in dB
+
 %Monte carlo for tau_error
 for k = 1:1000
 %signal generation
 F0 = 60; %Hz
 F1 = 60; %Hz
-UF1 = 0.05; %uncertainty of frequency in %
 F1 = F1 + F1*2*UF1/100*(rand-0.5);
 
 SampleRate = 5000; %Hz
@@ -21,24 +29,20 @@ tau_0 = (tau_pp - 0.5)*NSamples; %discrete time displacement
 n = n - tau_0;
 t = n*dt; %time vector
 Vm = 0.9; %70*sqrt(2);
-UVm = 1;
 Vm = Vm + Vm*2*UVm/100*(rand-0.5);
 
-Ps = 180; %phase in degrees
-UPs = 100;
-Ps = Ps + Ps*2*UPs/100*(rand-0.5);
+Ps = Pin; %phase in degrees
+Ps = Ps + 2*UPs/100*(rand-0.5);
 
 Ps_deg(k) = Ps;
 
 % Phase in radians
 Ph = Ps*pi/180;
 
-KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
-UKa = 1;
+KaS = -10;   % IEEE Std phase (angle) step index: 10 degrees
 KaS = KaS + KaS*2*UKa/100*(rand-0.5);
 
-KxS = 0.1;   % magnitude step index: 0.1 
-UKx = 1;
+KxS = 0;   % magnitude step index: 0.1 
 KxS = KxS + KxS*2*UKx/100*(rand-0.5);
 
 Wf = 2*pi*F1;  % fundamental frequency
@@ -54,11 +58,17 @@ Theta(i,:) = (Wf(i)*t) ...                         % Fundamental
                  + Ph(i);               % phase shift
 Theta(i,t >= 0) = Theta(i,t >= 0) + (KaS(i) * pi/180);
 cSignal = (Ain.*exp(-1i.*Theta));
-SNR = 65; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
-Aruido = Vm/10^(SNR/20);
+ %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+%Anoise = Vm/(sqrt(2))/10^(SNR/20);
+rSignal = real(cSignal);
+var_noise = ((std(rSignal))/(10^(SNR/20)))^2;
+std_noise = (std(rSignal))/(10^(SNR/20));
+noise = std_noise*randn(1,length(rSignal));  
+%noise_un = std_noise*rand(1,length(rSignal));
 
-  
-    Signal = real(cSignal) + Aruido*(rand(1,length(t))-0.5);
+    Signal =  rSignal + noise;
+    SNR_hist(k) = snr(Signal,noise);
+    
     %plot(Signal)
     %%%% Estimation of tau
     br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end
