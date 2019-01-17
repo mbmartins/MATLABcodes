@@ -6,6 +6,7 @@ T = 1/fs;
 xw = x.*window;
 
 Xfft = fft(xw);
+Wfft = fft(window);
 [Y,km] = max(Xfft(1:N/2));
 
 alfa = abs(Xfft(km-1)); %eq (6)
@@ -29,5 +30,5 @@ elseif strcmp(model,'power')
 end
 %results
 f = K_/(N*T);
-A = 2*abs(X_)/(N*window(N/2));
-ph = angle(X_);
+A = 2*abs(X_)/Wfft(1);
+ph = angle(Xfft(km-1));
