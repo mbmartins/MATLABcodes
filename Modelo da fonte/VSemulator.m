@@ -11,5 +11,5 @@ vout = y/max(abs(y));
 %spurious noise addition
 var_sig = std(Input);
 eta = var_sig/10^(SNR/20); %eq (3) CPEM
-vout = vout + normrnd(0,eta,[1,length(t)]);
+vout = vout + normrnd(0,eta,[1,length(Input)]);
 

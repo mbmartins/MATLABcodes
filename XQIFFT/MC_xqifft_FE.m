@@ -1,15 +1,20 @@
 clear all; close all; clc;
 
-%TODO :ver influencia em p e FE da variação em f1
-% verificar a geração do ruido se esta correta
-% comparar a medição com degraus
+% Verificação da implementação de XQIFFT
+% Variáveis de influência na estimação de Frequência
+% Estudo da influência do número de amostras total 
 
 %signal generation
-N = 2.^(8:11); %number of samples
 %cycles = 1;
-fs = 2500; %sampling frequency;
-f0 = 50.; %nominal system frequency
-Uf = 0.01;
+fs = 5000; %sampling frequency;
+%N = fs*(0.5:0.5:10); %number of samples
+N = 5000;
+f0 = 50.01; %nominal system frequency
+Uf = 0.0;
+Vm = 1.;
+    ni = 1;
+dt = 1/fs;
+    fbin = fs/N(ni);
 
 for ni = 1:size(N,2)
     dt = 1/fs;
@@ -21,11 +26,11 @@ for h = 1:1
     t = n*dt;
     u = [zeros(1,N(ni)/2) ones(1,N(ni)/2)];
     kx = 0.0; ka = 0*pi/180;%[rad]
-    Vm = 1;
+    x = Vm*(1+kx*u).*sin(2*pi*f1*t+ka*u); %+ 0.5*sin(2*pi*36*f1*t);  %samples
+    var_sig = std(x);
     SNR = 60; %[dB]
-    Aruido = Vm/10^(SNR/20);
-    x = Vm*(1+kx*u).*sin(2*pi*f1*t+pi/2+ka*u); %+ 0.5*sin(2*pi*36*f1*t);  %samples
-    x = x +  Aruido*(randn(1,length(t))-0.5); % ???????
+    eta = var_sig/10^(SNR/20); %eq (3) CPEM
+    x = x +  eta*(randn(1,length(t))-0.5);
     %plot(t,x,'o--')
     %snr_sig = snr(x)
 
@@ -40,6 +45,7 @@ for h = 1:1
         %wvtool(window);
         % pmin = 0.0853
 
+    %Busca do valor p que minimiza FE
     ps = 1e-4; pini = 0.05; pfin = 1;
     p = pini:ps:pfin;
     %p = 0.2240;
@@ -90,7 +96,7 @@ end
 
 figure
 loglog(p,abs(fe_ip),p,abs(fe_lq),p,abs(fe_xq_bm),p,abs(fe_xq_han)); 
-xlabel('p value'); ylabel('fe [Hz]')
+xlabel('p value'); ylabel('FE [Hz]')
 xlim([pini pfin]);
 legend('IP-DFT','LQ-DFT','XQ-DFT-BM','XQ-DFT-HAN')
 
@@ -104,6 +110,7 @@ semilogy(N,abs(fe_bm),'o--',N,abs(fe_han),'x--')
 xlabel('N amostras'); ylabel('FE[Hz]')
 legend('XQ-DFT-BM','XQ-DFT-HAN')
 
+% COMENTARIOS
 % o valor p depende principalmente de:
 % 1 - qual a janela utilizada: hanning, blackmann-harris, etc
 % 2 - numero de amostras

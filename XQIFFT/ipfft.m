@@ -31,4 +31,5 @@ end
 %results
 f = K_/(N*T);
 A = 2*abs(X_)/Wfft(1);
-ph = angle(Xfft(km-1));
+ph = angle(Xfft(km));
+
