@@ -11,7 +11,7 @@ clear all; close all; clc;
 fs = 5000; %sampling frequency;
 N = 5000; %number of samples
 f0 = 50.0; %nominal system frequency
-Uf = 0.01; %uncertainty of frequency
+Uf = 0.005; %uncertainty of frequency
 Vm = 1.;
     ni = 1;
 dt = 1/fs;
@@ -24,8 +24,8 @@ for ni = 1:size(N,2)
     dt = 1/fs;
     fbin = fs/N(ni);
 %Monte Carlo 
-for h = 1:100
-    f1(h) = f0 + Uf*f0*(randn(1,1)-0.5); %actual fund frequency
+for h = 1:10000
+    f1(h) = f0 + Uf*f0*randn(1,1); %actual fund frequency
     n = (0:N(ni)-1);
     t = n*dt;
     u = [zeros(1,N(ni)/2) ones(1,N(ni)/2)];
@@ -80,12 +80,27 @@ end
 
 %figure; plot(fe_han,ph_xq_han,'o');xlabel('FE [Hz]');ylabel('phase [rad]');
 
+deltaf = f1 - f0;
+
 figure
-% subplot(2,1,1)
-hist(fe_han); xlabel('FE_{HAN}')
-title('FE_{HAN}, p = 0.2240')
-mean(fe_han)
-std(fe_han)
+subplot(3,1,1)
+histfit(deltaf,20,'normal')
+title('Histogram \delta_f, p = 0.2240')
+xlabel('\delta_f [Hz]');
+
+subplot(3,1,2)
+title('\delta_f vs FE_{HAN}, p = 0.2240')
+plot(f1,fe_han,'.')
+xlabel('\delta_f [Hz]')
+ylabel('FE [Hz]')
+
+subplot(3,1,3)
+histfit(fe_han,20,'kernel'); xlabel('FE_{HAN}')
+title('Histogram FE_{HAN}, p = 0.2240')
+
+
+
+
 % subplot(2,1,2)
 % hist(pmin_han,10); xlabel('p value')
 % mean(pmin_han)
