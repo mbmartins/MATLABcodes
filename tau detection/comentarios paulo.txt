@@ -1,0 +1,44 @@
+Oi, Marcelo.
+
+Eu não consegui reproduzir (via simulação computacional) os resultados 
+que você reportou mais cedo sobre os casos críticos em saltos de fase. 
+Pelas simulações que fiz, os erros na estimativa de tau são menores do 
+que os que você encontrou.
+
+Ver códigos:
+fase_tau_detection_in_noise_hilbert1.m    (qualitativo 1 realização)
+salto_fase_tau_detection_in_noise_hilbert1_10mil.m   (10 mil 
+realizações)
+
+Para o salto de magnitude, com fase inicial 90 graus e salto próximo ao 
+cruzamento por zeros, e SNR =51dB, os erros nas estimativas de tau são 
+muito grandes, de fato. O detector via frequência instantânea não 
+funciona. Entretanto, o remédio para isso é usar um detector via a 
+magnitude instantânea. Uma opção é usar os dois detectores em conjunto 
+e, aplicando critérios de limiares simples sobre as duas funções de 
+detecção, é possível descartar detecções não-confiáveis dos dois 
+detectores.
+
+Ver códigos:
+mag_tau_detection_in_noise_hilbert2.m    (qualitativo 1 realização, 2 
+detectores)
+salto_fase_tau_detection_in_noise_hilbert2_10mil.m
+salto_mag_tau_detection_in_noise_10mil_hilbert2.m
+
+Para o artigo: reconhecer que há problemas na detecção de tau para os 
+casos críticos (principalmente o de magnitude), mas é algo que pode ser 
+contornado através do emprego de detetores mais elaborados.
+
+Abraço.
+
+
+
+
+
+Boa tarde, Marcelo.
+
+Modifiquei o seu código da simulação de Monte Carlo para usar, no pior 
+caso (fase inicial em 90 graus, SNR=50dB), a proposta de detecção de tau 
+com dois detectores, um via frequência e outro magnitude instantâneas. 
+Em aproximadamente 1% das 1000 realizações, o erro para tau fica acima 
+de 2*delta_t. O código segue anexo.

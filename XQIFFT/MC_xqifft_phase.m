@@ -11,7 +11,7 @@ clear all; close all; clc;
 fs = 5000; %sampling frequency;
 N = 5000; %number of samples
 f0 = 50.0; %nominal system frequency
-Uf = 0.0001; %uncertainty of frequency
+Uf = 0.005; %uncertainty of frequency
 Vm = 1.;
     ni = 1;
 dt = 1/fs;
@@ -73,8 +73,8 @@ for h = 1:101
 
     [fe_xqhan_min(h),ipmin] = min(abs(fe_xq_han));
     pmin_han(h,ni) = p(ipmin);
-    fest_han = f_xq_han(ipmin);
-    fe_han(h,ni) = fest_han - f1(h);
+    fest_han(h) = f_xq_han(ipmin);
+    fe_han(h,ni) = fest_han(h) - f1(h);
     h
 end
 end
@@ -83,7 +83,7 @@ end
 %figure; plot(f1,ph_ip*180/pi,'o');xlabel('F_1');ylabel('phase [deg]');
 
 figure; plot(f1,ph_lq,'o');xlabel('F_1');ylabel('phase [rad]');
-ph_corr = ph_lq - (3.1428*f1-157.14);
+ph_corr = ph_lq - pi*(fest_han-f0);
 figure;plot(f1,ph_corr)
 
 % figure
