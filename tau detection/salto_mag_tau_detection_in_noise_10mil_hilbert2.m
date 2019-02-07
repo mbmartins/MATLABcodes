@@ -43,7 +43,18 @@ elseif v2>limiar2,
     tau_est_v(k)=tau_est2(1)+9;
 else
     tau_est_v(k)=NaN;
+    figure
+    plot(9+(1:length(mag_anomaly)),abs(mag_anomaly),9+(1:length(mag_anomaly)),limiar2*ones(length(mag_anomaly),1),'k')
 end
+tau_error(k) = tau_est_v(k) - tau;
+
+if tau_error(k)>1
+    figure
+    plot(9+(1:length(mag_anomaly)),abs(mag_anomaly),9+(1:length(mag_anomaly)),limiar2*ones(length(mag_anomaly),1),'k')
 end
-hist (tau_est_v,tau-100:tau+100)
+    
+end
+
+figure
+hist (tau_error,tau_error-100:tau_error+100)
 

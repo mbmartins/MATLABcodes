@@ -6,8 +6,8 @@ fasei=0; % fase inicial em graus
 phi=fasei*pi/180; % fase inicial em rad 
 N=500; 
 pertau=.5;  % localização do salto em termos do percentual do tamanho da janela 
-%tau=round(N*pertau); % índice do instante (arredondado) de ocorrência do salto
-tau=312;  % tau ajustado para o salto de fase coincidir com um maximo local do seno
+tau=round(N*pertau); % índice do instante (arredondado) de ocorrência do salto
+%tau=312;  % tau ajustado para o salto de fase coincidir com um maximo local do seno
 n=(0:(N-1))'; % base de tempo unitário
 fase=2*pi*f0.*n/fs+phi; % fase limpa
 fase(tau:end)=fase(tau:end)+10*pi/180; % salto de 10 graus na fase em t=tau (conforme eq (2))
@@ -33,5 +33,4 @@ fi_anomaly=fi_anomaly(10:end-10);
 %plot(10:length(fi_anomaly)-10,abs(fi_anomaly(10:end-10)))
 plot(9+(1:length(fi_anomaly)),abs(fi_anomaly))
 [v,tau_est]=max(abs(fi_anomaly));
-tau_est(1)+9
-
+tau_error = tau_est(1)+9 - tau

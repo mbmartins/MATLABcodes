@@ -1,23 +1,27 @@
+function [tau_error,extremos,det_mag,det_fase,det_nan] = MC_tau_error_hibrid_detector(SNR,Pin,lim_mag,lim_fase,tau_pp_set,Nruns)
 % Estimation of Sincrophasors with discontinuities
 % using MATLAB optimization toolbox 
-clear all; close all; clc;
+%clear all; close all; clc;
 
 UF1 = 0.05; %uncertainty of frequency in [%]
 UVm = 1; %uncertainty of magnitude in [%]
 UKa = 1; %uncertainty of Ka in [%]
 UKx = 1; %uncertainty of Kx in [%]
 UPs = 1; %uncertainty of phase in degrees
-Pin = 90; %initial phase in degrees  %worst case is 90 degrees
+%Pin = 90; %initial phase in degrees  %worst case is 90 degrees
 
-SNR = 50;  %signal noise ratio in dB
+%SNR = 50;  %signal noise ratio in dB
 rng('shuffle');
 
 extremos = 0;
-lim_mag = 0.0;
-lim_fase = 8;
+det_mag = 0;
+det_fase = 0;
+det_nan = 0;
+%lim_mag = 0.0;
+%lim_fase = 8;
 
 %Monte carlo for tau_error
-for k = 1:50000
+for k = 1:Nruns
 
 %signal generation
 F0 = 60; %Hz
@@ -29,8 +33,8 @@ dt = 1/SampleRate;
 AnalysisCycles = 6;
 NSamples = floor(AnalysisCycles*SampleRate/F0);
 n = -NSamples/2:(NSamples/2-1); %discrete time vector
-tau_pp_set = 0.1:0.1:0.9; % relative time of step in percent of total time 
-tau_pp = tau_pp_set(randi(9));
+%tau_pp_set = 0.1:0.1:0.9; % relative time of step in percent of total time 
+tau_pp = tau_pp_set(randi(size(tau_pp_set,2)));
 tau_0 = (tau_pp - 0.5)*NSamples; %discrete time displacement
 n = n - tau_0;
 t = n*dt; %time vector
@@ -89,7 +93,7 @@ noise = std_noise*randn(1,length(rSignal));
     nn = 1:(NSamples);
     
    
-    [ifmax, imax] = max(abs(f(br:end-br)));
+    [ifmax1, imax] = max(abs(f(br:end-br)));
     limiar1=lim_fase*median(abs(f(br:end-br)));
     
     gmi=gradient(abs(z));
@@ -97,14 +101,29 @@ noise = std_noise*randn(1,length(rSignal));
     [ifmax2, imax2] = max(abs(gmi(br:end-br)));
     limiar2=lim_mag*median(abs(gmi(br:end-br)));
     
-    if ifmax(1)>limiar1,
+    % Detector híbrido - teste dos limiares
+    if ifmax1(1)>limiar1,
         tau_e=(br + imax(1)-1)*dt;
+        det_fase = det_fase +1;
     elseif ifmax2(1)>limiar2,
         tau_e=(br + imax2(1)-1)*dt;
+        det_mag = det_mag + 1;
     else
         tau_e=NaN;
+        det_nan = det_nan+1;
     end
 
+    %critério de escolha do estimador no caso de "empate"
+    if (ifmax1(1)>limiar1) && (ifmax2(1)>limiar2)
+           tau_e1 = (br + imax(1)-1)*dt;
+           tau_e2 = (br + imax2(1)-1)*dt;
+           if (ifmax1/std(f)) > (ifmax2/std(gmi))
+                tau_e = tau_e1;
+           else
+               tau_e = tau_e2;
+           end
+    end
+    
     %tau_e = (br + imax - 1)*dt;
     %tau_e = (br + imax(1)-1)*dt;
     tau = (tau_0 + NSamples/2)*dt;
@@ -124,9 +143,9 @@ noise = std_noise*randn(1,length(rSignal));
 end
 
 
-
-max_dt = max(tau_error)/dt
-min_dt = min(tau_error)/dt
+% 
+% max_dt = max(tau_error)/dt
+% min_dt = min(tau_error)/dt
 
 %figure
 %hist((tau_error/dt),200)
@@ -135,9 +154,6 @@ min_dt = min(tau_error)/dt
 % xlabel('\tau error [\Deltat]')
 % ylabel('Occurrences')
 
-extremos
-erro_tau_percentual=extremos*100/k
-beep 
 
 % figure
 % subplot(2,1,1)

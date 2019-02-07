@@ -19,14 +19,18 @@ vx=var(x); % variância do ruído
 cn=sqrt(vx/10^(SNRdB/10))*randn(size(x)); % componente de ruído
 xn=x+cn; % sinal com ruído
 SNR_med=10*log10(vx/var(cn))
-plot(x);
+
+plot(n,x,tau,x(tau),'x');
+title('Signal')
 figure
-plot(gradient(fase))
+plot(n,gradient(fase))
+xlabel('Samples');ylabel('gradient fase')
 
 xa=hilbert(xn); 
 
 % detector 1
-phase_est=phase(xa);
+%phase_est=phase(xa);
+phase_est=unwrap(angle(xa));
 
  
 fi_anomaly=gradient(phase_est);
