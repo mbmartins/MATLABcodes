@@ -9,9 +9,10 @@ clear all; close all; clc;
 %signal generation
 %cycles = 1;
 fs = 5000; %sampling frequency;
-N = 5000; %number of samples
-f0 = 50.0; %nominal system frequency
-Uf = 0.005; %uncertainty of frequency
+N = 500; %number of samples
+f0 = 60.0; %nominal system frequency
+Uf = 0.001; %uncertainty of frequency
+SNR = 60; %[dB]
 Vm = 1.;
     ni = 1;
 dt = 1/fs;
@@ -32,9 +33,8 @@ for h = 1:10000
     kx = 0.0; ka = 0*pi/180;%[rad]
     x = Vm*(1+kx*u).*sin(2*pi*f1(h)*t+ka*u); %+ 0.5*sin(2*pi*36*f1*t);  %samples
     var_sig = std(x);
-    SNR = 60; %[dB]
     eta = var_sig/10^(SNR/20); %eq (3) CPEM
-    x = x +  eta*(randn(1,length(t))-0.5);
+    x = x +  eta*(randn(1,length(t)));
     %plot(t,x,'o--')
     %snr_sig = snr(x)
 
@@ -43,16 +43,16 @@ for h = 1:10000
         window_rect = ones(1,N(ni));
     %hanning
         window_hanning = (0.5 - 0.5*cos(2*pi*n/N(ni)));
-        % pmin = 0.246;
+        pmin_han = 0.246;
     %blackman-harris
         window_bm = blackmanharris(N(ni))';
         %wvtool(window);
-        % pmin = 0.0853
+        pmin_bm = 0.0853;
 
     %Busca do valor p que minimiza FE
 %     ps = 1e-4; pini = 0.05; pfin = 1;
 %     p = pini:ps:pfin;
-    p = 0.2240;
+    p = pmin_bm;
     for k = 1:size(p,2)
         [f_ip(k),A_ip(k),ph_ip(k,h)] = ipfft(x,fs,p(k),window_bm,'parabola');
         [f_lq(k),A_lq(k),ph_lq(k,h)] = ipfft(x,fs,p(k),window_bm,'log');
@@ -85,18 +85,18 @@ deltaf = f1 - f0;
 figure
 subplot(3,1,1)
 histfit(deltaf,20,'normal')
-title('Histogram \delta_f, p = 0.2240')
+title('Histogram \delta_f')
 xlabel('\delta_f [Hz]');
 
 subplot(3,1,2)
-title('\delta_f vs FE_{HAN}, p = 0.2240')
-plot(f1,fe_han,'.')
-xlabel('\delta_f [Hz]')
+title('\delta_f vs FE_{BM}')
+plot(f1,fe_bm,'.')
+xlabel('f_1 [Hz]')
 ylabel('FE [Hz]')
 
 subplot(3,1,3)
-histfit(fe_han,20,'kernel'); xlabel('FE_{HAN}')
-title('Histogram FE_{HAN}, p = 0.2240')
+histfit(fe_han,20,'kernel'); xlabel('FE_{BM}')
+title('Histogram FE_{BM}')
 
 
 

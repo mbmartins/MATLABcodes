@@ -9,6 +9,7 @@ N = 512; %number of samples
 %cycles = 1;
 fs = 5000; %sampling frequency;
 f0 = 50.0; %nominal system frequency
+SNR = 60; %[dB]
 Uf = 0.0;
 Vm = 1.;
     ni = 1;
@@ -18,16 +19,16 @@ dt = 1/fs;
     
 %Monte Carlo 
 for h = 1:1
-    f1 = f0 + Uf*(randn(1,1)-0.5); %actual fund frequency
+    f1 = f0 + Uf*f0*(randn(1,1)); %actual fund frequency
     n = (0:N(ni)-1);
     t = n*dt;
     u = [zeros(1,N(ni)/2) ones(1,N(ni)/2)];
     kx = 0.0; ka = 0*pi/180;%[rad]
     x = Vm*(1+kx*u).*sin(2*pi*f1*t+ka*u); %+ 0.5*sin(2*pi*36*f1*t);  %samples
     var_sig = std(x);
-    SNR = 60; %[dB]
+
     eta = var_sig/10^(SNR/20); %eq (3) CPEM
-    x = x +  eta*(randn(1,length(t))-0.5); 
+    x = x +  eta*(randn(1,length(t))); 
     %plot(t,x,'o--')
     snr_sig = snr(x)
 
