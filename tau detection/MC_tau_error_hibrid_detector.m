@@ -79,7 +79,7 @@ noise = std_noise*randn(1,length(rSignal));
     Signal =  rSignal + noise;
     %SNR_hist(k) = snr(Signal,noise);
     SNR_est(k)=10*log10(var(rSignal)/var(noise));
-    %plot(Signal)
+    plot(Signal)
     %%%% Estimation of tau
     %br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end
     br = 0.02*NSamples; % 5% of NSamples are taken off at the beggining and end
