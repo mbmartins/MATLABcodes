@@ -61,7 +61,7 @@ for ti = 1:9
     for k = 1:Niter
         %first guess
         k
-        %incertezas dos parametros na geração do sinal
+        %uncertainties of parameters in signal generation
         if KaS ~= 0
         % phase         X1  w    ph   x3 (KaS)
             par_var = [1   0.05 1 1]; % parameter variation in percent related to nominal
@@ -75,7 +75,7 @@ for ti = 1:9
         xr = xnom.*(1+2*(par_var/100).*rn);
         freq_rand = xr(3)/(2*pi)
         
-        %incertezas na estimação de tau
+        %uncertainties of tau estimation
         utau = 2;  %number of dts 
         u = zeros(length(Xm),length(t));
         tau = dt*randi([-utau utau],1);
@@ -139,19 +139,19 @@ for ti = 1:9
         SignalParams(8) = 0;
         DelayCorr = 0; %-3500.0; %   %[in nanosecond]
         MagCorr = 1;
-        [Synx(k,:),Freq(k,:),ROCOF(k,:)] = SteadyStateFit ( ...
-            SignalParams, ...
-            DelayCorr, ...
-            MagCorr, ...
-            F0, ...
-            AnalysisCycles, ...
-            SampleRate, ...
-            Signal ...
-            );
-        FE_SS(k) = Wf/(2*pi) - Freq(k);   %[Hz]
+%         [Synx(k,:),Freq(k,:),ROCOF(k,:)] = SteadyStateFit ( ...
+%             SignalParams, ...
+%             DelayCorr, ...
+%             MagCorr, ...
+%             F0, ...
+%             AnalysisCycles, ...
+%             SampleRate, ...
+%             Signal ...
+%             );
+%         FE_SS(k) = Wf/(2*pi) - Freq(k);   %[Hz]
         FE_LM(k) = Wf/(2*pi) - X(3)/(2*pi);   %[Hz]
         
-        %Fasor medio
+        %Intermediate phasor
         T = NSamples*dt;
         tau_est = tau_pp + tau/NSamples;
         if KaS ~= 0
@@ -175,12 +175,12 @@ for ti = 1:9
     end
     
  
-    ERR_MAX = max(errors)*100';   %erros maximos em %
-    ERR_MIN = min(errors)*100';   %erros minimos em %    
-    MEAN_ERR = mean(errors)*100;  %erros medios em %
-    STDEV_ERR = std(errors)*100;  % desvio padrao em %
+    ERR_MAX = max(errors)*100';   %max errors in [%]
+    ERR_MIN = min(errors)*100';   %max errors in [%]    
+    MEAN_ERR = mean(errors)*100;  %max errors in [%]
+    STDEV_ERR = std(errors)*100;  %standard deviation in [%]
 
-    %Erros do fasor medio em [%]
+    %Intermediate phasor errors [%]
     Phasor_mag_errmax(ti,1) = max(Phasor_mag_error)*100;
     Phasor_mag_errmax_abs(ti,1) = max(abs(Phasor_mag_error))*100;
     Phasor_ph_errmax(ti,1) = max(Phasor_ph_error)*100;
@@ -192,14 +192,14 @@ for ti = 1:9
     Phasor_mag_errstdev(ti,1) = std(Phasor_mag_error)*100;
     Phasor_ph_errstdev(ti,1) = std(Phasor_ph_error)*100;        
     
-    %Erros de magnitude X1 em [%]
+    %X1 magnitude errors in [%]
     Mag_errmax(ti,1) = ERR_MAX(1);
     Mag_errmin(ti,1) = ERR_MIN(1);
     Mag_errmed(ti,1) = MEAN_ERR(1);
     Mag_stddev(ti,1) = STDEV_ERR(1);
     Mag_errmax_abs(ti,1) = max(abs([ERR_MAX(1),ERR_MIN(1)]));
     
-    %Erros de frequencia em [%]
+    %Frequency errors in [%]
     if KaS ~= 0
         ifreq = 2;
     else
@@ -211,7 +211,7 @@ for ti = 1:9
     Freq_stddev(ti,1) = STDEV_ERR(ifreq);
     Freq_errmax_abs(ti,1) = max(abs([ERR_MAX(ifreq),ERR_MIN(ifreq)]));
     
-    %Erros de fase em [%]
+    %Phase errors [%]
     if KaS ~= 0
         iph = 3;
     else
@@ -223,7 +223,7 @@ for ti = 1:9
     Ph_stddev(ti,1) = STDEV_ERR(iph);    
     Ph_errmax_abs(ti,1) = max(abs([ERR_MAX(iph),ERR_MIN(iph)]));
     
-    %Erros de degrau (KxS ou KaS) em [%]
+    %(KxS or KaS) errors in [%]
     if KaS ~= 0
         ik = 4;
     else
