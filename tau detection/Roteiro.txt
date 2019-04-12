@@ -1,0 +1,20 @@
+Rodando com:
+chamada_MC_tau_detector_2.m
+
+
+- reportar os resultados com o detector v4
+
+- variar a amplitude do degrau, até agora limitamos a análise a 10% em magnitude
+-> a variação da amplitude será mais significativa para sinais ruidosos
+- variar o ruído até 30dB
+
+- realizar o mesmo estudo em degrau de fase
+- realizar o mesmo estudo em sinais trifásicos
+
+- verificar que a detecção não é afetada pelo valor de tau, mas pelo fato de o degrau ocorrer perto do cruzamento por zero, independente da posição na janela (exceto os que ocorrem perto das extremidades, pois não são detectáveis por Hilbert). O gerador está projetado de forma que esta situação ocorra com a fase incial em 90 graus.
+
+- montar gráfico com o nível de 
+
+
+Montagem:
+- relatar o nivel de ruido inesperado com a amplificação

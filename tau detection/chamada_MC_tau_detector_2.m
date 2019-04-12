@@ -2,21 +2,23 @@ clear all; close all; clc;
 
 %chamada para MC - detecção de tau 
 
-SNR = 90; %SNR em db
+SNR = 35; %SNR em db
 Pin = 90; %fase inicial em graus
-%lim_mag = 0.1:0.1:7; %limiar do detector de magnitude (x mediana)
-%lim_fase = 1:0.2:7;%limiar do detector de fase (x mediana)
 
-%obs: nestes valores, praticamente atua somente o detector de mag
-lim_mag = 1; %limiar do detector de magnitude (x mediana)
-lim_fase = 7;%limiar do detector de fase (x mediana)
+%conjuntos de limiares para a simulação
+lim_mag = 0.1:0.1:7; %limiar do detector de magnitude (x mediana)
+lim_fase = 1:0.2:7;%limiar do detector de fase (x mediana)
+%obs: nos valores abaixo, praticamente atua somente o detector de mag
+%lim_mag = 1; %limiar do detector de magnitude (x mediana)
+%lim_fase = 7;%limiar do detector de fase (x mediana)
 
 Nruns = 10000; %numero de rodadas de Monte Carlo
+KxS = 0.2;
 
 for m = 1:length(lim_mag)
     for n = 1:length(lim_fase)
         tau_pp_lims = [0.4990 0.5010]; %conjunto de posições relativas de tau dentro da janela
-        [tau_errors,tau_pp, extremos(m,n), det_mag(m,n),det_fase(m,n),det_nan(m,n)] = MC_tau_error_hibrid_detector_v4_taurand(SNR,Pin,lim_mag(m),lim_fase(n),tau_pp_lims,Nruns);
+        [tau_errors,tau_pp, extremos(m,n), det_mag(m,n),det_fase(m,n),det_nan(m,n)] = MC_tau_error_hibrid_detector_v4_taurand(KxS,SNR,Pin,lim_mag(m),lim_fase(n),tau_pp_lims,Nruns);
         display([lim_mag(m) lim_fase(n)])
         
     end
@@ -41,5 +43,5 @@ display('OK')
 
 %surf(erro_tau_percentual)
 % 
-% surf(lim_mag,lim_fase,erro_tau_percentual')
-% xlabel('lim_{mag}');ylabel('lim_{fase}')
+surf(lim_mag,lim_fase,erro_tau_percentual')
+xlabel('lim_{mag}');ylabel('lim_{fase}')

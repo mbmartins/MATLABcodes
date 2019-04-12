@@ -1,4 +1,4 @@
-function [tau_error,tau_pp,extremos,det_mag,det_fase,det_nan] = MC_tau_error_hibrid_detector_v4_taurand(SNR,Pin,lim_mag,lim_fase,tau_pp_lims,Nruns)
+function [tau_error,tau_pp,extremos,det_mag,det_fase,det_nan] = MC_tau_error_hibrid_detector_v4_taurand(KxS,SNR,Pin,lim_mag,lim_fase,tau_pp_lims,Nruns)
 %Detection of tau using hilbert transform
 display('v4 running - random tau')
 
@@ -45,7 +45,7 @@ for k = 1:Nruns
 
     KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
     KaS = KaS + KaS*2*UKa/100*(rand-0.5);
-    KxS = 0.1;   % magnitude step index: 0.1 
+    %KxS = 0.1;   % magnitude step index: 0.1 
     KxS = KxS + KxS*2*UKx/100*(rand-0.5);
     Wf = 2*pi*F1;  % fundamental frequency
 
