@@ -2,10 +2,12 @@ Rodando com:
 chamada_MC_tau_detector_2.m
 
 
-- reportar os resultados com o detector v4
+- reportar os resultados com o detector v4:
+
+
 
 - variar a amplitude do degrau, até agora limitamos a análise a 10% em magnitude
--> a variação da amplitude será mais significativa para sinais ruidosos
+-> a variação da amplitude será mais significativa para sinais ruidosos??
 - variar o ruído até 30dB
 
 - realizar o mesmo estudo em degrau de fase
@@ -15,6 +17,9 @@ chamada_MC_tau_detector_2.m
 
 - montar gráfico com o nível de 
 
+-> Ruído maior prejudica a detecção
+-> usar PATV para fazer um "denoising" do sinal de gmi e fi, de forma que se aplique o gradiente no sinal resultante
 
 Montagem:
-- relatar o nivel de ruido inesperado com a amplificação
+- preparar um gerador de sinal com dois degraus, para representar um afundamento
+- gerar sinais com degraus
