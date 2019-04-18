@@ -1,0 +1,343 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      -->
+      <title>Example 1: Polynomial approximation + total variation filtering</title>
+      <meta name="generator" content="MATLAB 7.8">
+      <meta name="date" content="2013-03-07">
+      <meta name="m-file" content="Example1"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head>
+   <body>
+      <div class="content">
+         <h1>Example 1: Polynomial approximation + total variation filtering</h1>
+         <!--introduction-->
+         <p>Example: Simultaneous least-square polynomial approximation and total variation filtering. The algorithm in derived using
+            majorization-minimization (MM).
+         </p><pre>Ivan Selesnick,
+Polytechnic Institute of NYU</pre>
+         <!--/introduction--><h2>Contents</h2>
+         <div>
+            <ul>
+               <li><a href="#1">Start</a></li>
+               <li><a href="#2">Create test signals</a></li>
+               <li><a href="#3">Create noisy signal</a></li>
+               <li><a href="#4">Perform PATV filtering</a></li>
+               <li><a href="#8">Optimality scatter plot</a></li>
+               <li><a href="#9">PATV with logarithmic penalty</a></li>
+            </ul>
+         </div>
+         <h2>Start<a name="1"></a></h2><pre class="codeinput">clear
+close <span class="string">all</span>
+<span class="comment">% addpath extra_functions/</span>
+
+printme = @(filename) print(<span class="string">'-dpdf'</span>, sprintf(<span class="string">'figures/Example1_%s'</span>, filename));
+</pre><h2>Create test signals<a name="2"></a></h2><pre class="codeinput">N = 100;                            <span class="comment">% N : length of data</span>
+n = (1:N)';
+s1 = n &lt; 0.3*N;                     <span class="comment">% s1 : step function</span>
+s2 = 2-2*((n-N/2)/(N/2)).^2;
+s2 = s2 + n/N;                      <span class="comment">% s2 : polynomial function</span>
+
+randn(<span class="string">'state'</span>,0);                   <span class="comment">% Initialize randn so that example can be exactly reproduced</span>
+sigma = 0.25;
+noise = sigma * randn(N,1);
+</pre><h2>Create noisy signal<a name="3"></a></h2>
+         <p>Create polynomial signal with additive step discontinuity</p><pre class="codeinput">s = s1 + s2;                <span class="comment">% s : polynomial signal with additive step discontinuity</span>
+y = s + noise;              <span class="comment">% y : noisy signal</span>
+
+figure(1)
+plot(n, y, <span class="string">'.k'</span>)
+title(<span class="string">'Noisy data'</span>);
+printme(<span class="string">'data'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_01.png" alt=""> <h2>Perform PATV filtering<a name="4"></a></h2>
+         <p>PATV: Least square polynomial approximation + total variation denoising</p><pre class="codeinput"><span class="comment">% parameters</span>
+d = 2;                          <span class="comment">% d : degree of approximation polynomial</span>
+lam = 1.5;                      <span class="comment">% lambda : regularization parameter</span>
+Nit = 100;                      <span class="comment">% Nit : number of iterations</span>
+
+[x, p, cost, u, v] = patv_MM(y, d, lam, Nit);
+
+<span class="comment">% display cost function history</span>
+figure(1)
+plot(1:Nit, cost)
+title(<span class="string">'PATV algorithm - Cost function history'</span>);
+xlabel(<span class="string">'Iteration'</span>)
+ylabel(<span class="string">'Cost function value'</span>)
+ylim([3.3 4.5])
+printme(<span class="string">'convergence'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_02.png" alt=""> <p>Display calculated TV component</p><pre class="codeinput">figure(1)
+clf
+plot(n, x, <span class="string">'k'</span>)
+title(<span class="string">'Calculated TV component (PATV)'</span>);
+printme(<span class="string">'TV_component'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_03.png" alt=""> <p>Display TV-compensated data</p><pre class="codeinput">figure(2)
+clf
+plot(n, y - x, <span class="string">'.k'</span>)
+title(<span class="string">'TV-compensated data (PATV)'</span>);
+printme(<span class="string">'TV_compensated_data'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_04.png" alt=""> <p>Display estimated signal</p><pre class="codeinput">figure(1)
+clf
+plot(n, y,<span class="string">'.k'</span>, n, x+p, <span class="string">'black'</span>)
+title(<span class="string">'Estimated signal (PATV)'</span>);
+legend(<span class="string">'Data'</span>,<span class="string">'Estimated signal'</span>, <span class="string">'Location'</span>,<span class="string">'south'</span>)
+printme(<span class="string">'PATV'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_05.png" alt=""> <h2>Optimality scatter plot<a name="8"></a></h2><pre class="codeinput">phi_L1 = @(x) lam * abs(x);
+wfun_L1 = @(x) abs(x)/lam;
+dphi_L1 = @(x) lam * sign(x);
+
+t = [linspace(-1, -eps, 100) linspace(eps, 1, 100)];
+
+MS = 8;
+
+figure(1)
+plot( u, v, <span class="string">'.'</span> , <span class="string">'markersize'</span>, MS)
+line(t, dphi_L1(t), <span class="string">'linestyle'</span>, <span class="string">':'</span>)
+ylim([-1 1] * lam * 1.8)
+xlabel(<span class="string">'u = Dx'</span>)
+ylabel(<span class="string">'S^T H(y - x)'</span>)
+title(<span class="string">'Scatter plot'</span>);
+printme(<span class="string">'scatter'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_06.png" alt=""> <h2>PATV with logarithmic penalty<a name="9"></a></h2><pre class="codeinput">lam = 1.5;
+a = 1.0;
+<span class="comment">% a = eps;    % L1 norm - reproduces above result</span>
+
+phi = @(x) lam/a * log(1 + a*abs(x));
+dphi = @(x) lam ./(1 + a*abs(x)) .* sign(x);
+wfun = @(x) abs(x) .* (1 + a*abs(x)) / lam;
+
+[x2, p2, cost2, u, v] = patv_MM2(y, d, phi, wfun, Nit);
+
+t = [linspace(-2, -eps, 100) linspace(eps, 2, 100)];
+
+figure(1)
+plot( u, v, <span class="string">'.'</span> , <span class="string">'markersize'</span>, MS)
+line(t, dphi(t), <span class="string">'linestyle'</span>, <span class="string">':'</span>)
+ylim([-1 1] * max(abs(v)) * 2)
+xlabel(<span class="string">'u = Dx'</span>)
+ylabel(<span class="string">'S^T H(y - x)'</span>)
+title(<span class="string">'Scatter plot (log penalty)'</span>);
+printme(<span class="string">'scatter_log'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_07.png" alt=""> <p>Display estimated signal</p><pre class="codeinput">figure(2)
+clf
+plot(n, y,<span class="string">'.k'</span>, n, x2+p2, <span class="string">'black'</span>)
+title(<span class="string">'Estimated signal (PATV with log penalty)'</span>);
+legend(<span class="string">'Data'</span>,<span class="string">'Estimated signal'</span>, <span class="string">'Location'</span>,<span class="string">'south'</span>)
+printme(<span class="string">'PATV_log'</span>)
+</pre><img vspace="5" hspace="5" src="Example1_08.png" alt=""> <p class="footer"><br>
+            Published with MATLAB&reg; 7.8<br></p>
+      </div>
+      <!--
+##### SOURCE BEGIN #####
+%% Example 1: Polynomial approximation + total variation filtering
+% Example: Simultaneous least-square polynomial approximation and total variation
+% filtering. The algorithm in derived using majorization-minimization (MM).
+%
+%  Ivan Selesnick,
+% Polytechnic Institute of NYU
+
+%% Start
+
+clear
+close all
+% addpath extra_functions/
+
+printme = @(filename) print('-dpdf', sprintf('figures/Example1_%s', filename));
+
+%% Create test signals
+
+N = 100;                            % N : length of data
+n = (1:N)';
+s1 = n < 0.3*N;                     % s1 : step function
+s2 = 2-2*((n-N/2)/(N/2)).^2;
+s2 = s2 + n/N;                      % s2 : polynomial function
+
+randn('state',0);                   % Initialize randn so that example can be exactly reproduced
+sigma = 0.25;
+noise = sigma * randn(N,1);
+
+
+%% Create noisy signal
+% Create polynomial signal with additive step discontinuity
+
+s = s1 + s2;                % s : polynomial signal with additive step discontinuity
+y = s + noise;              % y : noisy signal
+
+figure(1)
+plot(n, y, '.k')
+title('Noisy data');
+printme('data')
+
+
+%% Perform PATV filtering
+% PATV: Least square polynomial approximation + total variation denoising
+
+% parameters
+d = 2;                          % d : degree of approximation polynomial
+lam = 1.5;                      % lambda : regularization parameter
+Nit = 100;                      % Nit : number of iterations
+
+[x, p, cost, u, v] = patv_MM(y, d, lam, Nit);
+
+% display cost function history
+figure(1)
+plot(1:Nit, cost)
+title('PATV algorithm - Cost function history');
+xlabel('Iteration')
+ylabel('Cost function value')
+ylim([3.3 4.5])
+printme('convergence')
+
+
+%%
+% Display calculated TV component
+
+figure(1)
+clf
+plot(n, x, 'k')
+title('Calculated TV component (PATV)');
+printme('TV_component')
+
+%%
+% Display TV-compensated data
+
+figure(2)
+clf
+plot(n, y - x, '.k')
+title('TV-compensated data (PATV)');
+printme('TV_compensated_data')
+
+%%
+% Display estimated signal
+
+figure(1)
+clf
+plot(n, y,'.k', n, x+p, 'black') 
+title('Estimated signal (PATV)');
+legend('Data','Estimated signal', 'Location','south')
+printme('PATV')
+
+
+%% Optimality scatter plot
+
+
+phi_L1 = @(x) lam * abs(x);
+wfun_L1 = @(x) abs(x)/lam;
+dphi_L1 = @(x) lam * sign(x);
+
+t = [linspace(-1, -eps, 100) linspace(eps, 1, 100)];
+
+MS = 8;
+
+figure(1)
+plot( u, v, '.' , 'markersize', MS)
+line(t, dphi_L1(t), 'linestyle', ':')
+ylim([-1 1] * lam * 1.8)
+xlabel('u = Dx')
+ylabel('S^T H(y - x)')
+title('Scatter plot');
+printme('scatter')
+
+
+
+%% PATV with logarithmic penalty
+
+lam = 1.5;
+a = 1.0;
+% a = eps;    % L1 norm - reproduces above result
+
+phi = @(x) lam/a * log(1 + a*abs(x));
+dphi = @(x) lam ./(1 + a*abs(x)) .* sign(x);
+wfun = @(x) abs(x) .* (1 + a*abs(x)) / lam;
+
+[x2, p2, cost2, u, v] = patv_MM2(y, d, phi, wfun, Nit);
+
+t = [linspace(-2, -eps, 100) linspace(eps, 2, 100)];
+
+figure(1)
+plot( u, v, '.' , 'markersize', MS)
+line(t, dphi(t), 'linestyle', ':')
+ylim([-1 1] * max(abs(v)) * 2)
+xlabel('u = Dx')
+ylabel('S^T H(y - x)')
+title('Scatter plot (log penalty)');
+printme('scatter_log')
+
+%%
+% Display estimated signal
+
+figure(2)
+clf
+plot(n, y,'.k', n, x2+p2, 'black') 
+title('Estimated signal (PATV with log penalty)');
+legend('Data','Estimated signal', 'Location','south')
+printme('PATV_log')
+
+
+%%
+
+
+##### SOURCE END #####
+-->
+   </body>
+</html>
