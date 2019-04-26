@@ -3,16 +3,22 @@ clear all; close all; clc;
 %nominal parameters
 F0 = 60; F1 = 59.8; Fs = 4800;
 Ps = 90; NCycles = 6;
-NSamples = floor(NCycles*Fs/F0);
-n = 1:NSamples;
+SNR = 60;
+tau1 = 0.5;  % in [%] of the time window
+SAG_cycles = 1; %duration of SAG
+KaS = 0; %[degrees]
+KxS = -0.05; % [relative step]
+th_gmi = 1e-3; th_fi = 1e-4; %thresholds for detection
+br = 0.02; %percentage of samples to be ignored in detection
 
-%parameters to set
-SNR = 50;
-tau1 = 0.0;  % in [%] of the time window
-tau2 = tau1+(Fs/F0)/NSamples;  %+1 cycle
-KaS = -10; %[degrees]
-KxS = -0.1; % [relative step]
-th_gmi = 1e-4; th_fi = 1e-4;
+NSamples = floor(NCycles*Fs/F0);
+samples_cycle = Fs/F0;
+br_mask = ones(1,NSamples); %mask to ignore samples
+br_mask(1:floor(br*NSamples)) = 0; 
+br_mask(floor((1-br)*NSamples):NSamples) = 0; 
+tau2 = tau1+SAG_cycles*(Fs/F0)/NSamples; % time to end SAG in [%]
+
+n = 1:NSamples;
 th_gmi_v(1:NSamples) = th_gmi; %threshold for magnitude detection
 th_fi_v(1:NSamples) = th_fi; %threshold for frequency detection
 
@@ -25,7 +31,7 @@ fi = unwrap(angle(z)); gmi = abs(z);
 
 figure(1)
 
-subplot(3,1,1); plot(Signal); title('Signal')
+subplot(3,1,1); plot(Signal); title('Signal'); grid on
 subplot(3,1,2); plot(fi); title('Instantaneous frequency')
 subplot(3,1,3); plot(gmi); title('Instantaneous magnitude')
 
@@ -41,8 +47,22 @@ lam_fi = 1;
 lam_gmi = 0.5;   % lambda : regularization parameter
 Nit = 10;                      % Nit : number of iterations
 
+%loPATV params
+% a = 1.0;
+% % a = eps;    % L1 norm - reproduces above result
+% phi_fi = @(x) lam_fi/a * log(1 + a*abs(x));
+% phi_gmi = @(x) lam_gmi/a * log(1 + a*abs(x));
+% %dphi = @(x) lam ./(1 + a*abs(x)) .* sign(x);
+% wfun_fi = @(x) abs(x) .* (1 + a*abs(x)) / lam_fi;
+% wfun_gmi = @(x) abs(x) .* (1 + a*abs(x)) / lam_gmi;
+
+%PATV algorithm
 [x_fi, p_fi, cost_fi, u, v] = patv_MM(fi, d_fi, lam_fi, Nit);
 [x_gmi,p_gmi, cost_gmi, u, v] = patv_MM(gmi, d_gmi, lam_gmi, Nit);
+
+%loPATV algorithm
+% [x_fi, p_fi, cost_fi, u, v] = patv_MM2(fi, d_fi,phi_fi,wfun_fi, Nit);
+% [x_gmi,p_gmi, cost_gmi, u, v] = patv_MM2(gmi, d_gmi,phi_gmi,wfun_gmi, Nit);
 
 % display cost function history
 figure(2)
@@ -68,7 +88,7 @@ subplot(2,1,1)
 plot(n, gmi,'.k', n, x_gmi+p_gmi, 'black') 
 title('Calculated TV component (PATV) - Magnitude');
 legend('Data','Estimated signal', 'Location','southeast')
-detector_gmi = abs(gradient(x_gmi));
+detector_gmi = br_mask'.*abs(gradient(x_gmi));
 subplot(2,1,2)
 plot(n,detector_gmi,'b');  ylabel('Detection signal')
 %d2_gmi = abs(detector_gmi.*gradient(detector_gmi)); hold on; plot(n,d2_gmi)
@@ -80,22 +100,24 @@ plot(n,detector_gmi,'b');  ylabel('Detection signal')
 %[gmi_min,imin] = min(detector_gmi);
 % ignores adjacent samples
 %br = floor(0.02*NSamples);
-aind = imax_gmi-1;
-while detector_gmi(aind)>th_gmi
-    detector_gmi(aind:imax_gmi) = 0;
-    aind = aind - 1;
-end
-aind = imax_gmi+1;
-while detector_gmi(aind)>th_gmi
-    detector_gmi(imax_gmi:aind) = 0;
-    aind = aind + 1;
-end
+aind = floor(samples_cycle)/2; %ignores half cycle centered in imax_gmi
+detector_gmi(imax_gmi(1)-aind:imax_gmi(1)+aind) = 0;
+%aind = imax_gmi-1;
+% while detector_gmi(aind)>th_gmi
+%     detector_gmi(aind:imax_gmi) = 0;
+%     aind = aind - 1;
+% end
+% aind = imax_gmi+1;
+% while detector_gmi(aind)>th_gmi
+%     detector_gmi(imax_gmi:aind) = 0;
+%     aind = aind + 1;
+% end
 hold on; plot(n,detector_gmi,'red',n,th_gmi_v,'k--')
 legend('d1_{gmi}','d2_{gmi}', 'Location','southeast')
 [gmi_max(2),imax_gmi(2)] = maxk(detector_gmi,1);
 
 %detector_fi
-detector_fi = abs(gradient(x_fi));
+detector_fi = br_mask'.*abs(gradient(x_fi));
 figure(4)
 subplot(2,1,1)
 plot(n, fi,'.k', n, x_fi+p_fi, 'black') 
@@ -108,7 +130,7 @@ plot(n,detector_fi,'b');  ylabel('Detection signal')
 
 %ignore adjacent samples
 %detector_fi(imax_fi-br:imax_fi+br) = 0; 
-aind = imax_fi-1;
+aind = imax_fi-floor((Fs/F0)/NSamples/2);
 while detector_fi(aind)>th_fi
     detector_fi(aind:imax_fi) = 0;
     aind = aind - 1;
@@ -147,14 +169,21 @@ FE = (f_est - F1)*100/F1
 %problemas: 
 % 1 - indices excedendo as bordas (na hora de excluir do sinal de
 % detecção) -> implementar um teste para isso não ocorrer
-% por exemplo, baseado no th_gmi - ok
+% por exemplo, baseado no th_gmi - ok, mas usando meio ciclo em torno do
+% pico funcionou melhor
+
 % 2 - picos ocorrendo perto das bordas (falsos ou verdadeiros) quando f1
 % está fora da nominal
 % -> implementar exclusão próximo das bordas (2 a 5%) ??
 % -> picos verdadeiros terão que ser excluídos -> limitação do método
 % talvez identificar de alguma forma o número de degraus pelo PATV
 % o PATV "filtra" as não idealidades de Hilbert próximo a borda
+
 % 3 - redução do desempenho da detecção quando os degraus estão próximos da
-% borda
+% borda -> limitação do método -> determinar os limites
+
 % 4 - quando só existe tau2, fazendo tau1<=0 -> ver como o sort lida com
-% NaN
+% NaN -> na verdade há um problema no cálculo do erro...
+
+% 5 - possibilidade de usar o LoPATV para melhoria do desempenho, se
+% necessário - não funcionou bem...
