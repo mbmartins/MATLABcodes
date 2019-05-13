@@ -1,5 +1,5 @@
-function [FE,tau_error] = HE(SNR,KxS,KaS,Ps,tau1,SAG_cycles)
-% estimates frequency and number of tau_error > 2dt using HE estimator
+function [FE,tau_error] = NLHE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles)
+% estimates frequency and tau_errors using NLHE estimator
 %clear all; close all; clc;
 
 %nominal parameters
@@ -49,8 +49,8 @@ fi = unwrap(angle(z)); gmi = abs(z);
 % parameters
 d_fi = 1;                          % d : degree of approximation polynomial
 d_gmi = 0;
-lam_fi = 1;
-lam_gmi = 0.5;   % lambda : regularization parameter
+lambda_fi = 1;
+lambda_gmi = 0.5;   % lambda : regularization parameter
 Nit = 10;                      % Nit : number of iterations
 
 %loPATV params
@@ -63,8 +63,8 @@ Nit = 10;                      % Nit : number of iterations
 % wfun_gmi = @(x) abs(x) .* (1 + a*abs(x)) / lam_gmi;
 
 %PATV algorithm
-[x_fi, p_fi, cost_fi, u, v] = patv_MM(fi, d_fi, lam_fi, Nit);
-[x_gmi,p_gmi, cost_gmi, u, v] = patv_MM(gmi, d_gmi, lam_gmi, Nit);
+[x_fi, p_fi, cost_fi, u, v] = patv_MM(fi, d_fi, lambda_fi, Nit);
+[x_gmi,p_gmi, cost_gmi, u, v] = patv_MM(gmi, d_gmi, lambda_gmi, Nit);
 
 %loPATV algorithm
 % [x_fi, p_fi, cost_fi, u, v] = patv_MM2(fi, d_fi,phi_fi,wfun_fi, Nit);
@@ -97,7 +97,7 @@ Nit = 10;                      % Nit : number of iterations
 detector_gmi = br_mask'.*abs(gradient(x_gmi));
 % subplot(2,1,2)
 % plot(n,detector_gmi,'b');  ylabel('Detection signal')
-d2_gmi = abs(detector_gmi.*gradient(detector_gmi)); 
+%d2_gmi = abs(detector_gmi.*gradient(detector_gmi)); 
 
 %hold on; plot(n,d2_gmi)
 
@@ -146,11 +146,13 @@ end
 
 % error calculation
 [tau_est_gmi, gmi_ind] = sort(imax_gmi); %error in samples
-tau_est_gmi(gmi_max < th_gmi) = NaN; % check if estimates are valid
+tau_est_gmi(gmi_max(gmi_ind) < th_gmi) = NaN; % check if estimates are valid
+[tau_est_gmi,gmi_ind] = sort(tau_est_gmi(gmi_ind));
 tau_error_gmi = (tau_est_gmi - [tau1 tau2]*NSamples); %error in [dt]
 
 [tau_est_fi,fi_ind] = sort(imax_fi); %tau estimated in [samples]
-tau_est_fi(fi_max < th_fi) = NaN; % check if estimates are valid
+tau_est_fi(fi_max(fi_ind) < th_fi) = NaN; % check if estimates are valid
+[tau_est_fi,fi_ind] = sort(tau_est_fi(fi_ind));
 tau_error_fi = (tau_est_fi - [tau1 tau2]*NSamples); %error in [dt]
 
 %criterio de escolha mag x freq com denoising: usar a maior diferença para 
