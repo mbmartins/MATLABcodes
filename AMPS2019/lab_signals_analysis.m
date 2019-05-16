@@ -11,6 +11,8 @@ n1 = wav_aux.TimePlot0;
 ini_sample = 28600; end_sample = ini_sample + 480;
 wav1 = wav_aux.AmplitudePlot0(n1 >= ini_sample & n1 < end_sample);
 
-%SNR = snr(wav1(1:2*4800));
+SNR = snr(wav_aux.AmplitudePlot0(1:2*4800))
 
 [tau1,tau2,fest] = tau_estimator(wav1,F0,Fs)
+
+FE = fest - F0
