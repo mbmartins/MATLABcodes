@@ -1,4 +1,4 @@
-function [tau_error_HE] = HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles)
+function [tau_error_HE,FE] = HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles)
 % estimates number of tau_error > 2dt using NLHE estimator
 %clear all; close all; clc;
 
@@ -11,7 +11,7 @@ k = 1;
 AnalysisCycles = 6;
 NSamples = floor(AnalysisCycles*Fs/F0);
 lim_mag = 3;
-lim_fase = 8;
+lim_fase = 3; % valor 8 praticamente fase não atua...
 tau_pp = tau1;
 tau2 = tau1+SAG_cycles*(Fs/F0)/NSamples; % time to end SAG in [%]
 br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end
@@ -48,7 +48,9 @@ br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end
     z=hilbert(Signal');  % calculates the analytic signal associated with Signal
 
     df=gradient(unwrap(angle(z)));% Hilbert estimate of the instantaneous frequency of z
-    df=abs(df-median(df(br:end-br))); %v3mod
+    fest = median(df(br:end-br)); %frequency estimate
+    fest_hz = fest*Fs/(2*pi);
+    df=abs(df-fest); %v3mod
     
     %Ain = (Ain - mean(Ain))./abs(Ain);
     nn = 1:(NSamples);
@@ -77,3 +79,4 @@ br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end
 
     tau = (tau_0 + NSamples/2)*dt;
     tau_error_HE = (tau_e - tau)/dt;
+    FE = fest_hz - F1;

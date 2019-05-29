@@ -12,14 +12,14 @@ SNR =   [60 55  50  45  40  35 30];
 %Pss = [90 45 30 10 0];
 
 %angulo fixo
-Pss = 0;
+Pss = 90;
 
 %fixed parameters
 f0 = 60;
 tau1 = 0.5;  % in [%] of the time window
 SAG_cycles = 10; %duration of SAG 
-KaS = 0; %[degrees]
-KxS = 0.1; % [relative step]
+KaS = 10; %[degrees]
+KxS = -0.; % [relative step]
 HE_eps =  zeros(1,length(SNR));
 NLHE_eps =  zeros(1,length(SNR));
 MCruns = 10000;
@@ -57,7 +57,7 @@ xlabel('SNR [dB]')
 ylabel('FE [Hz/Hz]')
 
 figure
-plot(SNR,FE_mean, SNR,FE_mean + FE_std, SNR, FE_mean - FE_std)
+plot(SNR,FE_mean, SNR,FE_mean FE_std
 
 
 figure
@@ -66,6 +66,5 @@ semilogy(SNR,FE_std,'ko-');
 xlabel('SNR [dB]'); 
 ylabel('\sigma_{FE} [Hz]')
 % 
-%figure; histfit(FE_box(7,:))
 % figure
 % histfit(FE) %do último valor de SNR
