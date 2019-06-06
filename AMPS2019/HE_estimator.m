@@ -1,4 +1,4 @@
-function [tau_error_HE,FE] = HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles)
+function [tau_error_HE,FE] = HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles, lim_mag,lim_fase)
 % estimates number of tau_error > 2dt using NLHE estimator
 %clear all; close all; clc;
 
@@ -10,8 +10,6 @@ dt = 1/Fs;
 k = 1;
 AnalysisCycles = 6;
 NSamples = floor(AnalysisCycles*Fs/F0);
-lim_mag = 3;
-lim_fase = 3; % valor 8 praticamente fase não atua...
 tau_pp = tau1;
 tau2 = tau1+SAG_cycles*(Fs/F0)/NSamples; % time to end SAG in [%]
 br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end

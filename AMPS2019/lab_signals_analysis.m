@@ -13,6 +13,11 @@ wav1 = wav_aux.AmplitudePlot0(n1 >= ini_sample & n1 < end_sample);
 
 SNR = snr(wav_aux.AmplitudePlot0(1:2*4800))
 
+%TODO:
+% - adaptar o tau_estimator para estimação sem o PATV
+% - ajustar os thresholds e parametros iguais aos da simulação
+% - tentar medir os 3 casos simulados
+
 [tau1,tau2,fest] = tau_estimator(wav1,F0,Fs)
 
 FE = fest - F0
