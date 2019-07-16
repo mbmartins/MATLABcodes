@@ -1,4 +1,4 @@
-function [tau_error_HE,FE] = HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles, lim_mag,lim_fase)
+function [tau_error_HE,FE] = HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles, km,kf)
 % estimates number of tau_error > 2dt using NLHE estimator
 %clear all; close all; clc;
 
@@ -54,12 +54,12 @@ br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end
     nn = 1:(NSamples);
    
     [ifmax_fase, imax_fase] = max(abs(df(br:end-br))); %max indices
-    limiar_fase=lim_fase*median(abs(df(br:end-br)));
+    limiar_fase=kf*median(abs(df(br:end-br)));
     
     gmi=gradient(abs(z)); % estimate of the gradient of instantaneous magnitude of z
     gmi=abs(gmi-median(gmi(br:end-br))); %v3mod
     [ifmax_mag, imax_mag] = max(abs(gmi(br:end-br))); %max indices
-    limiar_mag=lim_mag*median(abs(gmi(br:end-br)));
+    limiar_mag=km*median(abs(gmi(br:end-br)));
     
     % Threshold detection - v4mod
     crit1 = ifmax_fase(1)/limiar_fase; %fase
