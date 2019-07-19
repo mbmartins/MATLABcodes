@@ -1,8 +1,8 @@
 %generation of performance comparison
 clear all; close all; clc
 
-SNR = 50;
-%SNR = 60:-10:30;
+SNR = 60;
+SNR = 60:-10:30;
 %SNR = 90:-10:30;
 
 %angulo phi_0, fixo ou tabela
@@ -16,8 +16,8 @@ SAG_cycles = 10; %duration of SAG
 KaS = 0.0; %[degrees]
 KxS = -0.1; % [relative step]
 
-km = 3;
-kf = 2; % a partir de 8 praticamente fase não atua...
+km = 10;
+kf = 3; % a partir de 8 praticamente fase não atua...
 
 MCruns = 10000;
 
@@ -26,11 +26,11 @@ for ps = 1:length(Pss) % loop for different initial phases
         %MC engine
         for r = 1:MCruns  %taking the eps errors for tau1 only
             % Fixed phi_0
-            %Ps = Pss(ps);
+            Ps = Pss(ps);
             
             % random phi_0 from uniform distribution
-             Ps_rand(r) = 90*rand(1,1);
-             Ps = Ps_rand(r);
+            % Ps_rand(r) = 90*rand(1,1);
+            % Ps = Ps_rand(r);
             
             [tau_error_HE(r,:),FE_HE(r,:)] = HE_estimator(SNR(s),KxS,KaS,Ps,tau1,SAG_cycles,km,kf);
             %[tau_error_PATV_HE(r,:),FE_PATV_HE(r,:),dmax(r,:)] = PATV_HE_estimator(SNR(s),KxS,KaS,Ps,tau1,SAG_cycles);
