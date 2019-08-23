@@ -15,7 +15,7 @@ function [tau_error,FE, dmax] = PATV_HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles
 
 %nominal parameters
 F0 = 60; F1 = 60; Fs = 4800;
-Ps = 90; 
+%Ps = 90; 
 NCycles = 6;
 %SNR = 60;
 %tau1 = 0.5;  % in [%] of the time window
@@ -23,7 +23,13 @@ NCycles = 6;
 %KaS = 0; %[degrees]
 %KxS = -0.2; % [relative step]
 
-th_a_i = 1e-3; th_fi = 1e-2; %thresholds for detection
+th_a_i = 2.8e-3; th_fi = 4.8e-3; %thresholds for detection
+%km = 2e7;
+%kf = 100e9;
+
+%OBS: the thresholds with PATV are not easy to set relative to the median,
+%because the medians are usually too small.
+
 br = 0.05; %percentage of samples to be ignored in detection 
 
 NSamples = floor(NCycles*Fs/F0);
@@ -74,6 +80,7 @@ Nit = 10;                      % Nit : number of iterations
 % wfun_a_i = @(x) abs(x) .* (1 + a*abs(x)) / lam_a_i;
 
 %PATV algorithm
+%[x, p, cost, u, v] = patv_MM(y, d, lambda, Nit)
 [x_a_i,p_a_i, cost_a_i, u_a_i, v_a_i] = patv_MM(a_i, d_a_i, lambda_a_i, Nit);
 [x_theta_i, p_theta_i, cost_theta_i, u_theta_i, v_theta_i] = patv_MM(theta_i, d_theta_i, lambda_theta_i, Nit);
 
@@ -109,16 +116,27 @@ Nit = 10;                      % Nit : number of iterations
 % DETECTION SIGNALS
 %grad_a_i = abs(gradient(x_a_i));
 %grad_theta_i = abs(gradient(x_theta_i));
-grad_a_i = [abs(u_a_i); 0];
-grad_theta_i = [abs(u_theta_i); 0];
+% OBS: in the PATV procedure, the output signal u is already calculated as
+% a good approximation of the first order differences of x. 
+grad_a_i = [abs(u_a_i - median(u_a_i)); 0];
+grad_theta_i = [abs(u_theta_i - median(u_theta_i));0 ];
+
 detector_a_i = br_mask'.*grad_a_i;
 detector_theta_i = br_mask'.*grad_theta_i;
+
+%limiar_mag=km*median(abs(detector_a_i));
+%limiar_fase=kf*median(abs(detector_theta_i));
+limiar_mag = th_a_i; 
+limiar_fase = th_fi;
+
 
 % DETECTION OF FIRST PEAK
 [ga_i_max(1),imax_a_i(1)] = maxk(detector_a_i,1);
 [gtheta_i_max(1),imax_theta_i(1)] = maxk(detector_theta_i,1); %detects first peak
 
-dmax = ga_i_max(1); % valor a ser retornado para tentar compensar o efeito sistemático
+%dmax = ga_i_max(1); % valor a ser retornado para tentar compensar o efeito sistemático
+%dmax = median(abs(detector_a_i));
+dmax = gtheta_i_max(1);
 
 % subplot(2,1,2)
 % plot(n,detector_a_i,'b');  ylabel('Detection signal')
@@ -138,7 +156,7 @@ detector_theta_i2 = detector_theta_i;
 %ignores half cycle centered in imax_theta_i
 n_ini = ((imax_theta_i(1)-aind)>1)*(imax_theta_i(1)-aind-1) + 1;
 n_end = ((imax_theta_i(1)+aind)<NSamples)*(imax_theta_i(1)+aind-1) + 1;
-detector_theta_i2(imax_theta_i(1)-aind:imax_theta_i(1)+aind) = 0;
+detector_theta_i2(n_ini:n_end) = 0;
 
 % DETECTION OF SECOND PEAK
 [ga_i_max(2),imax_a_i(2)] = maxk(detector_a_i2,1);
@@ -173,28 +191,53 @@ detector_theta_i2(imax_theta_i(1)-aind:imax_theta_i(1)+aind) = 0;
 
 % error calculation
 [tau_est_a_i, a_i_ind] = sort(imax_a_i); %error in samples
-tau_est_a_i(ga_i_max(a_i_ind) < th_a_i) = NaN; % check if estimates are valid
+tau_est_a_i(ga_i_max(a_i_ind) < limiar_mag) = NaN; % check if estimates are valid
 [tau_est_a_i,a_i_ind] = sort(tau_est_a_i(a_i_ind));
 tau_error_a_i = (tau_est_a_i - [tau1 tau2]*NSamples); %error in [dt]
 
 [tau_est_theta_i,theta_i_ind] = sort(imax_theta_i); %tau estimated in [samples]
-tau_est_theta_i(gtheta_i_max(theta_i_ind) < th_fi) = NaN; % check if estimates are valid
+tau_est_theta_i(gtheta_i_max(theta_i_ind) < limiar_fase) = NaN; % check if estimates are valid
 [tau_est_theta_i,theta_i_ind] = sort(tau_est_theta_i(theta_i_ind));
 tau_error_theta_i = (tau_est_theta_i - [tau1 tau2]*NSamples); %error in [dt]
 
 %criterio de escolha mag x freq com denoising: usar a maior diferença para 
-% o limiar
-crit = ga_i_max(a_i_ind) - th_a_i > gtheta_i_max(theta_i_ind) - th_fi;
+% o limiar ??
+%crit = ga_i_max(a_i_ind) - th_a_i > gtheta_i_max(theta_i_ind) - th_fi;
+%% OU
+%% usar a razão, para manter o paralelismo
+
+crit = ga_i_max(a_i_ind)/limiar_mag > gtheta_i_max(theta_i_ind)/limiar_fase;
 tau_est(crit) = tau_est_a_i(crit);
 tau_est(~crit) = tau_est_theta_i(~crit);
-tau_error = tau_est - [tau1 tau2]*NSamples;
+tau_error = tau_est -2 - [tau1 tau2]*NSamples;
+
+
+if abs(tau_error(1))>2
+    %false positive
+    ratio_a = ga_i_max(a_i_ind)/limiar_mag;
+    ratio_f = gtheta_i_max(theta_i_ind)/limiar_fase;
+    if ratio_a > ratio_f
+        tau_est;
+    end
+end
+if isnan(tau_error(1))
+    tau_est;
+end
+
+
 
 %calcular frequencia pela inclinação da fase
-P = polyfit(n,p_theta_i',1);
-f_est = P(1)*Fs/(2*pi);
-FE = (f_est - F1)*100/F1;
+%P = polyfit(n,p_theta_i',1);
+%f_est = P(1)*Fs/(2*pi);
 
-tau_est = tau_est/Fs;
+%calcular a freq pela mediana da freq istantanea
+f_est = median(diff(p_theta_i))*Fs/(2*pi);
+
+FE = (f_est - F1); %Hz
+
+
+tau_est = (tau_est)/Fs;
+
 
 %problemas: 
 % 1 - indices excedendo as bordas (na hora de excluir do sinal de
