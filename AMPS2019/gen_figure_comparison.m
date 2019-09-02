@@ -1,18 +1,20 @@
 %generation of performance comparison
 clear all; close all; clc
 
-SNR = 30;
-%SNR = 60:-10:30;
+%SNR = 30;
+SNR = 60:-10:30;
 %SNR = 90:-10:30;
 
 %angulo phi_0, fixo ou tabela
 Pss = 45;
-%Pss = 0:15:90;
+Pss = 0:15:90;
 
 %fixed parameters
 f0 = 60;
 tau1 = 0.5;  % in [%] of the time window
 SAG_cycles = 10; %duration of SAG 
+
+%CASE 3
 KaS = 10.0; %[degrees]
 KxS = -0.1; % [relative step]
 
@@ -21,7 +23,8 @@ km = 3;
 kf = 3; % a partir de 8 praticamente fase não atua...
 
 %limiares para PATV_HE
-
+lambda_a = 0.5;
+lambda_theta = .5;
 
 MCruns = 1000;
 
@@ -37,7 +40,7 @@ for ps = 1:length(Pss) % loop for different initial phases
             % Ps = Ps_rand(r);
             
             [tau_error_HE(r,:),FE_HE(r,:)] = HE_estimator(SNR(s),KxS,KaS,Ps,tau1,SAG_cycles,km,kf);
-            [tau_error_PATV_HE(r,:),FE_PATV_HE(r,:),dmax(r,:)] = PATV_HE_estimator(SNR(s),KxS,KaS,Ps,tau1,SAG_cycles);
+            [tau_error_PATV_HE(r,:),FE_PATV_HE(r,:),dmax(r,:)] = PATV_HE_estimator(SNR(s),KxS,KaS,Ps,tau1,SAG_cycles,lambda_a,lambda_theta);
             
         %Performance of tau estimation    
         crit_tau_HE(r) = abs(tau_error_HE(r,1))>2;
@@ -74,6 +77,8 @@ FE_std_PATV_HE
 eps_HE
 eps_PATV_HE
 beep
+
+dmax_min = min(dmax)
 
 %FE_corr = FE_mean_PATV_HE - 0.002213
 % dmax_mean = mean(dmax)

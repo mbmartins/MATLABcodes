@@ -1,4 +1,4 @@
-function [tau_error,FE, dmax] = PATV_HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles)
+function [tau_error,FE, dmax] = PATV_HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles,lambda_a,lambda_theta)
 % estimates frequency and tau_errors using NLHE estimator
 %clear all; close all; clc;
 
@@ -66,8 +66,8 @@ theta_i = unwrap(angle(z)); a_i = abs(z);
 % parameters
 d_theta_i = 1;                          % d : degree of approximation polynomial
 d_a_i = 0;
-lambda_theta_i = 1.;
-lambda_a_i = 0.5;   % lambda : regularization parameter
+lambda_a_i = lambda_a;   % lambda : regularization parameter
+lambda_theta_i = lambda_theta;
 Nit = 10;                      % Nit : number of iterations
 
 %loPATV params
