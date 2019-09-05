@@ -14,17 +14,21 @@ f0 = 60;
 tau1 = 0.5;  % in [%] of the time window
 SAG_cycles = 10; %duration of SAG 
 
-%CASE 3
-KaS = 10.0; %[degrees]
+%CASE 1
+KaS = 0.0; %[degrees]
 KxS = -0.1; % [relative step]
+
+%CASE 3
+% KaS = 10.0; %[degrees]
+% KxS = -0.1; % [relative step]
 
 %limiares para HE
 km = 3;
 kf = 3; % a partir de 8 praticamente fase não atua...
 
 %limiares para PATV_HE
-lambda_a = 0.5;
-lambda_theta = .5;
+lambda_a = 2;
+lambda_theta = 0.5;
 
 MCruns = 1000;
 
