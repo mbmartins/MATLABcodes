@@ -23,7 +23,8 @@ NCycles = 6;
 %KaS = 0; %[degrees]
 %KxS = -0.2; % [relative step]
 
-th_a_i = 2.8e-3; th_fi = 4.8e-3; %thresholds for detection
+th_a_i = .7e-3; 
+th_fi = 1.0e-3; %thresholds for detection
 %km = 2e7;
 %kf = 100e9;
 
@@ -118,8 +119,13 @@ Nit = 10;                      % Nit : number of iterations
 %grad_theta_i = abs(gradient(x_theta_i));
 % OBS: in the PATV procedure, the output signal u is already calculated as
 % a good approximation of the first order differences of x. 
-grad_a_i = [abs(u_a_i - median(u_a_i)); 0];
-grad_theta_i = [abs(u_theta_i - median(u_theta_i));0 ];
+% grad_a_i = [abs(u_a_i - median(u_a_i)); 0];
+% grad_theta_i = [abs(u_theta_i - median(u_theta_i));0 ];
+
+%OBS: na prática, as medianas são praticamente nulas
+%OBS2: na prática, 
+grad_a_i = [abs(u_a_i); 0];
+grad_theta_i = [abs(u_theta_i);0 ];
 
 detector_a_i = br_mask'.*grad_a_i;
 detector_theta_i = br_mask'.*grad_theta_i;
@@ -144,23 +150,23 @@ dmax = gtheta_i_max(1);
 %hold on; plot(n,d2_a_i)
 
 % DETECTION SIGNALS FOR THE SECOND PEAK
-aind = floor(samples_cycle)/2; %half cycle number of samples 
-detector_a_i2 = detector_a_i;
-% guarantee indices within [1,NSamples]
-n_ini = ((imax_a_i(1)-aind)>1)*(imax_a_i(1)-aind-1) + 1;
-n_end = ((imax_a_i(1)+aind)<NSamples)*(imax_a_i(1)+aind-1) + 1;
-%ignores half cycle centered in imax_a_i
-detector_a_i2(n_ini:n_end) = 0;
+% aind = floor(samples_cycle)/2; %half cycle number of samples 
+% detector_a_i2 = detector_a_i;
+% % guarantee indices within [1,NSamples]
+% n_ini = ((imax_a_i(1)-aind)>1)*(imax_a_i(1)-aind-1) + 1;
+% n_end = ((imax_a_i(1)+aind)<NSamples)*(imax_a_i(1)+aind-1) + 1;
+% %ignores half cycle centered in imax_a_i
+% detector_a_i2(n_ini:n_end) = 0;
 
-detector_theta_i2 = detector_theta_i;
-%ignores half cycle centered in imax_theta_i
-n_ini = ((imax_theta_i(1)-aind)>1)*(imax_theta_i(1)-aind-1) + 1;
-n_end = ((imax_theta_i(1)+aind)<NSamples)*(imax_theta_i(1)+aind-1) + 1;
-detector_theta_i2(n_ini:n_end) = 0;
+% detector_theta_i2 = detector_theta_i;
+% %ignores half cycle centered in imax_theta_i
+% n_ini = ((imax_theta_i(1)-aind)>1)*(imax_theta_i(1)-aind-1) + 1;
+% n_end = ((imax_theta_i(1)+aind)<NSamples)*(imax_theta_i(1)+aind-1) + 1;
+% detector_theta_i2(n_ini:n_end) = 0;
 
 % DETECTION OF SECOND PEAK
-[ga_i_max(2),imax_a_i(2)] = maxk(detector_a_i2,1);
-[gtheta_i_max(2),imax_theta_i(2)] = maxk(detector_theta_i2,1);
+% [ga_i_max(2),imax_a_i(2)] = maxk(detector_a_i2,1);
+% [gtheta_i_max(2),imax_theta_i(2)] = maxk(detector_theta_i2,1);
 
 % hold on; plot(n,detector_a_i,'red',n,th_a_i_v,'k--')
 % legend('d1_{a_i}','d2_{a_i}', 'Location','southeast')
@@ -209,8 +215,8 @@ tau_error_theta_i = (tau_est_theta_i - [tau1 tau2]*NSamples); %error in [dt]
 crit = ga_i_max(a_i_ind)/limiar_mag > gtheta_i_max(theta_i_ind)/limiar_fase;
 tau_est(crit) = tau_est_a_i(crit);
 tau_est(~crit) = tau_est_theta_i(~crit);
-tau_error = tau_est -2 - [tau1 tau2]*NSamples;
-
+%tau_error = tau_est -2 - [tau1 tau2]*NSamples;
+tau_error = tau_est - [tau1 tau2]*NSamples;
 
 if abs(tau_error(1))>2
     %false positive
@@ -231,9 +237,25 @@ end
 %f_est = P(1)*Fs/(2*pi);
 
 %calcular a freq pela mediana da freq istantanea
-f_est = median(diff(p_theta_i))*Fs/(2*pi);
+f_i = gradient(p_theta_i)*Fs/(2*pi);
+%f_i = diff(p_theta_i)*Fs/(2*pi);
+f_est = median(f_i);
 
-FE = (f_est - F1); %Hz
+phi_0_est = p_theta_i(1)*180/pi
+
+%fazer função para correção sistemática
+%freq_corr = 0.00298276140145513; %phi0 = 0
+% freq_corr = 0.00296409387030716; %phi0 = 15
+% freq_corr = 0.00296598890104022; %phi0 = 30
+% freq_corr = 0.00306010061155422; %phi0 = 45
+% freq_corr = 0.00323290947446844; %phi0 = 60
+% freq_corr = 0.00338467357633335; %phi0 = 75
+% freq_corr = 0.00342652604283979; %phi0 = 90
+freq_corr = 0;
+
+FE = (f_est - F1 - freq_corr*F1); %Hz
+
+
 
 
 tau_est = (tau_est)/Fs;
