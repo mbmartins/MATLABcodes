@@ -135,6 +135,12 @@ detector_theta_i = br_mask'.*grad_theta_i;
 limiar_mag = th_a_i; 
 limiar_fase = th_fi;
 
+%testes para determinar o limiar
+eta_a = a_i - p_a_i - x_a_i;
+var_eta_a = std(eta_a)
+eta_theta = theta_i - p_theta_i - x_theta_i;
+var_eta_theta = std(eta_theta)
+ratio_etas = var_eta_a/var_eta_theta
 
 % DETECTION OF FIRST PEAK
 [ga_i_max(1),imax_a_i(1)] = maxk(detector_a_i,1);
