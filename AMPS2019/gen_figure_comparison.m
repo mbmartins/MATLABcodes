@@ -1,16 +1,16 @@
 %generation of performance comparison
 clear all; close all; clc
 
-SNR = 60;
-%SNR = 60:-10:30;
+%SNR = 60;
+SNR = 60:-10:30;
 %SNR = 90:-10:30;
 
 %angulo phi_0, fixo ou tabela
-%Pss = 0;
-Pss = 0:15:90;
+Pss = 0;
+%Pss = 0:15:90;
 
 %fixed parameters
-f0 = 60.01;
+f0 = 60.0;
 tau1 = 0.5;  % in [%] of the time window
 SAG_cycles = 10; %duration of SAG 
 

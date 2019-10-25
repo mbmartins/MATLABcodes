@@ -242,10 +242,20 @@ end
 %P = polyfit(n,p_theta_i',1);
 %f_est = P(1)*Fs/(2*pi);
 
-%calcular a freq pela mediana da freq istantanea
+%calcular a freq pela mediana da freq instantanea
 f_i = gradient(p_theta_i)*Fs/(2*pi);
+f_i2 = gradient(theta_i)*Fs/(2*pi);
+
 %f_i = diff(p_theta_i)*Fs/(2*pi);
-f_est = median(f_i);
+f_est1 = median(f_i);
+f_est2 = mean(f_i2);
+
+%other PATV for frequency estimation
+[x_theta_i, p_theta_i, cost_theta_i, u_theta_i, v_theta_i,a] = patv_MM_modified(theta_i, d_theta_i, lambda_theta_i, Nit);
+f_i3 = gradient(p_theta_i)*Fs/(2*pi);
+f_est3 = median(f_i3);
+
+f_est = f_est3;
 
 phi_0_est = p_theta_i(1)*180/pi
 
