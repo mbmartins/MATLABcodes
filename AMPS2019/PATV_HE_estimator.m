@@ -14,7 +14,7 @@ function [tau_error,FE, dmax] = PATV_HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles
 
 
 %nominal parameters
-F0 = 60; F1 = 60; Fs = 4800;
+F0 = 60; F1 = 60; Fs = 4800*10;
 %Ps = 90; 
 NCycles = 6;
 %SNR = 60;

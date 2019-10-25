@@ -1,8 +1,8 @@
 %generation of performance comparison
 clear all; close all; clc
 
-%SNR = 60;
-SNR = 60:-10:30;
+SNR = 60;
+%SNR = 60:-10:30;
 %SNR = 90:-10:30;
 
 %angulo phi_0, fixo ou tabela
