@@ -65,7 +65,7 @@ theta_i = unwrap(angle(z)); a_i = abs(z);
 
 % parameters
 d_theta_i = 1;                          % d : degree of approximation polynomial
-d_a_i = 0;
+d_a_i = 1;
 lambda_a_i = lambda_a;   % lambda : regularization parameter
 lambda_theta_i = lambda_theta;
 Nit = 10;                      % Nit : number of iterations
@@ -81,8 +81,8 @@ Nit = 10;                      % Nit : number of iterations
 
 %PATV algorithm
 %[x, p, cost, u, v] = patv_MM(y, d, lambda, Nit)
-[x_a_i,p_a_i, cost_a_i, u_a_i, v_a_i] = patv_MM(a_i, d_a_i, lambda_a_i, Nit);
-[x_theta_i, p_theta_i, cost_theta_i, u_theta_i, v_theta_i] = patv_MM(theta_i, d_theta_i, lambda_theta_i, Nit);
+[c_a,s_a_i, cost_a_i, u_a_i, v_a_i] = patv_MM(a_i, d_a_i, lambda_a_i, Nit);
+[c_theta, s_theta_i, cost_theta_i, u_theta_i, v_theta_i] = patv_MM(theta_i, d_theta_i, lambda_theta_i, Nit);
 
 %loPATV algorithm
 % [x_fi, p_theta_i, cost_theta_i, u, v] = patv_MM2(fi, d_fi,phi_fi,wfun_fi, Nit);
@@ -118,9 +118,19 @@ Nit = 10;                      % Nit : number of iterations
 %grad_theta_i = abs(gradient(x_theta_i));
 % OBS: in the PATV procedure, the output signal u is already calculated as
 % a good approximation of the first order differences of x. 
-grad_a_i = [abs(u_a_i - median(u_a_i)); 0];
-grad_theta_i = [abs(u_theta_i - median(u_theta_i));0 ];
+%grad_a_i = [abs(u_a_i - median(u_a_i)); 0];
+%grad_theta_i = [abs(u_theta_i - median(u_theta_i));0 ];
 
+grad_a_i = [abs(u_a_i); 0];
+grad_theta_i = [abs(u_theta_i); 0];
+
+subplot(2,1,1)
+plot(grad_a_i)
+ylabel('d_m'); title('\lambda_a = 2.0, d = 0')
+subplot(2,1,2)
+plot(c_a); hold on; plot(s_a_i + c_a)
+ylabel('c_a')
+%talvez não seja necessário mais o br mask
 detector_a_i = br_mask'.*grad_a_i;
 detector_theta_i = br_mask'.*grad_theta_i;
 
@@ -209,7 +219,7 @@ tau_error_theta_i = (tau_est_theta_i - [tau1 tau2]*NSamples); %error in [dt]
 crit = ga_i_max(a_i_ind)/limiar_mag > gtheta_i_max(theta_i_ind)/limiar_fase;
 tau_est(crit) = tau_est_a_i(crit);
 tau_est(~crit) = tau_est_theta_i(~crit);
-tau_error = tau_est -2 - [tau1 tau2]*NSamples;
+tau_error = tau_est - [tau1 tau2]*NSamples;
 
 
 if abs(tau_error(1))>2
@@ -231,7 +241,7 @@ end
 %f_est = P(1)*Fs/(2*pi);
 
 %calcular a freq pela mediana da freq istantanea
-f_est = median(diff(p_theta_i))*Fs/(2*pi);
+f_est = median(diff(s_theta_i))*Fs/(2*pi);
 
 FE = (f_est - F1); %Hz
 

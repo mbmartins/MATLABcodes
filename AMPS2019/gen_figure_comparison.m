@@ -1,13 +1,13 @@
 %generation of performance comparison
 clear all; close all; clc
 
-%SNR = 30;
-SNR = 60:-10:30;
+SNR = 30;
+%SNR = 60:-10:30;
 %SNR = 90:-10:30;
 
 %angulo phi_0, fixo ou tabela
-Pss = 45;
-Pss = 0:15:90;
+Pss = 90;
+%Pss = 0:15:90;
 
 %fixed parameters
 f0 = 60;
@@ -18,17 +18,23 @@ SAG_cycles = 10; %duration of SAG
 KaS = 0.0; %[degrees]
 KxS = -0.1; % [relative step]
 
+%CASE 2
+%KaS = 10.0; %[degrees]
+%KxS = -0.; % [relative step]
+
 %CASE 3
-% KaS = 10.0; %[degrees]
-% KxS = -0.1; % [relative step]
+%  KaS = 10.0; %[degrees]
+%  KxS = -0.1; % [relative step]
 
 %limiares para HE
 km = 3;
 kf = 3; % a partir de 8 praticamente fase não atua...
 
 %limiares para PATV_HE
-lambda_a = 2;
-lambda_theta = 0.5;
+lambda_a = .5;
+lambda_theta = 1.;
+
+%relatado no primeiro draft: lambda_a = .5; lambda_theta = 1.
 
 MCruns = 1000;
 
