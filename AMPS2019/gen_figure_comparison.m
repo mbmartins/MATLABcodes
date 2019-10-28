@@ -1,6 +1,7 @@
 %generation of performance comparison
 clear all; close all; clc
 
+<<<<<<< HEAD
 SNR = 30;
 %SNR = 60:-10:30;
 %SNR = 90:-10:30;
@@ -8,6 +9,15 @@ SNR = 30;
 %angulo phi_0, fixo ou tabela
 Pss = 90;
 %Pss = 0:15:90;
+=======
+%SNR = 60;
+SNR = 60:-10:30;
+%SNR = 90:-10:30;
+
+%angulo phi_0, fixo ou tabela
+%Pss = 90;
+Pss = 0:15:90;
+>>>>>>> 1b26e89cb0b2ee77742e9cdfadda6ce5d88eb8db
 
 %fixed parameters
 f0 = 60;
@@ -15,8 +25,12 @@ tau1 = 0.5;  % in [%] of the time window
 SAG_cycles = 10; %duration of SAG 
 
 %CASE 1
-KaS = 0.0; %[degrees]
-KxS = -0.1; % [relative step]
+%  KaS = 0.0; %[degrees]
+%  KxS = -0.1; % [relative step]
+
+% %CASE 2
+KaS = 10.0; %[degrees]
+KxS = -0.; % [relative step]
 
 %CASE 2
 %KaS = 10.0; %[degrees]
@@ -31,10 +45,15 @@ km = 3;
 kf = 3; % a partir de 8 praticamente fase não atua...
 
 %limiares para PATV_HE
+<<<<<<< HEAD
 lambda_a = .5;
 lambda_theta = 1.;
 
 %relatado no primeiro draft: lambda_a = .5; lambda_theta = 1.
+=======
+lambda_a = 2.;
+lambda_theta = 2.5;
+>>>>>>> 1b26e89cb0b2ee77742e9cdfadda6ce5d88eb8db
 
 MCruns = 1000;
 
