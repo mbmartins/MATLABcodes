@@ -11,11 +11,12 @@ function [f1,f2,F,f_u,ri] = EF5(f_i, az, tau_n, lambda)
 %   - estima f_2 = mediana de f_i a partir de tau_n
 % 6 - estima r_i[n] pelo gradiente de f_i[n]
 %   - estima r_u[n] pelo gradiente de f_u[n]
+
     NSamples = length(f_i);
     br = 0.05;%80/480; % fraction of samples to be ignored 
     brn = floor(br*NSamples)+1; % number of samples to be ignored
 
-    d = 1; %lambda = 2.5; 
+    d = 0; %lambda = 2.5; 
     % com d = 1, fu pode assumir variacao lenta
     f_icomp = f_i.*az./median(az);
     
@@ -40,7 +41,10 @@ function [f1,f2,F,f_u,ri] = EF5(f_i, az, tau_n, lambda)
         n2 = 1;
     end;
     
-    f1 = median(f_i(1:n1));
-    f2 = median(f_i(n2:end));
+%     f1 = median(f_i(1:n1));
+%     f2 = median(f_i(n2:end));
+    %F = median(f_u);
+     f1 = mean(f_i(1:n1));
+     f2 = mean(f_i(n2:end));
 
-    F = median(f_u);
+    F = mean(f_u);

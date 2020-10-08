@@ -20,9 +20,13 @@ function [f_1,f_2,f_r,f_u,r_i] = EF1(f_u, tau_n)
     f_u_trunc = f_u(brmask);
     
 r_i = gradient(f_u);
-f_1 = median(f_u(brmask1));
-f_2 = median(f_u(brmask2));
-f_r = median(f_u_trunc);
+% f_1 = median(f_u(brmask1));
+% f_2 = median(f_u(brmask2));
+%f_r = median(f_u_trunc);
+
+f_1 = mean(f_u(brmask1));
+f_2 = mean(f_u(brmask2));
+f_r = mean(f_u_trunc);
 
 %coeficiente de assimetria
 sk = skewness(f_u_trunc,0)

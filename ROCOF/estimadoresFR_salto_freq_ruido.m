@@ -3,11 +3,22 @@
 clear all; close all; clc
 %fixed parameters
 SNR = 60; %Signal noise ratio[dB]
-F0 = 60.0; %nominal frequency
-F1 = 60; %fundamental frequency
+
+%%% ajustar os valores de k para controlar os saltos
 k_a = 0.0; % phase (angle) step height [degrees]
 k_x = 0.0; % magnitude step height [relative]
 k_f = 1.0; % frequency step height [Hz]
+k_r = 0.0; % rocof step (not yet working)
+
+%parametro para o PATV
+% lambda_fase = 0.09; %otimizado para salto de fase
+% lambda_mag = 0.065; %otimizado para salto de fase
+% lambda_freq = 6.5; %otimizado para salto de frequencia
+% lambda = lambda_fase;
+
+F0 = 60.0; %nominal frequency
+F1 = 60; %fundamental frequency
+
 Fs = 4800; % sampling frequency [Hz]
 NCycles = 6; % signal number of generated nominal cycles
 T = NCycles/F0; % fundamental cycles duration
@@ -17,11 +28,11 @@ tau1 = 0.5;  % first step location in proportion of T
 tau2 = 1.; % second step location in proportion of T; set tau2 = 1 if you dont want two steps
 tau_n1 = floor(tau1*NSamples); %first step sample location
 tau_n2 = floor(tau2*NSamples); %2nd step sample location
-nbits = 32; % number of bits for the simulated signal generator
+nbits = 16; % number of bits for the simulated signal generator
  
 phistep = 5; %[degrees]
 ncurves = 180/phistep;
-phi_n = (70:phistep:(ncurves-1)*phistep) + phi_0;
+phi_n = (0:phistep:(ncurves-1)*phistep) + phi_0;
 Fref = (tau1*T*F1 + (T - tau1*T)*(F1 + k_f))/T; %one step only
 ROCOF_ref = (Fref - F1)/T;
 
@@ -65,30 +76,64 @@ RFE
 % legend('EF1','EF2','EF3','EF4')
 % 
 
-c = ['k','b','c','r','m'];
+c = ['k','b','c','r','m','g'];
 fig1 = figure(1)
-for k =1:size(FE,2)
+%subplot(1,3,1)
+for k =1:6
 plot(phi_n,FE(:,k),c(k)); hold on;
 end
 title('FE sem adicao de ruido')
 xlabel('\phi_0 [graus]')
 ylabel('FE [Hz]')
-legend('EF1','EF2','EF3','EF4','EF5')
+legend('EF1','EF2','EF3','EF4','EF5','EF6')
+% subplot(1,3,2)
+% for k =4:6
+% plot(phi_n,FE(:,k),c(k)); hold on;
+% end
+% xlabel('\phi_0 [graus]')
+% ylabel('FE [Hz]')
+% legend('EF4','EF5','EF6')
+% subplot(1,3,3)
+% plot(phi_n,FE(:,2),c(2)); hold on;
+% plot(phi_n,FE(:,4),c(4));
+% xlabel('\phi_0 [graus]')
+% ylabel('FE [Hz]')
+% legend('EF2','EF4')
 
 fig2 = figure(2)
 
-for k = 1:size(FE,2)
+%subplot(1,3,1)
+for k = 1:6
 EF(k) = plot(phi_n,FE_ruido(:,k),c(k)); hold on;
 plot(phi_n,FE_ruido(:,k) + FE_std(:,k),[c(k),'--']);
 plot(phi_n,FE_ruido(:,k) - FE_std(:,k),[c(k),'--']); 
 end
-title('FE com ruido SNR = 60 dB')
+legend(EF, 'EF1','EF2','EF3','EF4','EF5','EF6')
+%title('FE com ruido SNR = 60 dB')
 xlabel('\phi_0 [graus]')
 ylabel('FE [Hz]')
-legend(EF,'EF1','EF2','EF3','EF4','EF5','EF6')
+% subplot(1,3,2)
+% for k = 4:6
+% EFP(k-3) = plot(phi_n,FE_ruido(:,k),c(k)); hold on;
+% plot(phi_n,FE_ruido(:,k) + FE_std(:,k),[c(k),'--']);
+% plot(phi_n,FE_ruido(:,k) - FE_std(:,k),[c(k),'--']); 
+% end
+% xlabel('\phi_0 [graus]')
+% ylabel('FE [Hz]')
+% legend(EFP,'EF4','EF5','EF6')
+% subplot(1,3,3)
+% k = 2;
+% EFp3(1) = plot(phi_n,FE_ruido(:,k),c(k)); hold on;
+% plot(phi_n,FE_ruido(:,k) + FE_std(:,k),[c(k),'--']);
+% plot(phi_n,FE_ruido(:,k) - FE_std(:,k),[c(k),'--']); 
+% k = 4;
+% EFp3(2) = plot(phi_n,FE_ruido(:,k),c(k)); hold on;
+% plot(phi_n,FE_ruido(:,k) + FE_std(:,k),[c(k),'--']);
+% plot(phi_n,FE_ruido(:,k) - FE_std(:,k),[c(k),'--']);
+% xlabel('\phi_0 [graus]')
+% ylabel('FE [Hz]')
+% legend(EFp3,'EF2','EF4')
 
-ax1 = get(fig1,'CurrentAxes')
-figure(2); ylim(ax1.YLim)
 
 figure
 FE_diff = FE - FE_ruido;
@@ -106,21 +151,47 @@ legend('EF1','EF2','EF3','EF4','EF5','EF6')
 % ylabel('FE - FE_{ruido} [Hz]')
 % legend('EF4')
 
+% ----- Grafico da estimacao de f1 ------%
 fig5 = figure(5)
-
-for k = 1:size(FE,2)
-EF(k) = plot(phi_n,f1_mean(:,k),c(k)); hold on;
+subplot(1,3,1)
+for k = 1:3
+plotf1(k) = plot(phi_n,f1_mean(:,k),c(k)); hold on;
 plot(phi_n,f1_mean(:,k) + f1_std(:,k),[c(k),'--']);
 plot(phi_n,f1_mean(:,k) - f1_std(:,k),[c(k),'--']); 
 end
-title('F1 com ruido SNR = 60 dB')
+title('f_1 com ruido SNR = 60 dB')
 xlabel('\phi_0 [graus]')
 ylabel('f_1 [Hz]')
-legend(EF,'EF1','EF2','EF3','EF4','EF5','EF6')
+legend(plotf1,'EF1','EF2','EF3')
+subplot(1,3,2)
+for k = 4:6
+plotf1P(k-3) = plot(phi_n,f1_mean(:,k),c(k)); hold on;
+plot(phi_n,f1_mean(:,k) + f1_std(:,k),[c(k),'--']);
+plot(phi_n,f1_mean(:,k) - f1_std(:,k),[c(k),'--']); 
+end
+title('f_1 com ruido SNR = 60 dB')
+xlabel('\phi_0 [graus]')
+ylabel('f_1 [Hz]')
+legend(plotf1P,'EF4','EF5','EF6')
 
+subplot(1,3,3)
+k = 2;hold off;
+EFp3(1) = plot(phi_n,f1_mean(:,k),c(k)); hold on;
+plot(phi_n,f1_mean(:,k) + f1_std(:,k),[c(k),'--']);
+plot(phi_n,f1_mean(:,k) - f1_std(:,k),[c(k),'--']); 
+k = 5;
+EFp3(2) = plot(phi_n,f1_mean(:,k),c(k)); hold on;
+plot(phi_n,f1_mean(:,k) + f1_std(:,k),[c(k),'--']);
+plot(phi_n,f1_mean(:,k) - f1_std(:,k),[c(k),'--']);
+xlabel('\phi_0 [graus]')
+ylabel('FE [Hz]')
+legend(EFp3,'EF2','EF5')
+
+
+%----- Grafico da estimacao de kf ----- %
 fig6 = figure(6)
 
-for k = 1:size(FE,2)
+for k = 1:6
 EF(k) = plot(phi_n,kf_mean(:,k),c(k)); hold on;
 plot(phi_n,kf_mean(:,k) + kf_std(:,k),[c(k),'--']);
 plot(phi_n,kf_mean(:,k) - kf_std(:,k),[c(k),'--']); 

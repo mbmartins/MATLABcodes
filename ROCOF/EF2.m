@@ -23,6 +23,9 @@ function [f1,f2,F,f_u,ri] = EF2(f_i, az, tau_n)
     
     ri = gradient(f_u);
     
-    f1 = median(f_u(brmask1));
-    f2 = median(f_u(brmask2));
-    F = median(f_u(brmask));
+%     f1 = median(f_u(brmask1));
+%     f2 = median(f_u(brmask2));
+    %F = median(f_u(brmask));
+f1 = mean(f_u(brmask1));
+f2 = mean(f_u(brmask2));
+F = mean(f_u);

@@ -29,7 +29,9 @@ function [f1,f2,F,f_u,ri] = EF3(f_i, az, tau_n)
 
     %retirando amostras próximas a tau
     % 2*brn pois no f_u2 já foi retirado brn
-    f1 = median(f_u(1:(tau_n-2*brn)));  
-    f2 = median(f_u((tau_n-2*brn+1):end));
-    %F = median([f1 f2]);
-    F = median(f_u);
+%     f1 = median(f_u(1:(tau_n-2*brn)));  
+%     f2 = median(f_u((tau_n-2*brn+1):end));
+    %F = median(f_u);
+f1 = mean(f_u(1:(tau_n-2*brn)));
+f2 = mean(f_u((tau_n-2*brn+1):end));
+F = mean(f_u);
