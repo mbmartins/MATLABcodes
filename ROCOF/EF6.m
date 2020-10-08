@@ -28,13 +28,21 @@ NSamples = length(f_i);
     ri = gradient(f_i); % ou usar diretamente u e v
     ru = gradient(f_u);
 
+    %----- Debug -------
+    figure;
+    nn = brn:NSamples-brn-1;
+    plot(nn,ri);
+    xlabel('x','Interpreter','latex');
+    ylabel('y','Interpreter','latex');
+    xlabel('Samples')
+    ylabel('$\hat{r}_i[n]$ [Hz/s]')
     
-    
-%      f1 = median(f_i(1:(tau_n)));
-%      f2 = median(f_i((tau_n+1):end));
-  %F = median(f_u);
 
-      f1 = mean(f_i(1:(tau_n)));
-      f2 = mean(f_i((tau_n+1):end));
-  
-    F = mean(f_u);
+     f1 = median(f_i(1:(tau_n)));
+     f2 = median(f_i((tau_n+1):end));
+  F = median(f_u);
+
+%       f1 = mean(f_i(1:(tau_n)));
+%       f2 = mean(f_i((tau_n+1):end));
+%   
+%     F = mean(f_u);

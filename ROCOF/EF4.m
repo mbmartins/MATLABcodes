@@ -51,11 +51,11 @@ function [f1,f2,F,f_u,ri] = EF4(Psi_noise, az, Fs, tau_n,lambda)
     ri = gradient(f_i);
     ru = gradient(f_u);
     
-%     f1 = median(f_i(1:tau_n));
-%     f2 = median(f_i((tau_n+1):end));
-%     F = median(f_u); 
-f1 = mean(f_i(1:tau_n));
-f2 = mean(f_i((tau_n+1):end));
-F = mean(f_u);
+    f1 = median(f_i(1:tau_n));
+    f2 = median(f_i((tau_n+1):end));
+    F = median(f_u); 
+% f1 = mean(f_i(1:tau_n));
+% f2 = mean(f_i((tau_n+1):end));
+% F = mean(f_u);
 
     phi_0_est = Psi_u(1)*180/pi;

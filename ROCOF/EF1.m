@@ -1,4 +1,4 @@
-function [f_1,f_2,f_r,f_u,r_i] = EF1(f_u, tau_n)
+function [f_1,f_2,f_r,f_u,ri] = EF1(f_u, tau_n)
 %EF1
 % 1 - amostragem ideal
 % 2 - Psi obtido pela fase do sinal analitico
@@ -19,15 +19,31 @@ function [f_1,f_2,f_r,f_u,r_i] = EF1(f_u, tau_n)
     brmask = [brmask1 brmask2];
     f_u_trunc = f_u(brmask);
     
-r_i = gradient(f_u);
-% f_1 = median(f_u(brmask1));
-% f_2 = median(f_u(brmask2));
-%f_r = median(f_u_trunc);
+ri = gradient(f_u_trunc);
+%  f_1 = median(f_u(brmask1));
+%  f_2 = median(f_u(brmask2));
+% f_r = median(f_u_trunc);
 
-f_1 = mean(f_u(brmask1));
-f_2 = mean(f_u(brmask2));
-f_r = mean(f_u_trunc);
+ f_1 = mean(f_u(brmask1));
+ f_2 = mean(f_u(brmask2));
+ f_r = mean(f_u_trunc);
 
+% ---- Debug ----
+% subplot(1,2,1)
+% plot(f_u_trunc)
+% xlabel('Samples'); ylabel('f_u [Hz]')
+% subplot(1,2,2)
+% h = histogram(f_u_trunc,'Orientation','horizontal');
+% h.NumBins = 30;
+% xlabel('Occurrences'); ylabel('f_u [Hz]')
 %coeficiente de assimetria
+    figure;
+    nn = brn:NSamples-brn-1;
+    plot(nn,ri);
+    xlabel('x','Interpreter','latex');
+    ylabel('y','Interpreter','latex');
+    xlabel('Samples')
+    ylabel('$\hat{r}_i[n]$ [Hz/s]')
+    
 sk = skewness(f_u_trunc,0)
 

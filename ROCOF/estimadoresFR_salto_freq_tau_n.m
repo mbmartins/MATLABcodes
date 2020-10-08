@@ -1,29 +1,34 @@
 %testes para estimação de fase, frequência e ROCOF
 
-%variacoes interessantes:
-% f1 = 59, 61, etc
-% dois saltos
-% encontrar um lambda otimo para o PATV
-
 clear all; close all; clc
-SNR = 600;
 %fixed parameters
+SNR = 60; %Signal noise ratio[dB]
+
+%%% ajustar os valores de k para controlar os saltos
+k_a = 0.0; % phase (angle) step height [degrees]
+k_x = 0.0; % magnitude step height [relative]
+k_f = 1.0; % frequency step height [Hz]
+k_r = 0.0; % rocof step (not yet working)
+
+%parametro para o PATV
+% lambda_fase = 0.09; %otimizado para salto de fase
+% lambda_mag = 0.065; %otimizado para salto de fase
+% lambda_freq = 6.5; %otimizado para salto de frequencia
+% lambda = lambda_fase;
+
 F0 = 60.0; %nominal frequency
 F1 = 60; %fundamental frequency
-KaS = 0.0; %[degrees]
-KxS = 0.0; % [relative magnitude step]
-KfS = 1.5; %[Hz] %size of frequency step
-Fs =4800;
-%Fs = 5120*60;
-NCycles = 6; %T_c
-T = NCycles/F0;
-phi_0 = 0; %angle phi_0 [degrees]
-tau1 = 0.5;  % in proportion of T
-tau2 = 1.; % in proportion of T; set tau2 = 1 if you dont want two steps
-NSamples = floor(NCycles*Fs/F0);
-tau_n1 = floor(tau1*NSamples);
-tau_n2 = floor(tau2*NSamples);
-nbits = 16;
+
+Fs = 4800; % sampling frequency [Hz]
+NCycles = 6; % signal number of generated nominal cycles
+T = NCycles/F0; % fundamental cycles duration
+NSamples = floor(NCycles*Fs/F0); % total number of signal samples
+phi_0 = 0; % initial angle phi_0 [degrees]
+tau1 = 0.5;  % first step location in proportion of T
+tau2 = 1.; % second step location in proportion of T; set tau2 = 1 if you dont want two steps
+tau_n1 = floor(tau1*NSamples); %first step sample location
+tau_n2 = floor(tau2*NSamples); %2nd step sample location
+nbits = 16; % number of bits for the simulated signal generator
 
 phistep = 5; %[degrees]
 ncurves = 1;
@@ -34,63 +39,41 @@ tau_n = floor(tau_vec*NSamples);
 
 for tau_i = 1:length(tau_vec)
 for j = 1:ncurves
-    Signal = SigGEN2(F0,F1,Fs,phi_n(j),NCycles,tau_vec(tau_i),tau2,SNR,KaS, KxS,KfS,nbits);
+    %----- geracao do sinal real e analitico
+    Signal = SigGEN2(F0,F1,Fs,phi_n(j),NCycles,tau_vec(tau_i),tau2,SNR,k_a, k_x,k_f,nbits);
     z=hilbert(Signal');
     Psi_i = unwrap(angle(z)); %[rad]
-    %Psi_i = phase(z);
     f_i=gradient(Psi_i)*Fs/(2*pi);% Hilbert estimate of the instantaneous frequency of z
     az = abs(z);
 
-    % Estimation and analysis
-    %Fref = (tau1*T*F1 + (T - tau1*T)*(F1 + KfS))/T; %one step only
-    %ROCOF_ref = (Fref - F1)/T;
-    n = 1:NSamples;
-    br = 0.05; brn = floor(br*NSamples); % number of samples to be ignored
-    %Estimator EF1 
-    f_u1 = f_i;
-    F_est(1) = median(f_u1);
-
-    %Estimator EF2
-    f_u2 = f_i.*az./median(az);
-    f_u2 = f_u2(brn:end-brn-1);
-    F_est(2) = median(f_u2);
-
-    %Estimator EF3 - considerando dois taus somente
-    f_u3 = [f_u2(1:tau_n1-2*brn); f_u2(tau_n1+1:tau_n2-2*brn); f_u2(tau_n2+1:end)];
-    %f_u3 = [f_u1(1:tau_n-brn); f_u1(tau_n+1:end)];
-    F_est(3) = median(f_u3);
-    %F_est(3) = mean(f_u3);
-    
-    %Estimador EF4 - procurar um valor ótimo de lambda que minimize o erro
-    %médio/máximo de Fr ??
-    d = 1; lambda = 0.09; Nit = 10; %%% aplicar aqui o PATV, como no AMPS estendido
-    [x, p, cost, u, v] = patv_MM(Psi_i, d, lambda, Nit);
-    Psi_PATV = p;
-    f_u4=gradient(Psi_PATV)*Fs/(2*pi);% Hilbert estimate of the instantaneous frequency of z
-    F_est(4) = median(f_u4); 
-    phi_0_est(j) = Psi_PATV(1)*180/pi;
-    
+    %----- Loop de Monte Carlo -----
+    MC_iterations = 300;
+    [Fraw,f1raw,f2raw,kfraw] = MC_estimation(MC_iterations,F0,F1,Fs,phi_n(j),NCycles,tau_vec(tau_i),tau2,SNR,k_a, k_x,k_f,nbits);
+    F_mean = mean(Fraw,2);
+    %------- calculos estatisticos ----
+    f1_mean(j,:) = mean(f1raw,2);
+    f1_std(j,:) = std(f1raw,0,2);
+    f2_mean(j,:) = mean(f2raw,2);
+    f2_std(j,:) = std(f2raw,0,2);
+    kf_mean(j,:) = mean(kfraw,2);
+    kf_std(j,:) = std(f2raw,0,2);
     tau = tau_vec(tau_i)*T;
-    Fref = (tau*F1 + (T-tau)*(F1 + KfS))/T; %only one step
+    Fref = (tau*F1 + (T-tau)*(F1 + k_f))/T; %only one step
     ROCOF_ref = (Fref - F1)/T;
-    
-    FE(tau_i,:) = F_est - Fref;
-    ROCOF_est = (F_est - F1)./T;
-    RFE(tau_i,:) = ROCOF_est - ROCOF_ref; % [Hz/s]
+    FE(tau_i,:) = F_mean - Fref;
+    %ROCOF_est = (F_est - F1)./T;
+    %RFE(tau_i,:) = ROCOF_est - ROCOF_ref; % [Hz/s]
     
 end
 end
-
-FE
-RFE
 
 FE_ = mean(FE)
-RFE_ = mean(RFE)
+%RFE_ = mean(RFE)
 
 figure
-plot(tau_n,FE,'.-')
+plot(tau_n,FE)
 xlabel('x','Interpreter','latex');
 ylabel('y','Interpreter','latex');
 xlabel('$\tau_n$')
 ylabel('$FE$ [Hz]')
-legend('EF1','EF2','EF3','EF4')
+legend('EF1','EF2','EF3','EF4','EF5','EF6')
