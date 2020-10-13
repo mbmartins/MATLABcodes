@@ -52,7 +52,7 @@ for j = 1:ncurves
     f2_mean(j,:) = mean(f2raw,2);
     f2_std(j,:) = std(f2raw,0,2);
     kf_mean(j,:) = mean(kfraw,2);
-    kf_std(j,:) = std(f2raw,0,2);
+    kf_std(j,:) = std(kfraw,0,2);
     if MC_iterations>1
         FE_std(j,:) = std(Fraw,0,2);
     else
@@ -60,7 +60,7 @@ for j = 1:ncurves
     end
     
     % 1st pearson coeficiente de assimetria
-    As(j,:) = (F_mean - F_mode)./FE_std(j,:)';
+%    As(j,:) = (F_mean - F_mode)./FE_std(j,:)';
     
     FE(j,:) = F_est - Fref;
     FE_ruido(j,:) = F_mean - Fref;
@@ -142,7 +142,8 @@ ylabel('FE [Hz]')
 
 
 figure(3); hold off;
-s = ["kx",'b','c','r','m','g'];
+%s = ["kx",'b','c','r','m','g'];
+s = c;
 FE_diff = FE - FE_ruido;
 for k=1:size(FE,2)
 plot(phi_n,FE_diff(:,k),s(k)); hold on;
@@ -166,7 +167,8 @@ plotf1(k) = plot(phi_n,FE1(:,k),c(k)); hold on;
 %plot(phi_n,FE1(:,k) + f1_std(:,k),[c(k),'--']);
 %plot(phi_n,FE1(:,k) - f1_std(:,k),[c(k),'--']); 
 end
-title('FE_1 sem ruido');% SNR = 60 dB')
+ylim([-0.1 0.1]);
+title('a)');% SNR = 60 dB')
 xlabel('\phi_0 [graus]')
 ylabel('FE_1 [Hz]')
 legend(plotf1,'EF1','EF2','EF3','EF4','EF5','EF6')
@@ -176,7 +178,8 @@ for k = 1:6
  plot(phi_n,FE1_ruido(:,k) + f1_std(:,k),[c(k),'--']);
  plot(phi_n,FE1_ruido(:,k) - f1_std(:,k),[c(k),'--']); 
 end
- title('FE_1 com ruido SNR = 60 dB')
+ylim([-0.1 0.1]);
+title('b)')
  xlabel('\phi_0 [graus]')
  ylabel('FE_1 [Hz]')
 legend(plotf1,'EF1','EF2','EF3','EF4','EF5','EF6')
@@ -186,9 +189,10 @@ FE1diff = FE1 - FE1_ruido;
 for k = 1:6
   plotf1P(k) = plot(phi_n,FE1diff(:,k),c(k)); hold on;
 end
-% title('FE_1 diff')
+ylim([-0.1 0.1]);
+title('c)')
  xlabel('\phi_0 [graus]')
- ylabel('FE_1 - FE_1_ruido [Hz]')
+ ylabel('FE_1 - FE_1_{ruido} [Hz]')
 legend(plotf1,'EF1','EF2','EF3','EF4','EF5','EF6')
 
 
@@ -215,19 +219,21 @@ plotk(k) = plot(phi_n,KE(:,k),c(k)); hold on;
 %plot(phi_n,FE1(:,k) + f1_std(:,k),[c(k),'--']);
 %plot(phi_n,FE1(:,k) - f1_std(:,k),[c(k),'--']); 
 end
-title('KE sem ruido');% SNR = 60 dB')
+ylim([-0.15 0.15]);
+title('a)');% SNR = 60 dB')
 xlabel('\phi_0 [graus]')
-ylabel('KE [Hz]')
-legend(plotf1,'EF1','EF2','EF3','EF4','EF5','EF6')
+ylabel('K_fE [Hz]')
+%legend(plotf1,'EF1','EF2','EF3','EF4','EF5','EF6')
 subplot(1,3,2)
 for k = 1:6
   plotkP(k) = plot(phi_n,KE_ruido(:,k),c(k)); hold on;
  plot(phi_n,KE_ruido(:,k) + kf_std(:,k),[c(k),'--']);
  plot(phi_n,KE_ruido(:,k) - kf_std(:,k),[c(k),'--']); 
 end
- title('KE com ruido SNR = 60 dB')
+ title('b)')
+ ylim([-0.15 0.15]);
  xlabel('\phi_0 [graus]')
- ylabel('KE [Hz]')
+ ylabel('K_fE [Hz]')
 legend(plotkP,'EF1','EF2','EF3','EF4','EF5','EF6')
 % 
 subplot(1,3,3)
@@ -235,9 +241,10 @@ KEdiff = KE - KE_ruido;
 for k = 1:6
   plotKEP(k) = plot(phi_n,KEdiff(:,k),c(k)); hold on;
 end
-% title('FE_1 diff')
+ylim([-0.15 0.15]);
+ title('c)')
  xlabel('\phi_0 [graus]')
- ylabel('KE - KE_{ruido} [Hz]')
+ ylabel('K_fE - K_fE_{ruido} [Hz]')
 legend(plotKEP,'EF1','EF2','EF3','EF4','EF5','EF6')
 
 

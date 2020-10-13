@@ -50,9 +50,9 @@ for j = 1:ncurves
     tau_n1 = floor(tau*NSamples/T);
     
     %estimador EFx
-    [f1_est,f2_est,F_est,fu,ri] = EF4(Psi_i,az,Fs,tau_n1,lambda_n(k));
-    %[f1_est5,f2_est5,F_est,fu5,ri5] = EF5(f_i,az,tau_n1,lambda_n(k));
-    %[f1_est5,f2_est5,F_est,fu5,ri5] = EF6(f_i,az,tau_n1,lambda_n(k));
+    %[f1_est,f2_est,F_est,fu,ri] = EF4(Psi_i,az,Fs,tau_n1,lambda_n(k));
+    [f1_est,f2_est,F_est,fu,ri] = EF5(f_i,az,tau_n1,lambda_n(k));
+    %[f1_est,f2_est,F_est,fu,ri] = EF6(f_i,az,tau_n1,lambda_n(k));
     
     
     ROCOF_ref = (Fref - F1)/T;
@@ -93,7 +93,7 @@ legend('\tau = 0.1T','\tau = 0.2T', '\tau = 0.3T','\tau = 0.4T','\tau = 0.5T')
 
 
 figure
-semilogy(lambda_n,FE1max(:,1),'o-')
+semilogy(lambda_n,FE1max,'o-')
 xlabel('x','Interpreter','latex');
 ylabel('y','Interpreter','latex');
 xlabel('$\lambda$')

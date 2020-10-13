@@ -32,6 +32,10 @@ function [f1,f2,F,f_u,ri] = EF3(f_i, az, tau_n)
 %      f1 = median(f_u(1:(tau_n-2*brn)));  
 %      f2 = median(f_u((tau_n-2*brn+1):end));
 %     F = median(f_u);
- f1 = mean(f_u(1:(tau_n-2*brn)));
- f2 = mean(f_u((tau_n-2*brn+1):end));
- F = mean(f_u);
+  f1 = mean(f_u(1:(tau_n-2*brn)));
+  if (tau_n-2*brn+1)<length(f_u)
+    f2 = mean(f_u((tau_n-2*brn+1):end));
+  else
+    f2 = f_u(end);
+  end
+  F = mean(f_u);

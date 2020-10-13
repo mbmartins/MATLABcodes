@@ -20,7 +20,8 @@ NSamples = length(f_i);
     %Ef6 - PATV aplicado a fi
     d = 1; %lambda = 2.5; 
     f_icomp = f_i.*az./median(az);
-    f_i2 = f_icomp(brn:end-brn-1);
+    %f_i2 = f_icomp(brn:end-brn-1);
+    f_i2 = f_icomp;
     
     Nit = 20;
     [x, f_u, cost, u, v] = patv_MM(f_i2, d, lambda, Nit);
@@ -29,20 +30,25 @@ NSamples = length(f_i);
     ru = gradient(f_u);
 
     %----- Debug -------
-    figure;
-    nn = brn:NSamples-brn-1;
-    plot(nn,ri);
-    xlabel('x','Interpreter','latex');
-    ylabel('y','Interpreter','latex');
-    xlabel('Samples')
-    ylabel('$\hat{r}_i[n]$ [Hz/s]')
+%     figure;
+%     nn = brn:NSamples-brn-1;
+%     plot(nn,ri);
+%     xlabel('x','Interpreter','latex');
+%     ylabel('y','Interpreter','latex');
+%     xlabel('Samples')
+%     ylabel('$\hat{r}_i[n]$ [Hz/s]')
     
 
-     f1 = median(f_i(1:(tau_n)));
-     f2 = median(f_i((tau_n+1):end));
-  F = median(f_u);
+      f1 = median(f_i(1:tau_n));
+      if tau_n-brn<length(f_i)
+        f2 = median(f_i((tau_n+1):end));
+      else
+        f2 = f_i(end);
+      end
+%   F = median(f_i); % a medicao por fi eh melhor do que por fu neste caso
 
-%       f1 = mean(f_i(1:(tau_n)));
-%       f2 = mean(f_i((tau_n+1):end));
-%   
-%     F = mean(f_u);
+%      f1 = mean(f_i(1:(tau_n)));
+%      f2 = mean(f_i((tau_n+1):end));
+  
+      tau = tau_n/NSamples;
+    F = tau*f1 + (1-tau)*f2;

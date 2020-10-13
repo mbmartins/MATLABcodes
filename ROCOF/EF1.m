@@ -24,9 +24,9 @@ ri = gradient(f_u_trunc);
 %  f_2 = median(f_u(brmask2));
 % f_r = median(f_u_trunc);
 
- f_1 = mean(f_u(brmask1));
- f_2 = mean(f_u(brmask2));
- f_r = mean(f_u_trunc);
+  f_1 = mean(f_u(brmask1));
+  f_2 = mean(f_u(brmask2));
+  f_r = mean(f_u_trunc);
 
 % ---- Debug ----
 % subplot(1,2,1)
@@ -36,14 +36,15 @@ ri = gradient(f_u_trunc);
 % h = histogram(f_u_trunc,'Orientation','horizontal');
 % h.NumBins = 30;
 % xlabel('Occurrences'); ylabel('f_u [Hz]')
+
+%     figure;
+%     nn = brn:NSamples-brn-1;
+%     plot(nn,ri);
+%     xlabel('x','Interpreter','latex');
+%     ylabel('y','Interpreter','latex');
+%     xlabel('Samples')
+%     ylabel('$\hat{r}_i[n]$ [Hz/s]')
+
 %coeficiente de assimetria
-    figure;
-    nn = brn:NSamples-brn-1;
-    plot(nn,ri);
-    xlabel('x','Interpreter','latex');
-    ylabel('y','Interpreter','latex');
-    xlabel('Samples')
-    ylabel('$\hat{r}_i[n]$ [Hz/s]')
-    
-sk = skewness(f_u_trunc,0)
+sk = skewness(f_u_trunc,0);
 

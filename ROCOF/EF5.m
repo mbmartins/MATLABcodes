@@ -36,15 +36,17 @@ function [f1,f2,F,f_u,ri] = EF5(f_i, az, tau_n, lambda)
     if n1<1
         n1 = 1;
     end
-    n2 = (tau_n-brn+1)
+    n2 = (tau_n-brn+1);
     if n2<1
         n2 = 1;
     end;
     
-    f1 = median(f_i(1:n1));
-    f2 = median(f_i(n2:end));
-    F = median(f_u);
-%      f1 = mean(f_i(1:n1));
-%      f2 = mean(f_i(n2:end));
-% 
-%     F = mean(f_u);
+     f1 = median(f_i(1:n1));
+     f2 = median(f_i(n2:end));
+%     F = median(f_i);
+%     f1 = mean(f_i(1:n1));
+%     f2 = mean(f_i(n2:end));
+
+%    F = mean(f_i);
+      tau = tau_n/NSamples;
+    F = tau*f1 + (1-tau)*f2;
