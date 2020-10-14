@@ -17,30 +17,30 @@ Fs = 4800; % sampling frequency [Hz]
 NCycles = 6; % signal number of generated nominal cycles
 T = NCycles/F0; % fundamental cycles duration
 NSamples = floor(NCycles*Fs/F0); % total number of signal samples
-phi_0 = 45; % initial angle phi_0 [degrees]
+phi_0 = 0; % initial angle phi_0 [degrees]
 tau1 = 0.5;  % first step location in proportion of T
 tau2 = 1.; % second step location in proportion of T; set tau2 = 1 if you dont want two steps
 tau_n1 = floor(tau1*NSamples); %first step sample location
 tau_n2 = floor(tau2*NSamples); %2nd step sample location
 nbits = 16; % number of bits for the simulated signal generator
 
-phistep = 10; %[degrees]
-ncurves = 36;
-phi_n = (0:phistep:(ncurves-1)*phistep) + phi_0;
+% phistep = 10; %[degrees]
+% ncurves = 36;
+% phi_n = (0:phistep:(ncurves-1)*phistep) + phi_0;
 
 tau_vec = 0.5;
 %tau_vec = (0.1:0.01:0.9);
 tau_n = floor(tau_vec*NSamples);
 
-Ncycles_vec = [3:30];
+Fs_vec = [2400:400:19200];
 
-for j = 1:length(Ncycles_vec)
+for j = 1:length(Fs_vec)
     %para acompanhamento
     j
 
     %----- Loop de Monte Carlo -----
     MC_iterations = 300;
-    [Fraw,f1raw,f2raw,kfraw] = MC_estimation(MC_iterations,F0,F1,Fs,phi_0,Ncycles_vec(j),tau_vec,tau2,SNR,k_a, k_x,k_f,nbits);
+    [Fraw,f1raw,f2raw,kfraw] = MC_estimation(MC_iterations,F0,F1,Fs_vec(j),phi_0,NCycles,tau_vec,tau2,SNR,k_a, k_x,k_f,nbits);
     F_mean = mean(Fraw,2);
     %------- calculos estatisticos ----
     f1_mean(j,:) = mean(f1raw,2);
@@ -65,51 +65,42 @@ end
 c = ['k','b','c','r','m','g'];
     subplot(1,3,1)
     for k = 1:6
-        plot(Ncycles_vec,FE(:,k),c(k)); hold on;
-        plot(Ncycles_vec,FE(:,k) + FE_std(:,k),[c(k),'--']);
-        plot(Ncycles_vec,FE(:,k) - FE_std(:,k),[c(k),'--']); 
+        plot(Fs_vec,FE(:,k),c(k)); hold on;
+        plot(Fs_vec,FE(:,k) + FE_std(:,k),[c(k),'--']);
+        plot(Fs_vec,FE(:,k) - FE_std(:,k),[c(k),'--']); 
     end
     title('a)')
     xlabel('x','Interpreter','latex');
     ylabel('y','Interpreter','latex');
-    xlabel('$T (ciclos)$')
+    xlabel('$F_s (Hz)$')
     ylabel('$FE$ [Hz]')
     %legend('EF1','EF2','EF3','EF4','EF5','EF6')
     grid on
     
     subplot(1,3,2)
     for k = 1:6
-        plot(Ncycles_vec,FE1(:,k),c(k)); hold on;
-        plot(Ncycles_vec,FE1(:,k) + f1_std(:,k),[c(k),'--']);
-        plot(Ncycles_vec,FE1(:,k) - f1_std(:,k),[c(k),'--']); 
+        plot(Fs_vec,FE1(:,k),c(k)); hold on;
+        plot(Fs_vec,FE1(:,k) + f1_std(:,k),[c(k),'--']);
+        plot(Fs_vec,FE1(:,k) - f1_std(:,k),[c(k),'--']); 
     end
     title('b)')
     xlabel('x','Interpreter','latex');
     ylabel('y','Interpreter','latex');
-    xlabel('$T (ciclos)$')
+    xlabel('$F_s [Hz]$')
     ylabel('$FE1$ [Hz]')
     %legend('EF1','EF2','EF3','EF4','EF5','EF6')
     grid on
     
     subplot(1,3,3)
     for k = 1:6
-        plotkP(k) = plot(Ncycles_vec,KFE(:,k),c(k)); hold on;
-        plot(Ncycles_vec,KFE(:,k) + kf_std(:,k),[c(k),'--']);
-        plot(Ncycles_vec,KFE(:,k) - kf_std(:,k),[c(k),'--']); 
+        plotkP(k) = plot(Fs_vec,KFE(:,k),c(k)); hold on;
+        plot(Fs_vec,KFE(:,k) + kf_std(:,k),[c(k),'--']);
+        plot(Fs_vec,KFE(:,k) - kf_std(:,k),[c(k),'--']); 
     end
     title('c)')
     xlabel('x','Interpreter','latex');
     ylabel('y','Interpreter','latex');
-    xlabel('$T (ciclos)$')
+    xlabel('$F_s [Hz]$')
     ylabel('$KFE1$ [Hz]')
     legend(plotkP, 'EF1','EF2','EF3','EF4','EF5','EF6')
     grid on
-
-    %para avaliar o T
-%     FE_mean = mean(FE)
-%     FE_std = std(FE)
-%     FE1_mean = mean(FE1)
-%     FE1_std = std(FE1)
-%     KFE1_mean = mean(KFE)
-%     KFE1_std = std(KFE)
-    

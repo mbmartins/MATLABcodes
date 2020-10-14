@@ -10,9 +10,9 @@ SNR = 60;
 %fixed parameters
 F0 = 60.0; %nominal frequency
 F1 = 60; %fundamental frequency
-KaS = 0.0; %[degrees]
+KaS = 10.0; %[degrees]
 KxS = 0.0; % [relative magnitude step]
-KfS = 1.; %[Hz] %size of frequency step
+KfS = 0.; %[Hz] %size of frequency step
 Fs =4800;
 NCycles = 6;
 T = NCycles/F0;
@@ -29,7 +29,7 @@ ncurves = 180/phistep;
 phi_n = (0:phistep:(ncurves-1)*phistep) + phi_0;
 
 lambda_step = .1;
-n_lambdas = 200; la_ini = .001;
+n_lambdas = 100; la_ini = .001;
 lambda_n = la_ini+(0:lambda_step:(n_lambdas-1)*lambda_step);
 
 tau_vec = 0.1:0.1:0.5;
@@ -68,42 +68,46 @@ FEmax(k,tau_i) = max(abs(FE));
 FE1max(k,tau_i) = max(abs(FE1));
 FE2max(k,tau_i) = max(abs(FE2));
 kfEmax(k,tau_i) = max(abs(kfE));
+
+FEmean(k,tau_i) = mean(FE);
+
+
 end
 end
 
 FE
 RFE
-
-figure(1)
-semilogy(lambda_n,kfEmax,'o-')
-xlabel('x','Interpreter','latex');
-ylabel('y','Interpreter','latex');
-xlabel('$\lambda$')
-ylabel('$KfE_{max}$ [Hz]')
-legend('\tau = 0.5T')
-legend('\tau = 0.1T','\tau = 0.2T', '\tau = 0.3T','\tau = 0.4T','\tau = 0.5T')
-
-figure
-semilogy(lambda_n,FEmax,'o-')
-xlabel('x','Interpreter','latex');
-ylabel('y','Interpreter','latex');
-xlabel('$\lambda$')
-ylabel('$FE_{max}$ [Hz]')
-legend('\tau = 0.1T','\tau = 0.2T', '\tau = 0.3T','\tau = 0.4T','\tau = 0.5T')
-
+% 
+% figure(1)
+% semilogy(lambda_n,kfEmax,'o-')
+% xlabel('x','Interpreter','latex');
+% ylabel('y','Interpreter','latex');
+% xlabel('$\lambda$')
+% ylabel('$KfE_{max}$ [Hz]')
+% legend('\tau = 0.5T')
+% legend('\tau = 0.1T','\tau = 0.2T', '\tau = 0.3T','\tau = 0.4T','\tau = 0.5T')
 
 figure
-semilogy(lambda_n,FE1max,'o-')
+semilogy(lambda_n,abs(FEmean),'o-')
 xlabel('x','Interpreter','latex');
 ylabel('y','Interpreter','latex');
 xlabel('$\lambda$')
-ylabel('$FE1_{max}$ [Hz]')
+ylabel('$|\mu(FE)|$ [Hz]')
 legend('\tau = 0.1T','\tau = 0.2T', '\tau = 0.3T','\tau = 0.4T','\tau = 0.5T')
 
-figure
-plot(lambda_n,FE2max,'o-')
-xlabel('x','Interpreter','latex');
-ylabel('y','Interpreter','latex');
-xlabel('$\lambda$')
-ylabel('$FE2_{max}$ [Hz]')
-legend('\tau = 0.1T','\tau = 0.2T', '\tau = 0.3T','\tau = 0.4T','\tau = 0.5T')
+% 
+% figure
+% semilogy(lambda_n,FE1max,'o-')
+% xlabel('x','Interpreter','latex');
+% ylabel('y','Interpreter','latex');
+% xlabel('$\lambda$')
+% ylabel('$FE1_{max}$ [Hz]')
+% legend('\tau = 0.1T','\tau = 0.2T', '\tau = 0.3T','\tau = 0.4T','\tau = 0.5T')
+% 
+% figure
+% plot(lambda_n,FE2max,'o-')
+% xlabel('x','Interpreter','latex');
+% ylabel('y','Interpreter','latex');
+% xlabel('$\lambda$')
+% ylabel('$FE2_{max}$ [Hz]')
+% legend('\tau = 0.1T','\tau = 0.2T', '\tau = 0.3T','\tau = 0.4T','\tau = 0.5T')

@@ -6,13 +6,13 @@
 % encontrar um lambda otimo para o PATV
 
 clear all; close all; clc
-SNR = 600;
+SNR = 60;
 %fixed parameters
 F0 = 60.0; %nominal frequency
 F1 = 60; %fundamental frequency
-KaS = 0.0; %[degrees]
+KaS = 10.0; %[degrees]
 KxS = 0.0; % [relative magnitude step]
-KfS = 1.0; %[Hz] %size of frequency step
+KfS = 0.0; %[Hz] %size of frequency step
 Fs =4800;
 NCycles = 6;
 T = NCycles/F0;
