@@ -112,4 +112,4 @@ c = ['k','b','c','r','m','g'];
 %     FE1_std = std(FE1)
 %     KFE1_mean = mean(KFE)
 %     KFE1_std = std(KFE)
-    
+    save('salto freq\estimadoresFR_salto_freq_T')

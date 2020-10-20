@@ -21,7 +21,8 @@ function [f1,f2,F,f_u,ri] = EF2(f_i, az, tau_n)
     f_u = f_i.*az./median(az);
     % aplicar brmask em az e fi??
     
-    ri = gradient(f_u);
+    ri = zeros(NSamples);
+    ri(brmask) = gradient(f_u(brmask));
     
 %      f1 = median(f_u(brmask1));
 %      f2 = median(f_u(brmask2));

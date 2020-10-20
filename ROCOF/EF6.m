@@ -5,7 +5,7 @@ function [f1,f2,F,f_u,ri] = EF6(f_i, az, tau_n,lambda)
 % 3 - f_i[n] obtida pelo gradient de Psi
 % 4 - considera f_u = polinomio p obtido pela aplicacao de PATV (d=1,lambda?) a f_i 
 % compensado pela amplitude az[n],{EM REVISAO excluindo amostras proximo as bordas e
-% proximas a tau EM REVISAO }
+% proximas a tau EM REVISAO - a exclusao de amostras quando d=1 nao é uma boa}
 % 5 
 %   - considera f_r = media de f_u, aproximada pela mediana
 %   - estima f_1 = mediana de f_i até tau_n
@@ -16,7 +16,8 @@ function [f1,f2,F,f_u,ri] = EF6(f_i, az, tau_n,lambda)
 NSamples = length(f_i);
     br = 0.05; %80/480; % fraction of samples to be ignored 
     brn = floor(br*NSamples); % number of samples to be ignored
-
+    brmask = [brn+1:NSamples-brn];
+    
     %Ef6 - PATV aplicado a fi
     d = 1; %lambda = 2.5; 
     f_icomp = f_i.*az./median(az);
@@ -25,8 +26,9 @@ NSamples = length(f_i);
     
     Nit = 20;
     [x, f_u, cost, u, v] = patv_MM(f_i2, d, lambda, Nit);
-    f_i = f_u + x;  
-    ri = gradient(f_i); % ou usar diretamente u e v
+    f_i = f_u + x;
+    ri = zeros(1,NSamples);
+    ri(brmask) = gradient(f_i(brmask)); % ou usar diretamente u e v
     ru = gradient(f_u);
 
     %----- Debug -------

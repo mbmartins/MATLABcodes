@@ -19,7 +19,8 @@ function [f_1,f_2,f_r,f_u,ri] = EF1(f_u, tau_n)
     brmask = [brmask1 brmask2];
     f_u_trunc = f_u(brmask);
     
-ri = gradient(f_u_trunc);
+ri = zeros(NSamples,1);
+ri(brmask) = gradient(f_u_trunc);
 %  f_1 = median(f_u(brmask1));
 %  f_2 = median(f_u(brmask2));
 % f_r = median(f_u_trunc);

@@ -11,32 +11,11 @@ function [f1,f2,F,f_u,ri] = EF4(Psi_noise, az, Fs, tau_n,lambda)
 %   - estima f_2 = mediana de f_u a partir de tau_n
 % 6 - estima r_i[n] pelo gradiente de f_i[n]
 
-
-%Estimador EF4 
-    % aplica PATV em Psi 
-    % calcula freqs pela mediana de fi
-    
-    d = 1;  %aproxima Psi por uma reta
-    %valor de lambda otimizado para minizar FE na definicao de F medio
-    %para salto de frequencia
-    %lambda = 6.5; 
-    %para salto de fase
-    %lambda = 0.09;
-    %para salto de magnitude
-    %lambda = 0.065;
+    br = 0.05;%80/480; % fraction of samples to be ignored 
+    brn = floor(br*NSamples)+1; % number of samples to be ignored
+    brmask = [brn+1:NSamples-brn];
     
     Nit = 20; 
-    %%% aplicar aqui o PATV, como no AMPS estendido
-%     if KaS>0 %salto somente de fase
-%         lambda = 0.09;
-%     end
-%     if KfS>0 %salto somente de frequencia
-%         lambda = 6.5;  
-%         %lambda = 1.;
-%     end
-%     if KxS>0 %salto somente de magnitude
-%         lambda = 0.065;
-%     end
    
     [x, p, cost, u, v] = patv_MM(Psi_noise, d, lambda, Nit);
     %[x, p, cost, u, v] = patv_MM(Psi_i(brmask), d, lambda, Nit); 
@@ -46,9 +25,10 @@ function [f1,f2,F,f_u,ri] = EF4(Psi_noise, az, Fs, tau_n,lambda)
     Psi_u = p;
     Psi_i = p + x;
     f_i=gradient(Psi_i)*Fs/(2*pi);% Hilbert estimate of the instantaneous frequency of z
-    f_u=gradient(Psi_u)*Fs/(2*pi);% Hilbert estimate of the underlying frequency of z
-    
-    ri = gradient(f_i);
+    f_u=gradient(Psi_u)*Fs/(2*pi);% Hilbert estimate of the underlying frequency of z   
+
+    ri = zeros(1,NSamples);
+    ri(brmask) = gradient(f_i(brmask));
     ru = gradient(f_u);
     
      f1 = median(f_i(1:tau_n));

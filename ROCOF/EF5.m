@@ -3,7 +3,7 @@ function [f1,f2,F,f_u,ri] = EF5(f_i, az, tau_n, lambda)
 % 1 - amostragem ideal
 % 2 - Psi obtido pela fase do sinal analitico
 % 3 - f_i[n] obtida pelo gradient de Psi
-% 4 - considera f_u = polinomio p obtido pela aplicacao de PATV (d=1,lambda?) a f_i 
+% 4 - considera f_u = polinomio p obtido pela aplicacao de PATV (d=0,lambda?) a f_i 
 % compensado pela amplitude az[n], excluindo amostras proximo as bordas
 % 5 
 %   - considera f_r = media de f_u, aproximada pela mediana
@@ -15,19 +15,21 @@ function [f1,f2,F,f_u,ri] = EF5(f_i, az, tau_n, lambda)
     NSamples = length(f_i);
     br = 0.05;%80/480; % fraction of samples to be ignored 
     brn = floor(br*NSamples)+1; % number of samples to be ignored
-
+    brmask = [brn+1:NSamples-brn];
+    
     d = 0; %lambda = 2.5; 
     % com d = 1, fu pode assumir variacao lenta
     f_icomp = f_i.*az./median(az);
     
     %exclui as amostras proximo as bordas
-    f_i2 = f_icomp(brn:end-brn-1);
+    f_i2 = f_icomp(brmask);
     %f_u2 = f_ucomp;
     
     Nit = 20;
     [x, f_u, cost, u, v] = patv_MM(f_i2, d, lambda, Nit);
     f_i = f_u + x; 
-    ri = gradient(f_i); % ou usar diretamente u
+    ri = zeros(NSamples,1);
+    ri(brmask) = gradient(f_i); % ou usar diretamente u
     ru = gradient(f_u);
     
     % indices deslocados pela supressao das amostras nas bordas

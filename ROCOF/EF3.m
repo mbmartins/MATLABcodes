@@ -25,7 +25,8 @@ function [f1,f2,F,f_u,ri] = EF3(f_i, az, tau_n)
     f_utrunc = f_i(brmask);
     
     f_u = f_utrunc.*aztrunc./median(aztrunc);
-    ri = gradient(f_i);
+    ri = zeros(1,NSamples);
+    ri(brmask) = gradient(f_i(brmask));
 
     %retirando amostras próximas a tau
     % 2*brn pois no f_u2 já foi retirado brn

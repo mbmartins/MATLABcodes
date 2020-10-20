@@ -104,3 +104,5 @@ c = ['k','b','c','r','m','g'];
     ylabel('$KFE1$ [Hz]')
     legend(plotkP, 'EF1','EF2','EF3','EF4','EF5','EF6')
     grid on
+    
+    save('salto freq\estimadoresFR_salto_freq_Fs')

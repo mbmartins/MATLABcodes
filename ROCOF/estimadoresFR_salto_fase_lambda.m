@@ -60,6 +60,7 @@ for j = 1:ncurves
     %estimador EF5
     [f1_est5,f2_est5,F_est,fu5,ri5] = EF5(f_i,az,tau_n1,lambda_n(k));
     
+    
     ROCOF_ref = (Fref - F1)/T;
     FE(j,:) = F_est - Fref;
     FE1(j,:) = f1_est5 - F1;

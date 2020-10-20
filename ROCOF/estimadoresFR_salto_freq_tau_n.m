@@ -116,4 +116,4 @@ c = ['k','b','c','r','m','g'];
     FE_mean = mean(FE)
     FE_std = std(FE)
     
-    
+    save('salto freq\estimadoresFR_salto_freq_tau_n')

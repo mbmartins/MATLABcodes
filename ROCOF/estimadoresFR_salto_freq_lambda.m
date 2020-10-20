@@ -10,9 +10,9 @@ SNR = 60;
 %fixed parameters
 F0 = 60.0; %nominal frequency
 F1 = 60; %fundamental frequency
-KaS = 10.0; %[degrees]
+KaS = 0.0; %[degrees]
 KxS = 0.0; % [relative magnitude step]
-KfS = 0.; %[Hz] %size of frequency step
+KfS = 1.; %[Hz] %size of frequency step
 Fs =4800;
 NCycles = 6;
 T = NCycles/F0;
@@ -22,7 +22,7 @@ tau2 = 1.; % in proportion of T; set tau2 = 1 if you dont want two steps
 NSamples = floor(NCycles*Fs/F0);
 tau_n1 = floor(tau1*NSamples);
 tau_n2 = floor(tau2*NSamples);
-nbits = 32;
+nbits = 16;
 
 phistep = 5; %[degrees]
 ncurves = 180/phistep;
@@ -50,8 +50,8 @@ for j = 1:ncurves
     tau_n1 = floor(tau*NSamples/T);
     
     %estimador EFx
-    %[f1_est,f2_est,F_est,fu,ri] = EF4(Psi_i,az,Fs,tau_n1,lambda_n(k));
-    [f1_est,f2_est,F_est,fu,ri] = EF5(f_i,az,tau_n1,lambda_n(k));
+    [f1_est,f2_est,F_est,fu,ri] = EF4(Psi_i,az,Fs,tau_n1,lambda_n(k));
+    %[f1_est,f2_est,F_est,fu,ri] = EF5(f_i,az,tau_n1,lambda_n(k));
     %[f1_est,f2_est,F_est,fu,ri] = EF6(f_i,az,tau_n1,lambda_n(k));
     
     
@@ -95,6 +95,13 @@ xlabel('$\lambda$')
 ylabel('$|\mu(FE)|$ [Hz]')
 legend('\tau = 0.1T','\tau = 0.2T', '\tau = 0.3T','\tau = 0.4T','\tau = 0.5T')
 
+figure
+plot(lambda_n,abs(FEmax),'o-')
+xlabel('x','Interpreter','latex');
+ylabel('y','Interpreter','latex');
+xlabel('$\lambda$')
+ylabel('$|FE_{max}|$ [Hz]')
+legend('\tau = 0.1T','\tau = 0.2T', '\tau = 0.3T','\tau = 0.4T','\tau = 0.5T')
 % 
 % figure
 % semilogy(lambda_n,FE1max,'o-')
