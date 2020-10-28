@@ -17,14 +17,20 @@ MCiter = 5000;
 phi_n = 360*rand(1,MCiter); %distribuicao de phi_0
 tau_vec = 0.1 + (0.8)*rand(1,MCiter); %distribuicao de tau
 
-% MC loop
-%baseline
-% k_a = 0; k_x = 0; k_f = 0;
-% [FEraw_zero,fE1raw_zero,fE2raw_zero,kfEraw_zero] = MC_estimation_geral_afund(MCiter,F0,F1,Fs,NCycles,SNR,k_a, k_x,k_f,nbits);
+% afundamento com duração de 0 a 0.8T, sem variacao de frequencia
+k_a = 10; k_x = -0.1; k_f = 0.0;
+duracao = 0.1;%*rand(1,MCiter);
+tau_vec(2,:) = tau_vec(1,:) + duracao; %rand(1,MCiter); %distribuição de tau2;
+%estimando frequencia com estimador para 1 salto somente
+[FEraw_sag,fE1raw_sag,fE2raw_sag,kfEraw_sag, riraw_sag, draw_sag, tau_nraw_sag] = MC_estimation_ROCOF(MCiter,F0,F1,Fs,phi_n,NCycles,tau_vec,SNR,k_a, k_x,k_f,nbits);
+kfest_sag = kfEraw_sag + k_f;
 
-%salto fase + salto mag combinados, frequencia constante
-k_a = 10; k_x = 0.1; k_f = 0;
-[FEraw_fase,fE1raw_fase,fE2raw_fase,kfEraw_fase] = MC_estimation_geral_afund(MCiter,F0,F1,Fs,NCycles,SNR,k_a, k_x,k_f,nbits);
+% afundamento com duração de 0.1T, sem variacao de frequencia
+k_a = 30; k_x = -0.3; k_f = 0.0;
+%estimando frequencia com estimador para 1 salto somente
+[FEraw_sag30,fE1raw_sag30,fE2raw_sag30,kfEraw_sag30, riraw_sag30, draw_sag30, tau_nraw_sag30] = MC_estimation_ROCOF(MCiter,F0,F1,Fs,phi_n,NCycles,tau_vec,SNR,k_a, k_x,k_f,nbits);
+kfest_sag30 = kfEraw_sag30 + k_f;
+
 
 save('afundamento_geral')
 run('analise_geral_afundamento')

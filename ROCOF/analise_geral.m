@@ -1,5 +1,5 @@
 clear all; close all; clc;
-load('boxplot_geral.mat')
+load('boxplot_geral_mediana.mat')
 
 tits = ["EF1","EF2","EF3","EF4","EF5","EF6"];
 
@@ -12,8 +12,8 @@ for i = 0:2
     % variavel
     for j=0:3 
         % tipo salto
-    filename(8*i+2*j+1) = "geral\" + variavel(i+1) + tipo_salto(j+1)+"_boxplot.png";
-    filename(8*i+2*j+2) = "geral\" + variavel(i+1) + tipo_salto(j+1)+"_hist.png";
+    filename(8*i+2*j+1) = "geral\media-mediana\" + variavel(i+1) + tipo_salto(j+1)+"_boxplot_mediana.png";
+    filename(8*i+2*j+2) = "geral\media-mediana\" + variavel(i+1) + tipo_salto(j+1)+"_hist_mediana.png";
     end
 end
 

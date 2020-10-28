@@ -1,4 +1,4 @@
-function [f1,f2,F,f_u,ri] = EF3(f_i, az, tau_n)
+function [f1,f2,f_r,f_u,ri] = EF3(f_i, az, tau_n)
 %EF3
 % 1 - amostragem ideal
 % 2 - Psi obtido pela fase do sinal analitico
@@ -25,7 +25,7 @@ function [f1,f2,F,f_u,ri] = EF3(f_i, az, tau_n)
     f_utrunc = f_i(brmask);
     
     f_u = f_utrunc.*aztrunc./median(aztrunc);
-    ri = zeros(1,NSamples);
+    ri = zeros(NSamples,1);
     ri(brmask) = gradient(f_i(brmask));
 
     %retirando amostras próximas a tau
@@ -33,10 +33,19 @@ function [f1,f2,F,f_u,ri] = EF3(f_i, az, tau_n)
 %      f1 = median(f_u(1:(tau_n-2*brn)));  
 %      f2 = median(f_u((tau_n-2*brn+1):end));
 %     F = median(f_u);
+
   f1 = mean(f_u(1:(tau_n-2*brn)));
+%  f1 = median(f_u(1:(tau_n-2*brn)));  
+
   if (tau_n-2*brn+1)<length(f_u)
     f2 = mean(f_u((tau_n-2*brn+1):end));
+%     f2 = median(f_u((tau_n-2*brn+1):end));
+
   else
     f2 = f_u(end);
   end
-  F = mean(f_u);
+ % f_r = median(f_u);  
+%  F = mean(f_u);
+
+      tau = tau_n/NSamples;
+    f_r = tau*f1 + (1-tau)*f2;

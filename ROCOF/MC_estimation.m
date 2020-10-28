@@ -45,9 +45,9 @@ for k = 1:MC_iterations
     end
     
     
-    [f1_est4(k),f2_est4(k),F_est4(k),fu4,ri4] = EF4(Psi_i,az,Fs,tau_n1,lambdaEF4);
-    [f1_est5(k),f2_est5(k),F_est5(k),fu5,ri5] = EF5(f_i,az,tau_n1,lambdaEF5);
-    [f1_est6(k),f2_est6(k),F_est6(k),fu6,ri6] = EF6(f_i,az,tau_n1,lambdaEF6);
+    [f1_est4(k),f2_est4(k),F_est4(k),fu4,ri4,ru4] = EF4(Psi_i,az,Fs,tau_n1,lambdaEF4);
+    [f1_est5(k),f2_est5(k),F_est5(k),fu5,ri5,ru5] = EF5(f_i,az,tau_n1,lambdaEF5);
+    [f1_est6(k),f2_est6(k),F_est6(k),fu6,ri6,ru6] = EF6(f_i,az,tau_n1,lambdaEF6);
     
     kf1(k) = f2_est1(k) - f1_est1(k);
     kf2(k) = f2_est2(k) - f1_est2(k);

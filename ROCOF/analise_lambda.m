@@ -38,27 +38,34 @@ close all;
 
 % ----- Figuras para EF4
 figs(1) = figure(1);hold off
-subplot(121)
+subplot(211)
 semilogy(lambda_n,abs(FEmean4),'b.-'); hold on;
-semilogy(lambda_n,abs(FEmean4)+FE_std4,'k--');
-semilogy(lambda_n,(FEmax4),'k:');
+title('EF4 - mediana')
 grid on;
 xlabel('x','Interpreter','latex');
 ylabel('y','Interpreter','latex');
 xlabel('$\lambda$')
-ylabel('EF4 $|FE|$ [Hz]')
-legend('|\mu(FE)|','|\mu(FE)| + \sigma(FE)', '|FE_{max}|')
+ylabel('$|FE|$ [Hz]')
+legend('|\mu(FE)|')
 %title('EF4')
-subplot(122)
-semilogy(lambda_n,abs(KFEmean4),'b.-'); hold on;
-semilogy(lambda_n,abs(KFEmean4)+KFE_std4,'k--');
-semilogy(lambda_n,(KFEmax4),'k:');
-grid on;
+subplot(212)
+semilogy(lambda_n,FE_std4,'k--');
 xlabel('x','Interpreter','latex');
 ylabel('y','Interpreter','latex');
 xlabel('$\lambda$')
-ylabel('EF4 $|K_fE|$ [Hz]')
-legend('|\mu(K_fE)|','|\mu(K_fE)| + \sigma(K_fE)', '|K_fE_{max}|')
+ylabel('$|FE|$ [Hz]')
+grid on;
+legend('\sigma(FE)')
+
+% semilogy(lambda_n,abs(KFEmean4),'b.-'); hold on;
+% semilogy(lambda_n,abs(KFEmean4)+KFE_std4,'k--');
+% semilogy(lambda_n,(KFEmax4),'k:');
+% grid on;
+% xlabel('x','Interpreter','latex');
+% ylabel('y','Interpreter','latex');
+% xlabel('$\lambda$')
+% ylabel('EF4 $|K_fE|$ [Hz]')
+% legend('|\mu(K_fE)|','|\mu(K_fE)| + \sigma(K_fE)', '|K_fE_{max}|')
 %title('EF4')
 
 %--------- Figuras para EF5

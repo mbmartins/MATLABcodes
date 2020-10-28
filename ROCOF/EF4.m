@@ -1,4 +1,4 @@
-function [f1,f2,F,f_u,ri] = EF4(Psi_noise, az, Fs, tau_n,lambda)    
+function [f1,f2,f_r,f_u,ri,ru] = EF4(Psi_noise, az, Fs, tau_n,lambda)    
 % EF4
 % 1 - amostragem ideal
 % 2 - Psi obtido pela fase do sinal analitico
@@ -11,12 +11,14 @@ function [f1,f2,F,f_u,ri] = EF4(Psi_noise, az, Fs, tau_n,lambda)
 %   - estima f_2 = mediana de f_u a partir de tau_n
 % 6 - estima r_i[n] pelo gradiente de f_i[n]
 
+    NSamples = length(Psi_noise);
     br = 0.05;%80/480; % fraction of samples to be ignored 
     brn = floor(br*NSamples)+1; % number of samples to be ignored
     brmask = [brn+1:NSamples-brn];
     
     Nit = 20; 
    
+    d = 1; % aproximando Psi por uma reta
     [x, p, cost, u, v] = patv_MM(Psi_noise, d, lambda, Nit);
     %[x, p, cost, u, v] = patv_MM(Psi_i(brmask), d, lambda, Nit); 
     % OBS: nao funciona bem retirar as amostras inciais e finais antes do 
@@ -27,15 +29,19 @@ function [f1,f2,F,f_u,ri] = EF4(Psi_noise, az, Fs, tau_n,lambda)
     f_i=gradient(Psi_i)*Fs/(2*pi);% Hilbert estimate of the instantaneous frequency of z
     f_u=gradient(Psi_u)*Fs/(2*pi);% Hilbert estimate of the underlying frequency of z   
 
-    ri = zeros(1,NSamples);
+    ri = zeros(NSamples,1);ru = zeros(NSamples,1);
     ri(brmask) = gradient(f_i(brmask));
-    ru = gradient(f_u);
+    ru(brmask) = gradient(f_u(brmask));
     
-     f1 = median(f_i(1:tau_n));
-     f2 = median(f_i((tau_n+1):end));
-%     F = median(f_u); 
-%f1 = mean(f_i(1:tau_n));
-%f2 = mean(f_i((tau_n+1):end));
-F = mean(f_i);
+    f1 = median(f_i(1:tau_n));
+    f2 = median(f_i((tau_n+1):end));
+%     f_r = median(f_u); 
+%   f1 = mean(f_i(1:tau_n));
+%   f2 = mean(f_i((tau_n+1):end));
+%  F = mean(f_i);
 
     phi_0_est = Psi_u(1)*180/pi;
+    
+    tau = tau_n/NSamples;
+    f_r = tau*f1 + (1-tau)*f2;
+

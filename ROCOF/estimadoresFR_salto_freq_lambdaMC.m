@@ -25,8 +25,8 @@ tau_n2 = floor(tau2*NSamples);
 nbits = 16;
 
 % vetor de valores de lambda
- lambda_step = .01;
- n_lambdas = 500; la_ini = .05;
+ lambda_step = .05;
+ n_lambdas = 140; la_ini = .05;
  lambda_n = la_ini+(0:lambda_step:(n_lambdas-1)*lambda_step);
 
 % --- grade fina, valores pequenos de lambda

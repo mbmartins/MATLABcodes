@@ -1,4 +1,4 @@
-function [f1,f2,F,f_u,ri] = EF5(f_i, az, tau_n, lambda)
+function [f1,f2,f_r,f_u,ri,ru] = EF5(f_i, az, tau_n, lambda)
 % EF5
 % 1 - amostragem ideal
 % 2 - Psi obtido pela fase do sinal analitico
@@ -19,7 +19,9 @@ function [f1,f2,F,f_u,ri] = EF5(f_i, az, tau_n, lambda)
     
     d = 0; %lambda = 2.5; 
     % com d = 1, fu pode assumir variacao lenta
-    f_icomp = f_i.*az./median(az);
+    %f_icomp = f_i.*az./median(az);
+    % TESTE DEBUG
+    f_icomp = f_i;
     
     %exclui as amostras proximo as bordas
     f_i2 = f_icomp(brmask);
@@ -28,9 +30,9 @@ function [f1,f2,F,f_u,ri] = EF5(f_i, az, tau_n, lambda)
     Nit = 20;
     [x, f_u, cost, u, v] = patv_MM(f_i2, d, lambda, Nit);
     f_i = f_u + x; 
-    ri = zeros(NSamples,1);
+    ri = zeros(NSamples,1);ru = zeros(NSamples,1);
     ri(brmask) = gradient(f_i); % ou usar diretamente u
-    ru = gradient(f_u);
+    ru(brmask) = gradient(f_u);
     
     % indices deslocados pela supressao das amostras nas bordas
     % tratamento de erro para o caso de tau ser muito proximo a borda
@@ -43,12 +45,12 @@ function [f1,f2,F,f_u,ri] = EF5(f_i, az, tau_n, lambda)
         n2 = 1;
     end;
     
-     f1 = median(f_i(1:n1));
-     f2 = median(f_i(n2:end));
-%     F = median(f_i);
-%     f1 = mean(f_i(1:n1));
-%     f2 = mean(f_i(n2:end));
+   f1 = median(f_i(1:n1));
+   f2 = median(f_i(n2:end));
+%      f_r = median(f_i);
+%       f1 = mean(f_i(1:n1));
+%       f2 = mean(f_i(n2:end));
 
-%    F = mean(f_i);
+%   F = mean(f_i);
       tau = tau_n/NSamples;
-    F = tau*f1 + (1-tau)*f2;
+    f_r = tau*f1 + (1-tau)*f2;

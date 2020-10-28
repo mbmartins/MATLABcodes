@@ -1,4 +1,5 @@
 %testes para estimação de fase, frequência e ROCOF
+% em funcao de phi0, com tau fixo
 
 clear all; close all; clc
 %fixed parameters
@@ -108,6 +109,7 @@ EF(k) = plot(phi_n,FE_ruido(:,k),c(k)); hold on;
 plot(phi_n,FE_ruido(:,k) + FE_std(:,k),[c(k),'--']);
 plot(phi_n,FE_ruido(:,k) - FE_std(:,k),[c(k),'--']); 
 end
+grid on;
 legend(EF, 'EF1','EF2','EF3','EF4','EF5','EF6')
 %title('FE com ruido SNR = 60 dB')
 xlabel('\phi_0 [graus]')

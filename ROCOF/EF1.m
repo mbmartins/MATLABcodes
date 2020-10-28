@@ -1,4 +1,4 @@
-function [f_1,f_2,f_r,f_u,ri] = EF1(f_u, tau_n)
+function [f1,f2,f_r,f_u,ri] = EF1(f_u, tau_n)
 %EF1
 % 1 - amostragem ideal
 % 2 - Psi obtido pela fase do sinal analitico
@@ -21,14 +21,16 @@ function [f_1,f_2,f_r,f_u,ri] = EF1(f_u, tau_n)
     
 ri = zeros(NSamples,1);
 ri(brmask) = gradient(f_u_trunc);
-%  f_1 = median(f_u(brmask1));
-%  f_2 = median(f_u(brmask2));
-% f_r = median(f_u_trunc);
+   f1 = median(f_u(brmask1));
+   f2 = median(f_u(brmask2));
+%  f_r = median(f_u_trunc);
 
-  f_1 = mean(f_u(brmask1));
-  f_2 = mean(f_u(brmask2));
-  f_r = mean(f_u_trunc);
-
+   f1 = mean(f_u(brmask1));
+   f2 = mean(f_u(brmask2));
+%   f_r = mean(f_u_trunc);
+      tau = tau_n/NSamples;
+    f_r = tau*f1 + (1-tau)*f2;
+    
 % ---- Debug ----
 % subplot(1,2,1)
 % plot(f_u_trunc)

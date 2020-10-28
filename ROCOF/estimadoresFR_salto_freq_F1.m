@@ -17,7 +17,7 @@ Fs = 4800; % sampling frequency [Hz]
 NCycles = 6; % signal number of generated nominal cycles
 T = NCycles/F0; % fundamental cycles duration
 NSamples = floor(NCycles*Fs/F0); % total number of signal samples
-phi_0 = 90; % initial angle phi_0 [degrees]
+phi_0 = 0; % initial angle phi_0 [degrees]
 tau1 = 0.5;  % first step location in proportion of T
 tau2 = 1.; % second step location in proportion of T; set tau2 = 1 if you dont want two steps
 tau_n1 = floor(tau1*NSamples); %first step sample location

@@ -1,4 +1,4 @@
-function [f1,f2,F,f_u,ri] = EF2(f_i, az, tau_n)
+function [f1,f2,f_r,f_u,ri] = EF2(f_i, az, tau_n)
 %EF2
 % 1 - amostragem ideal
 % 2 - Psi obtido pela fase do sinal analitico
@@ -7,8 +7,8 @@ function [f1,f2,F,f_u,ri] = EF2(f_i, az, tau_n)
 % 5 
 %   - retira 5% das amostras proximas das bordas
 %   - considera f_r = media de f_u, aproximada pela mediana
-%   - estima f_1 = mediana de f_u até tau_n
-%   - estima f_2 = mediana de f_u a partir de tau_n
+%   - estima f_1 = media de f_u até tau_n
+%   - estima f_2 = media de f_u a partir de tau_n
 % 6 - estima r_i[n] pelo gradiente de f_i[n]
 
     NSamples = length(f_i);
@@ -21,12 +21,14 @@ function [f1,f2,F,f_u,ri] = EF2(f_i, az, tau_n)
     f_u = f_i.*az./median(az);
     % aplicar brmask em az e fi??
     
-    ri = zeros(NSamples);
+    ri = zeros(NSamples,1);
     ri(brmask) = gradient(f_u(brmask));
     
-%      f1 = median(f_u(brmask1));
-%      f2 = median(f_u(brmask2));
-%      F = median(f_u(brmask));
-  f1 = mean(f_u(brmask1));
-  f2 = mean(f_u(brmask2));
-  F = mean(f_u(brmask));
+      f1 = median(f_u(brmask1));
+      f2 = median(f_u(brmask2));
+%      f_r = median(f_u(brmask));
+   f1 = mean(f_u(brmask1));
+   f2 = mean(f_u(brmask2));
+%   F = mean(f_u(brmask));
+      tau = tau_n/NSamples;
+    f_r = tau*f1 + (1-tau)*f2;
