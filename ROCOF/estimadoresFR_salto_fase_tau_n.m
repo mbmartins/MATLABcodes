@@ -113,7 +113,7 @@ c = ['k','b','c','r','m','g'];
     % verificar phi_0 que facam sentido
     
     %para avaliar o T
-    FE_mean = mean(FE)
-    FE_std = std(FE)
-    
+%     FE_mean = mean(FE)
+%     FE_std = std(FE)
+%     
     save('salto fase\estimadoresFR_salto_fase_tau_n')
