@@ -46,3 +46,20 @@ tau3n = tau3/dt
 FE1 = (fest1 - F0)/F0
 FE2 = (fest2 - F0)/F0
 FE3 = (fest3 - F0)/F0
+
+% ---- HD-PATV
+lambda_a = 2;
+lambda_theta = 2.5;
+[tau1_P,fest1_P, dmax] = HD_PATV_estimator(wav1,lambda_a,lambda_theta);
+[tau2_P,fest2_P, dmax] = HD_PATV_estimator(wav2,lambda_a,lambda_theta);
+[tau3_P,fest3_P, dmax] = HD_PATV_estimator(wav3,lambda_a,lambda_theta);
+
+tau1nP = tau1_P/dt
+tau2nP = tau2_P/dt
+tau3nP = tau3_P/dt
+
+%[tau1,tau2,fest] = tau_estimator(wav1,F0,Fs)
+
+FE1P = (fest1_P - F0)/F0
+FE2P = (fest2_P - F0)/F0
+FE3P = (fest3_P - F0)/F0

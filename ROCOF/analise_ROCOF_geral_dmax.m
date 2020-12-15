@@ -8,7 +8,7 @@ tits = ["EF1","EF2","EF3","EF4","EF5","EF6"];
 % sao 4 tipos de saltos, 2 tipos de plot (bp e hist), para 1 variaveis
 % variavel ri - 4 saltos - 2 tipos
 tipo_salto = ["salto_fase"; "salto_mag"; "salto_freq"; "senoidal"];
-var_observada = ["d_{max}"];
+var_observada = ["d_{rmax}"];
 
 for i = 0:(length(var_observada)-1)
     % variavel
@@ -29,6 +29,7 @@ for k = 1:6
     xlabel('Samples'); ylabel('d[n] [Hz/s]'); %legend('ri','ru');
 end
 B = convertStringsToChars(filename(f));saveas(gcf,B)
+
 figB=figure(f+1); title('Salto fase')
 % for k = 1:6
 %     subplot(subs(k)); histogram(riraw_fase(k,:)); title(tits(k))
