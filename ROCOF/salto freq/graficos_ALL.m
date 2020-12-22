@@ -56,7 +56,7 @@ for k=1:6
     xlim([0,175]); grid on;
 end
 savefig(fig_dp,"salto_freq_ALL_phi0"+"_dpad")
-saveas(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad.png")
+saveas(fig_dp,"salto_freq_ALL_"+var+"_dpad.png")
 % --------------------------------------------------
 
 
@@ -90,8 +90,8 @@ for k = 1:6
     xlabel(xlabels); ylabel('FE_1 [Hz]')
     grid on;
     xlim([48,432]); ylim([-2.5 1.])
-savefig(figALLf1(k),"salto freq\salto_freq_ALL_"+var+"_EF"+k)
-saveas(figALLf1(k),"salto freq\salto_freq_ALL_"+var+"_EF"+k+".png")
+savefig(figALLf1(k),"salto_freq_ALL_"+var+"_EF"+k)
+saveas(figALLf1(k),"salto_freq_ALL_"+var+"_EF"+k+".png")
 end
 % --------------------------------------------------
 fig_dp = figure('Units','normalized','Position',[0 0 0.5 0.3]);
@@ -115,8 +115,8 @@ for k=1:6
     xlabel(xlabels); ylabel('\sigma_{FE_1} [Hz]')
     grid on;
 end
-savefig(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad")
-saveas(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad.png")
+savefig(fig_dp,"salto_freq_ALL_"+var+"_dpad")
+saveas(fig_dp,"salto_freq_ALL_"+var+"_dpad.png")
 % --------------------------------------------------
 
 
@@ -176,8 +176,8 @@ for k=1:6
     xlabel(xlabels); ylabel('\sigma_{FE_1} [Hz]')
     grid on;
 end
-savefig(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad")
-saveas(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad.png")
+savefig(fig_dp,"salto_freq_ALL_"+var+"_dpad")
+saveas(fig_dp,"salto_freq_ALL_"+var+"_dpad.png")
 % --------------------------------------------------
 
 
@@ -195,14 +195,16 @@ for k = 1:6
     pleg(1) = plot(VEC,FE(:,k),c(k)+"-"); hold on;
     shade(VEC,FE(:,k) - FE_std(:,k),[c(k),'-.'],VEC,FE(:,k) + FE_std(:,k),[c(k),'--'], 'FillType', [1,2; 2,1]);
     xlabel(xlabels); ylabel('FE [Hz]')
-    %xlim([48,432]); ylim([-0.3 0.1])
+    xlim([0,3]); 
+    ylim([-0.3 0.1])
     grid on;
     subplot(1,3,2)
     plot(VEC,zeros(1,length(VEC)),'k--'); hold on;
     pleg(2) = plot(VEC,KFE(:,k),c(k)+"-"); hold on;
     shade(VEC,KFE(:,k) - kf_std(:,k),[c(k),'--'],VEC,KFE(:,k) + kf_std(:,k),[c(k),'--'], 'FillType', [1,2; 2,1]);
     xlabel(xlabels); ylabel('K_fE [Hz]')
-    %xlim([48,432]); ylim([-0.3 0.1])
+    xlim([0,3]); 
+    ylim([-3 0.1])
     grid on;
     subplot(1,3,3)
     plot(VEC,zeros(1,length(VEC)),'k--'); hold on;    
@@ -210,9 +212,10 @@ for k = 1:6
     shade(VEC,FE1(:,k) - f1_std(:,k),[c(k),'--'],VEC,FE1(:,k) + f1_std(:,k),[c(k),'--'], 'FillType', [1,2; 2,1]);
     xlabel(xlabels); ylabel('FE_1 [Hz]')
     grid on;
-    %xlim([48,432]); ylim([-0.3 0.1])
-savefig(figALLf1(k),"salto freq\salto_freq_ALL_"+var+"_EF"+k)
-saveas(figALLf1(k),"salto freq\salto_freq_ALL_"+var+"_EF"+k+".png")
+    xlim([0,3]); 
+    ylim([-0.1 1.1])
+savefig(figALLf1(k),"salto_freq_ALL_"+var+"_EF"+k)
+saveas(figALLf1(k),"salto_freq_ALL_"+var+"_EF"+k+".png")
 end
 % --------------------------------------------------
 fig_dp = figure('Units','normalized','Position',[0 0 0.5 0.3]);
@@ -236,8 +239,8 @@ for k=1:6
     xlabel(xlabels); ylabel('\sigma_{FE_1} [Hz]')
     grid on;
 end
-savefig(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad")
-saveas(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad.png")
+savefig(fig_dp,"salto_freq_ALL_"+var+"_dpad")
+saveas(fig_dp,"salto_freq_ALL_"+var+"_dpad.png")
 % --------------------------------------------------
 
 
@@ -255,14 +258,16 @@ for k = 1:6
     pleg(1) = plot(VEC,FE(:,k),c(k)+"-"); hold on;
     shade(VEC,FE(:,k) - FE_std(:,k),[c(k),'-.'],VEC,FE(:,k) + FE_std(:,k),[c(k),'--'], 'FillType', [1,2; 2,1]);
     xlabel(xlabels); ylabel('FE [Hz]')
-    xlim = [min(Fs_vec) max(Fs_vec)]; ylim([-0.3 0.1])
+    xlim = [min(Fs_vec) max(Fs_vec)]; 
+    ylim([-0.1 0.1])
     grid on;
     subplot(1,3,2)
     plot(VEC,zeros(1,length(VEC)),'k--'); hold on;
     pleg(2) = plot(VEC,KFE(:,k),c(k)+"-"); hold on;
     shade(VEC,KFE(:,k) - kf_std(:,k),[c(k),'--'],VEC,KFE(:,k) + kf_std(:,k),[c(k),'--'], 'FillType', [1,2; 2,1]);
     xlabel(xlabels); ylabel('K_fE [Hz]')
-    xlim = [min(Fs_vec) max(Fs_vec)];ylim([-1.1 0.1])
+    xlim = [min(Fs_vec) max(Fs_vec)];
+    ylim([-1.1 0.1])
     grid on;
     subplot(1,3,3)
     plot(VEC,zeros(1,length(VEC)),'k--'); hold on;    
@@ -271,8 +276,8 @@ for k = 1:6
     xlabel(xlabels); ylabel('FE_1 [Hz]')
     grid on;
     xlim = [min(Fs_vec) max(Fs_vec)];ylim([-0.3 0.6])
-savefig(figALLf1(k),"salto freq\salto_freq_ALL_"+var+"_EF"+k)
-saveas(figALLf1(k),"salto freq\salto_freq_ALL_"+var+"_EF"+k+".png")
+savefig(figALLf1(k),"salto_freq_ALL_"+var+"_EF"+k)
+saveas(figALLf1(k),"salto_freq_ALL_"+var+"_EF"+k+".png")
 end
 % --------------------------------------------------
 fig_dp = figure('Units','normalized','Position',[0 0 0.5 0.3]);
@@ -296,8 +301,8 @@ for k=1:6
     xlabel(xlabels); ylabel('\sigma_{FE_1} [Hz]')
     grid on;
 end
-savefig(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad")
-saveas(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad.png")
+savefig(fig_dp,"salto_freq_ALL_"+var+"_dpad")
+saveas(fig_dp,"salto_freq_ALL_"+var+"_dpad.png")
 % --------------------------------------------------
 
 
@@ -315,7 +320,8 @@ for k = 1:6
     pleg(1) = plot(VEC,FE(:,k),c(k)+"-"); hold on;
     shade(VEC,FE(:,k) - FE_std(:,k),[c(k),'-.'],VEC,FE(:,k) + FE_std(:,k),[c(k),'--'], 'FillType', [1,2; 2,1]);
     xlabel(xlabels); ylabel('FE [Hz]')
-    xlim = [min(Ncycles_vec) max(Ncycles_vec)]; ylim([-0.3 0.1])
+    xlim = [min(Ncycles_vec) max(Ncycles_vec)]; 
+    ylim([-0.2 0.1])
     grid on;
     subplot(1,3,2)
     plot(VEC,zeros(1,length(VEC)),'k--'); hold on;
@@ -331,8 +337,8 @@ for k = 1:6
     xlabel(xlabels); ylabel('FE_1 [Hz]')
     grid on;
     xlim = [min(Ncycles_vec) max(Ncycles_vec)];ylim([-0.3 0.6])
-savefig(figALLf1(k),"salto freq\salto_freq_ALL_"+var+"_EF"+k)
-saveas(figALLf1(k),"salto freq\salto_freq_ALL_"+var+"_EF"+k+".png")
+savefig(figALLf1(k),"salto_freq_ALL_"+var+"_EF"+k)
+saveas(figALLf1(k),"salto_freq_ALL_"+var+"_EF"+k+".png")
 end
 % --------------------------------------------------
 fig_dp = figure('Units','normalized','Position',[0 0 0.5 0.3]);
@@ -356,6 +362,6 @@ for k=1:6
     xlabel(xlabels); ylabel('\sigma_{FE_1} [Hz]')
     grid on;
 end
-savefig(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad")
-saveas(fig_dp,"salto freq\salto_freq_ALL_"+var+"_dpad.png")
+savefig(fig_dp,"salto_freq_ALL_"+var+"_dpad")
+saveas(fig_dp,"salto_freq_ALL_"+var+"_dpad.png")
 % --------------------------------------------------
