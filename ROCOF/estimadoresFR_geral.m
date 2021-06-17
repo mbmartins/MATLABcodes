@@ -32,7 +32,7 @@ tau_vec = 0.1 + (0.8)*rand(1,MCiter); %distribuicao de tau
 % k_a = 0; k_x = 0.1; k_f = 0;
 % [FEraw_mag,fE1raw_mag,fE2raw_mag,kfEraw_mag] = MC_estimation_geral(MCiter,F0,F1,Fs,NCycles,SNR,k_a, k_x,k_f,nbits);
 %salto freq
-k_a = 10; k_x = 0; k_f = 1;
+k_a = 0; k_x = 0; k_f = 100;
 [FEraw_freq,fE1raw_freq,fE2raw_freq,kfEraw_freq] = MC_estimation_geral(MCiter,F0,F1,Fs,NCycles,SNR,k_a, k_x,k_f,nbits);
 
 save('boxplot_geral_media_Ftau60')

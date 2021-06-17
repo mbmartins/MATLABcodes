@@ -15,12 +15,12 @@ tau1 = 0.5;  % in [%] of the time window
 SAG_cycles = 10; %duration of SAG 
 
 %CASE 1
-  KaS = 0.0; %[degrees]
-  KxS = -0.1; % [relative step]
+%   KaS = 0.0; %[degrees]
+%   KxS = -0.1; % [relative step]
 
 % %CASE 2
-%KaS = 10.0; %[degrees]
-%KxS = -0.; % [relative step]
+KaS = 10.0; %[degrees]
+KxS = -0.; % [relative step]
 
 %CASE 2
 %KaS = 10.0; %[degrees]

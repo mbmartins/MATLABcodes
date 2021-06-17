@@ -50,9 +50,9 @@ FE3 = (fest3 - F0)/F0
 % ---- HD-PATV
 lambda_a = 2;
 lambda_theta = 2.5;
-[tau1_P,fest1_P, dmax] = HD_PATV_estimator(wav1,lambda_a,lambda_theta);
-[tau2_P,fest2_P, dmax] = HD_PATV_estimator(wav2,lambda_a,lambda_theta);
-[tau3_P,fest3_P, dmax] = HD_PATV_estimator(wav3,lambda_a,lambda_theta);
+[tau1_P,fest1_P, phi_01] = HD_PATV_estimator(wav1,lambda_a,lambda_theta);
+[tau2_P,fest2_P, phi_02] = HD_PATV_estimator(wav2,lambda_a,lambda_theta);
+[tau3_P,fest3_P, phi_03] = HD_PATV_estimator(wav3,lambda_a,lambda_theta);
 
 tau1nP = tau1_P/dt
 tau2nP = tau2_P/dt
@@ -63,3 +63,14 @@ tau3nP = tau3_P/dt
 FE1P = (fest1_P - F0)/F0
 FE2P = (fest2_P - F0)/F0
 FE3P = (fest3_P - F0)/F0
+
+%consultar nas tabelas
+corr(1) = 0.0;  %caso 1
+corr(2) = 2.983345E-03; %caso 2, para tau ~ 0.5, phi_0 = 4 graus ~ 0;
+corr(3) =  2.983345E-03;;  % caso 3 do AMPS...
+
+FE1P_c = FE1P - corr(1)
+FE2P_c = FE2P - corr(2)
+FE3P_c = FE3P - corr(3)
+
+% fazer medição de hf em wav1 e wav2

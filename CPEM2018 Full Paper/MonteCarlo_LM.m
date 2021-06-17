@@ -18,7 +18,7 @@ Ph = Ps*pi/180;% Phase in radians
 KaS = -10;   % IEEE Std phase (angle) step index: 10 degrees
 KxS = 0;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
-SNR = 90; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+SNR = 50; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 %Aruido = Vm/10^(SNR/20);
 
 for ti = 1:9

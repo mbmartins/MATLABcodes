@@ -1,4 +1,4 @@
-function [tau1,f_est1, dmax] = HD_PATV_estimator(Signal,lambda_a,lambda_theta)
+function [tau1,f_est1, phi_0] = HD_PATV_estimator(Signal,lambda_a,lambda_theta)
 % estimates frequency and tau_errors using NLHE estimator
 %clear all; close all; clc;
 
@@ -50,6 +50,7 @@ th_fi_v(1:NSamples) = th_fi; %threshold for frequency detection
 %calculate instantaneous freq and magnitude by Hilbert Transform
 z=hilbert(Signal');  % calculates the analytic signal associated with Signal
 theta_i = unwrap(angle(z)); a_i = abs(z);
+phi_0 = theta_i(1)*180/pi; % in degrees
 
 % figure(1)
 % plot(Signal,'.k'); ylabel('Sampled signal x[n] [V]'); xlabel('Samples')

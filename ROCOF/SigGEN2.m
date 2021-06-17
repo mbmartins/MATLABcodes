@@ -13,6 +13,7 @@ NSamples = floor(NCycles*SampleRate/F0);
 n = -NSamples/2:(NSamples/2-1); %discrete time vector
 tau_pp1 = tau1; % relative time of step in percent of total time 
 tau_pp2 = tau2;
+T = NSamples*dt;
 
 tau_0 = (tau_pp1 - 0.5)*NSamples; %discrete time displacement
 tau_02 = (tau_pp2 - 0.5)*NSamples;
@@ -38,10 +39,16 @@ Ain(i,t1 >= 0 & t2<=0) = Ain(i,t1 >= 0 & t2<=0) * (1 + KxS(i));
 Wf(i,1:NSamples) = Wf1;
 Wf(i,t1 >= 0 & t2<=0) = Wf(i,t1 >= 0 & t2<=0) + KRS*2*pi;
 
+%Ph=0; %MBM debug
 %Phase step
 Theta(i,:) = (Wf(i,:).*t1) ...                         % Fundamental
                  + Ph(i);               % phase shift
 Theta(i,t1 >= 0 & t2<=0) = Theta(i,t1 >= 0 & t2<=0) + (KaS(i) * pi/180);
+plot(Theta)
+
+% correção para o salto de freq
+%Theta(i,t1 >= 0 & t2<=0) = Theta(i,t1 >= 0 & t2<=0) - (2*pi*KRS(i) * (tau1-0.5)*T);
+
 cSignal = (Ain.*exp(-1i.*Theta));
 %SNR = 90; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 %Aruido = Vm/10^(SNR/20);
