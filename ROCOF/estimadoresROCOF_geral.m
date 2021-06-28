@@ -11,10 +11,14 @@ T = NCycles/F0;
 NSamples = floor(NCycles*Fs/F0);
 nbits = 16;
 
-MCiter = 1;
+MCiter = 2;
 %phi_n = 360*rand(1,MCiter); %distribuicao de phi_0
+
+%phi_0 fixo em zero:
 phi_n = 0*ones(1,MCiter);
 %tau_vec = 0.1 + (0.8)*rand(1,MCiter); %distribuicao de tau
+
+%tau fixo em 0.5T
 tau_vec = 0.5*ones(1,MCiter);;
 
 % MC loop

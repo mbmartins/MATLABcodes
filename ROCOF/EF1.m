@@ -25,8 +25,8 @@ ri(brmask) = gradient(f_u_trunc);
    f2 = median(f_u(brmask2));
 %  f_r = median(f_u_trunc);
 
-   f1 = mean(f_u(brmask1));
-   f2 = mean(f_u(brmask2));
+%    f1 = mean(f_u(brmask1));
+%    f2 = mean(f_u(brmask2));
 %   f_r = mean(f_u_trunc);
       tau = tau_n/NSamples;
     f_r = tau*f1 + (1-tau)*f2;

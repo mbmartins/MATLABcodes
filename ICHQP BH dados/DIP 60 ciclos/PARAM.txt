@@ -1,0 +1,5 @@
+Interv = 1.253153e-04
+TempoAmostr = 2.000000e-04
+NumCicl = 60
+NumAmostr = 5000
+Abertura = 1.700000e-04

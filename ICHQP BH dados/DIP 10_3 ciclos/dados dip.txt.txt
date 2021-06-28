@@ -1,0 +1,8 @@
+10 ciclos
+0.01 ramp in
+3 ciclos
+0.01 ramp out
+10 ciclos
+
+110V fund
+afundamento para 90%
