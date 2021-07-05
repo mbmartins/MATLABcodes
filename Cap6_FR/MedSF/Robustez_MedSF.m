@@ -1,4 +1,4 @@
-function filename = Robustez_MedSF(phi_n,tau_vec,MCiter,h_f)
+function filename = Robustez_MedSF(phi_n,tau_vec,MCiter,h_f,filedisc)
 %testes para robustez do MedSF aos saltos de fase e magnitude
 SNR = 60;
 %fixed parameters
@@ -11,8 +11,8 @@ NSamples = floor(NCycles*Fs/F0);
 nbits = 16;
 
 % MC loop
-for k = 1:MCiter
-    k
+% for k = 1:MCiter
+%     k
 %baseline
 %k_a = 0; k_x = 0; k_f = 0;
 %[FEraw_zero,fE1raw_zero,fE2raw_zero,kfEraw_zero, riraw_zero, draw_zero] = MC_estimation_Robustez(MCiter,F0,F1,Fs,phi_n(k),NCycles,tau_vec,SNR,k_a, k_x,k_f,nbits);
@@ -28,7 +28,7 @@ kfest_mag = kfEraw_mag + k_f;
 k_a = 0; k_x = 0; k_f = h_f;
 [FEraw_freq,fE1raw_freq,fE2raw_freq,kfEraw_freq, riraw_freq, draw_freq] = MC_estimation_Robustez(MCiter,F0,F1,Fs,phi_n,NCycles,tau_vec,SNR,k_a, k_x,k_f,nbits);
 kfest_freq = kfEraw_freq + k_f;
-end
-filename = "Robustez\Robustez"+MCiter+ "_hf" +h_f*10;
+% end
+filename = "Robustez\Robustez"+MCiter+ "_hf" +h_f*10 + filedisc;
 save(filename)
 

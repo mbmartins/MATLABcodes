@@ -9,7 +9,7 @@ tau_n2 = floor(NSamples);
 n = 1:NSamples;
 
 for k = 1:MCiter
-    
+    k
     tau1 = tau_vec(1,k); tau2 = 1.0; %tau_vec(2,k);
     tau_n1 = floor(tau1*NSamples);    
     tau_n2 = floor(tau2*NSamples);    
