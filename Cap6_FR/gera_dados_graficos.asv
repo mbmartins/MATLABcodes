@@ -1,6 +1,0 @@
-% gera dados
-MCiter = 10;
-h_f =1;
-pasta = gera_dados_MC(MCiter,h_f);
-%gera graficos
-c = graficos_ALL_MedSF(pasta);
