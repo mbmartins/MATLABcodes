@@ -16,12 +16,12 @@ ylim([0 0.5]);
 % t = xlabel('$\hat{h}_f$ [Hz]','Fontsize',14);
 % t.Interpreter = 'latex';
 %xlim([-0.5 1.5])
-lgd = legend('Salto Magnitude ($h_m = -0,1$)','Salto Frequ\^encia ($h_f = 1$ Hz)');
+lgd = legend('Salto Magnitude ($h_m = -0,1$)','Salto Frequ\^encia ($h_f = -1$ Hz)');
 lgd.Interpreter = 'latex';
 lgd.Location = 'north';
 lgd.EdgeColor = 'none';
 lgd.Color = 'none';
-lgd.Orientation = 'vertical';
+lgd.Orientation = 'horizontal';
 lgd.FontSize = 12;
 title('Salto de Magnitude - MedSF')
 
@@ -37,12 +37,12 @@ ylim([0 0.5]);
 t = xlabel('$\hat{h}_f$ [Hz]','Fontsize',14);
 t.Interpreter = 'latex';
 %xlim([-0.5 1.5])
-lgd = legend('Salto Magnitude ($h_m = -0,1$)','Salto Frequ\^encia ($h_f = 1$ Hz)');
+lgd = legend('Salto Magnitude ($h_m = -0,1$)','Salto Frequ\^encia ($h_f = -1$ Hz)');
 lgd.Interpreter = 'latex';
 lgd.Location = 'north';
 lgd.EdgeColor = 'none';
 lgd.Color = 'none';
-lgd.Orientation = 'vertical';
+lgd.Orientation = 'horizontal';
 lgd.FontSize = 12;
 title('Salto de Magnitude - MedSF-PATV')
 
@@ -58,13 +58,13 @@ ylabel('Frequência relativa','Fontsize',14);
 ylim([0 0.5]);
 % t = xlabel('$\hat{h}_f$ [Hz]','Fontsize',14);
 % t.Interpreter = 'latex';
-lgd = legend('Salto Fase ($h_a = 10^o$)','Salto Frequ\^encia ($h_f = 1$ Hz)');
+lgd = legend('Salto Fase ($h_a = 10^o$)','Salto Frequ\^encia ($h_f = -1$ Hz)');
 lgd.Interpreter = 'latex';
 lgd.Location = 'north';
 lgd.EdgeColor = 'none';
 lgd.Color = 'none';
 lgd.FontSize = 12;
-lgd.Orientation = 'vertical';
+lgd.Orientation = 'horizontal';
 
 title('Salto de Fase - MedSF')
 
@@ -79,12 +79,12 @@ ylabel('Frequência relativa','Fontsize',14);
 ylim([0 0.5]);
 t = xlabel('$\hat{h}_f$ [Hz]','Fontsize',14);
 t.Interpreter = 'latex';
-lgd = legend('Salto Fase ($h_a = 10^o$)','Salto Frequ\^encia ($h_f = 1$ Hz)');
+lgd = legend('Salto Fase ($h_a = 10^o$)','Salto Frequ\^encia ($h_f = -1$ Hz)');
 lgd.Interpreter = 'latex';
 lgd.Location = 'north';
 lgd.EdgeColor = 'none';
 lgd.Color = 'none';
-lgd.Orientation = 'vertical';
+lgd.Orientation = 'horizontal';
 lgd.FontSize = 12;
 title('Salto de Fase - MedSF-PATV')
 
@@ -116,10 +116,34 @@ title('Salto de Fase - MedSF-PATV')
 %analise dos desvios padrão
 hf_std_MedSF_fase = std(kfest_fase(1,:))
 hf_std_MedSF_PATV_fase = std(kfest_fase(5,:))
-hf_std_MedSF_mag = std(kfest_mag(1,:))
-hf_std_MedSF_PATV_mag = std(kfest_mag(5,:))
 hf_std_MedSF_fase = std(kfest_fase(1,:))
 hf_std_MedSF_PATV_fase = std(kfest_fase(5,:))
 hf_std_MedSF_freq = std(kfest_freq(1,:))
 hf_std_MedSF_PATV_freq = std(kfest_freq(5,:))
+
+%valores medios
+hfE_mu_MedSF_mag = mean(kfest_mag(1,:)) 
+hfE_mu_MedSF_PATV_mag = mean(kfest_mag(5,:))
+hfE_mu_MedSF_fase = mean(kfest_fase(1,:)) 
+hfE_mu_MedSF_PATV_fase = mean(kfest_fase(5,:))
+hfE_mu_MedSF_freq = mean(kfest_freq(1,:)) - h_f
+hfE_mu_MedSF_PATV_freq = mean(kfest_freq(5,:)) - h_f
+
+
+%analise dos desvios padrão
+% FE_std_MedSF_fase = std(kfest_fase(1,:))
+% FE_std_MedSF_PATV_fase = std(kfest_fase(5,:))
+% FE_std_MedSF_fase = std(kfest_fase(1,:))
+% FE_std_MedSF_PATV_fase = std(kfest_fase(5,:))
+% FE_std_MedSF_freq = std(kfest_freq(1,:))
+% FE_std_MedSF_PATV_freq = std(kfest_freq(5,:))
+% 
+% %valores medios
+% FE_mu_MedSF_mag = mean(kfest_mag(1,:)) 
+% FE_mu_MedSF_PATV_mag = mean(kfest_mag(5,:))
+% FE_mu_MedSF_fase = mean(kfest_fase(1,:)) 
+% FE_mu_MedSF_PATV_fase = mean(kfest_fase(5,:))
+% FE_mu_MedSF_freq = mean(kfest_freq(1,:)) 
+% FE_mu_MedSF_PATV_freq = mean(kfest_freq(5,:))
+
 message = "Analise completa "+filename;
