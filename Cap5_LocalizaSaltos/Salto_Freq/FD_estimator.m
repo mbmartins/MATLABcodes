@@ -1,4 +1,4 @@
-function [tau_e,dmax,limiar] = HF_estimator(Signal,kf)
+function [tau_e,dmax,limiar] = FD_estimator(Signal,kf)
 % estima a localização do salto de frequência do sinal
 
 N = length(Signal);
