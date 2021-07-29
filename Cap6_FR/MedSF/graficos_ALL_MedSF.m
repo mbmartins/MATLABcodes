@@ -5,7 +5,7 @@ c = ['k','b','c','r','m','g'];
 %plot_type = 6; 
 fsize = 16; %font sizes
 
-for plot_type = 1:6
+for plot_type = 1:7
 % casos:
 % 1 - phi_0
 % 2 - tau
@@ -13,6 +13,7 @@ for plot_type = 1:6
 % 4 - altura do salto hf
 % 5 - frequencia de amostragem fs
 % 6 - tamanho da janela T
+% 7 - erro de estimativa de tau
 
 switch plot_type
     case 1
@@ -64,6 +65,14 @@ switch plot_type
         sxlabel = 'T [ciclos]';
         var = "T";
         vxlim = [3 30];
+        KE = KFE;
+     case 7 
+        % ---- erro de estimação de tau
+        load(pasta+"estimadoresFR_salto_freq_tau_error.mat");
+        VEC = tau_n_error;
+        sxlabel = '\epsilon [\Delta t]';
+        var = "tau_error";
+        vxlim = [-10 10];
         KE = KFE;
 end
 

@@ -1,16 +1,16 @@
 %generation of performance comparison
 clear all; close all; clc
 
-%OBS: resultados pessimos, não vale a pena insistir muito
+%OBS: resultados pessimos para o FD, não vale a pena insistir muito
 % apostar no PATV
 
-SNR = 60;
+%SNR = 60;
 %SNR = 60:-10:30;
-%SNR = 90:-10:30;
+SNR = 80:-20:40;
 
 %angulo phi_0, fixo ou tabela
-%Pss = 45;  %pior caso para salto de freq é phi0 = 45;
-Pss = 0:15:90;
+Pss = 0;  %pior caso para salto de freq é phi0 = 0;
+%Pss = 0:15:90;
 
 %fixed parameters
 F0 = 60.0;
@@ -28,16 +28,16 @@ h_x = -0.; % [relative step]
 h_f = -1; %[Hz]
 
 %fator de multiplicação para limiares de detecção
-kf = 10; % para salto de frequencia pq 10x??
+kf = 3; % para salto de frequencia pq 10x??
 %limiar para detector com PATV
 Lf = 1e-13;
 % 
 % parametro para PATV_HE
-lambda = 0.15; %para d=0
+lambda = 0.1; %para d=0
 %lambda = 1.; %para d=1;
 
 %maximo erro de tau toleravel em dt
-max_dt = 8;
+max_dt = 2;
 % em phi = 0, temos uma maior distribuição dos erros entao max_dt tem que
 % ser em torno de 8
 % essa dispersão diminui a medida em que phi aumenta
@@ -81,6 +81,9 @@ for ps = 1:length(Pss) % loop for different initial phases
         false_neg_FD(ps,s) = sum(crit_nan_FD)*100/MCruns;
         false_pos_FD_PATV(ps,s) = sum(crit_tau_FD_PATV)*100/MCruns;
         false_neg_FD_PATV(ps,s) = sum(crit_nan_FD_PATV)*100/MCruns;
+        
+        std_tau_e_FD(ps,s) = std(tau_error_FD);
+        std_tau_e_FD_PATV(ps,s) = std(tau_error_FD_PATV)
         
         eps_FD(ps,s) = sum(crit_FD)*100/MCruns % in [%];
         eps_FD_PATV(ps,s) = sum(crit_FD_PATV)*100/MCruns % in [%]; 
