@@ -77,6 +77,7 @@ MCruns = 1000;
 %limiar_p_mean = mean(limiar_p)
 
 plot(lambda,std_tau_e_FD_PATV);
+
 beep
 
 %graficos e analises antigas do HD e HD-PATV, verificar se pode ser util

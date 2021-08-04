@@ -12,9 +12,9 @@ ai = abs(z);
 ai = ai(brmask)/median(ai); %normalização
 fi = fi(brmask);
 %compensação pela magnitude
-fic = fi.*ai;
+%fic = fi.*ai;
 
-ri = gradient(fic); %rocof de fi compensado
+ri = gradient(fi); %rocof de fi compensado
 
 d_r = abs(ri);
 

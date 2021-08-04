@@ -1,4 +1,4 @@
-function [tau_e,dmax,Lf] = FD_PATV_estimator(Signal,Lf,lambda)
+function [tau_e,dmax,Lr] = FD_PATV_estimator(Signal,Lr,lambda)
 % estima a localização do salto de frequência do sinal
 
 N = length(Signal);
@@ -31,7 +31,7 @@ d_r = abs(ri);
 [dmax, imax_freq] = max(d_r); %max indices
     
     % Threshold detection
-    if dmax(1) > Lf
+    if dmax(1) > Lr
         tau_e=(br + imax_freq(1)-1); %em [delta t]
     else
         tau_e = NaN;

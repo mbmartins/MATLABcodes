@@ -6,11 +6,11 @@ clear all; close all; clc
 
 %SNR = 60;
 %SNR = 60:-10:30;
-SNR = 80:-20:40;
+SNR = 80:-10:40;
 
 %angulo phi_0, fixo ou tabela
-Pss = 0;  %pior caso para salto de freq é phi0 = 0;
-%Pss = 0:15:90;
+%Pss = 0;  %pior caso para salto de freq é phi0 = 0;
+Pss = 0:15:90;
 
 %fixed parameters
 F0 = 60.0;
@@ -28,21 +28,22 @@ h_x = -0.; % [relative step]
 h_f = -1; %[Hz]
 
 %fator de multiplicação para limiares de detecção
-kf = 3; % para salto de frequencia pq 10x??
+kr = 3; % para salto de frequencia pq 10x??
 %limiar para detector com PATV
-Lf = 1e-13;
+Lr = 1e-13;
 % 
 % parametro para PATV_HE
-lambda = 0.1; %para d=0
+lambda = 0.14; %para d=0
 %lambda = 1.; %para d=1;
 
 %maximo erro de tau toleravel em dt
 max_dt = 2;
+max_dt2 = 4;
 % em phi = 0, temos uma maior distribuição dos erros entao max_dt tem que
 % ser em torno de 8
 % essa dispersão diminui a medida em que phi aumenta
 
-MCruns = 1000;
+MCruns = 10000;
 
 for ps = 1:length(Pss) % loop for different initial phases
     for s = 1:length(SNR)  % loop for different SNRs
@@ -57,8 +58,8 @@ for ps = 1:length(Pss) % loop for different initial phases
             
              Signal = SigGEN2(F0,F1,Fs,Ps,NCycles,tau,tau2,SNR(s),h_a,h_x,h_f,nbits);
              
-            [tau_e,dmax(r),limiar(r)] = FD_estimator(Signal,kf); %kf é o limiar de detecção
-            [tau_ep,dmax_p(r),limiar_p(r)] = FD_PATV_estimator(Signal,Lf,lambda); %kf é o limiar de detecção
+            [tau_e,dmax(r),limiar(r)] = FD_estimator(Signal,kr); %kf é o limiar de detecção
+            [tau_ep,dmax_p(r),limiar_p(r)] = FD_PATV_estimator(Signal,Lr,lambda); %kf é o limiar de detecção
 
             %tau_e é dado em dt
             %tau_e = tau_e/Fs; dt=1/Fs;
@@ -96,6 +97,8 @@ dmax_mean = mean(dmax)
 
 limiar_p_mean = mean(limiar_p)
 dmax_p_mean = mean(dmax_p)
+
+save("MC_localiza_salto_freq"+MCruns)
 
 beep
 
