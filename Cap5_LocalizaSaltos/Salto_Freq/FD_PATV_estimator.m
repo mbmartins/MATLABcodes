@@ -14,7 +14,7 @@ brmask = br:N-br-1;
 ai = ai(brmask)/median(ai); %normalização
 fi = fi(brmask);
 %compensação pela magnitude
-fic = fi.*ai;
+%fic = fi.*ai;
 
 %aplicar PATV em fi
 d = 0; Nit = 100;

@@ -7,7 +7,8 @@ clear all; close all; clc
 SNR = 60;
 
 %angulo phi_0, fixo ou tabela
-Pss = 0;  %pior caso para salto de freq é phi0 = 0;
+%Pss = 0;  %pior caso para salto de freq é phi0 = 0;
+Pss = 45;  %pior caso para determinar Lr parece ser 45;
 %Pss = 0:15:90;
 
 %fixed parameters
@@ -26,7 +27,7 @@ h_x = -0.; % [relative step]
 h_f = -1; %[Hz]
 
 %limiar para detector com PATV
-Lf = 1e-7;
+Lr= 1e-7;
 % 
 
 % parametro para PATV_HE
@@ -50,7 +51,7 @@ MCruns = 1000;
             
             Signal = SigGEN2(F0,F1,Fs,Ps,NCycles,tau,tau2,SNR,h_a,h_x,h_f,nbits);
              
-            [tau_ep,dmax_p(r),limiar_p(r)] = FD_PATV_estimator(Signal,Lf,lambda(k)); 
+            [tau_ep,dmax_p(r),limiar_p(r)] = FD_PATV_estimator(Signal,Lr,lambda(k)); 
 
             %tau_e é dado em dt
             %tau_e = tau_e/Fs; dt=1/Fs;
@@ -76,7 +77,8 @@ MCruns = 1000;
 
 %limiar_p_mean = mean(limiar_p)
 
-plot(lambda,std_tau_e_FD_PATV);
+semilogy(lambda,dmax_p_min);
+
 
 beep
 

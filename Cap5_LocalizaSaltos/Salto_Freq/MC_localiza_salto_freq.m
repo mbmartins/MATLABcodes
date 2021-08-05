@@ -30,15 +30,15 @@ h_f = -1; %[Hz]
 %fator de multiplicação para limiares de detecção
 kr = 3; % para salto de frequencia pq 10x??
 %limiar para detector com PATV
-Lr = 1e-13;
+Lr = 1e-7;
 % 
 % parametro para PATV_HE
-lambda = 0.14; %para d=0
+lambda = 0.11; %para d=0
 %lambda = 1.; %para d=1;
 
 %maximo erro de tau toleravel em dt
-max_dt = 2;
-max_dt2 = 4;
+max_dt = 8;
+%max_dt2 = 4;
 % em phi = 0, temos uma maior distribuição dos erros entao max_dt tem que
 % ser em torno de 8
 % essa dispersão diminui a medida em que phi aumenta
@@ -98,7 +98,7 @@ dmax_mean = mean(dmax)
 limiar_p_mean = mean(limiar_p)
 dmax_p_mean = mean(dmax_p)
 
-save("MC_localiza_salto_freq"+MCruns)
+save("MC_localiza_salto_freq"+MCruns+"eps"+maxdt)
 
 beep
 
