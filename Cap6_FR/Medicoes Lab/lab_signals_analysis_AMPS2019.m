@@ -97,13 +97,13 @@ hfE_MedSF_caso2 = wav2_h_fp
 
 %medições de fr com LM
 %salto mag: x0 = [Vm KxS 2*pi*F1 Ph];
-x0 = [1 -0.1 2*pi*F0 pi/2]; KaS = 0; KxS = -0.1;
-[params] = LM_estimator(wav1,x0,tau1n, KaS, KxS, Fs)
+x1 = [1 -0.1 2*pi*F0 pi/2]; KaS = 0; KxS = -0.1;
+[params] = LM_estimator(wav1',x1,tau1n, KaS, KxS, Fs)
 fmed1 = params(3)/(2*pi)
 ferror1 = (fmed1 - F0)/F0
 
 % salto fase [Vm 2*pi*F1 Ph KaS];
-x0 = [1 2*pi*F0 0 10]; KaS = 10; KxS = -0.1;
-[params] = LM_estimator(wav1,x0,tau1n, KaS, KxS, Fs)
-fmed2 = params(2)/(2*pi)
+x2 = [1 2*pi*F0 0 10]; KaS = 10; KxS = -0.1;
+[params2] = LM_estimator(wav2',x2,tau1n, KaS, KxS, Fs)
+fmed2 = params2(2)/(2*pi)
 ferror2 = (fmed2 - F0)/F0

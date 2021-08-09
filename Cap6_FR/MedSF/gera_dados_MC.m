@@ -4,7 +4,7 @@ function pasta = gera_dados_MC(MCiter,h_f)
 %h_f = 1; % salto de 1 Hz
 pasta = "figuras_hf_"+h_f+"_"+MCiter+"\";
 %phi_0
-% file_phi0 = teste_MedSF_phi0(MCiter,h_f,pasta);
+file_phi0 = teste_MedSF_phi0(MCiter,h_f,pasta);
 % %tau
 % file_tau = teste_MedSF_tau(MCiter,h_f,pasta);
 % %F1
@@ -16,4 +16,4 @@ pasta = "figuras_hf_"+h_f+"_"+MCiter+"\";
 % %T
 % file_T = teste_MedSF_T(MCiter,h_f,pasta);
 %tau error
-file_tau_error = teste_MedSF_tau_error(MCiter,h_f,pasta);
+% file_tau_error = teste_MedSF_tau_error(MCiter,h_f,pasta);

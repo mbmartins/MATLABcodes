@@ -33,7 +33,7 @@ Fref = (tau1*T*F1 + (T - tau1*T)*(F1 + k_f))/T; %one step only
 ROCOF_ref = (Fref - F1)/T;
 
 for j = 1:ncurves
-    
+    phi_n(j)
     %MC_iterations = 300;
     [Fraw,f1raw,f2raw,kfraw] = MC_estimation(MC_iterations,F0,F1,Fs,phi_n(j),NCycles,tau1,tau2,SNR,k_a, k_x,k_f,nbits);
     F_mean = mean(Fraw,2);
@@ -58,5 +58,5 @@ for j = 1:ncurves
     
 end
 
-filename = pasta + "salto_freq_phi0.mat"
-save(filename)
+% filename = pasta + "salto_freq_phi0.mat"
+% save(filename)

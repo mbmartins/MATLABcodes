@@ -1,0 +1,18 @@
+clear all; close all;clc;
+MCi = 1;
+F0 = 60;
+F1 = 60;
+phi0=0;
+Fs = 4800;
+tau1 = 0.5;
+tau2 = 10;
+SNR = 90;
+k_a = 0;
+k_x = 0;
+k_f = -10;
+nbits = 16;
+NCycles = 6;
+phi0=0;
+[Fraw,f1raw,f2raw,kfraw] = MC_estimation(MCi,F0,F1,Fs,phi0,NCycles,tau1,tau2,SNR,k_a, k_x,k_f,nbits);
+phi0=60;
+[Fraw,f1raw,f2raw,kfraw] = MC_estimation(MCi,F0,F1,Fs,phi0,NCycles,tau1,tau2,SNR,k_a, k_x,k_f,nbits);
