@@ -37,7 +37,7 @@ lambda = 0.11; %para d=0
 %lambda = 1.; %para d=1;
 
 %maximo erro de tau toleravel em dt
-max_dt = 8;
+max_dt = 7;
 %max_dt2 = 4;
 % em phi = 0, temos uma maior distribuição dos erros entao max_dt tem que
 % ser em torno de 8
@@ -98,7 +98,7 @@ dmax_mean = mean(dmax)
 limiar_p_mean = mean(limiar_p)
 dmax_p_mean = mean(dmax_p)
 
-save("MC_localiza_salto_freq"+MCruns+"eps"+maxdt)
+save("MC_localiza_salto_freq"+MCruns+"eps"+max_dt)
 
 beep
 
