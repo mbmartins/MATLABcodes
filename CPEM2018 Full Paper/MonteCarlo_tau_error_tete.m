@@ -9,7 +9,7 @@ UKx = 1; %uncertainty of Kx in [%]
 UPs = 1; %uncertainty of phase in degrees
 Pin = 90; %initial phase in degrees  %worst case is 90 degrees
 
-SNR = 80;  %signal noise ratio in dB
+SNR = 75;  %signal noise ratio in dB
 rng('shuffle');
 
 %Monte carlo for tau_error
@@ -76,7 +76,7 @@ noise = std_noise*randn(1,length(rSignal));
     br = 0.05*NSamples; % 5% of NSamples are taken off at the beggining and end
     z=hilbert(Signal');  % calculates the analytic signal associated with Signal
     f=angle(z(2:end,:).*conj(z(1:end-1,:)));  % Hilbert estimate of the instantaneous frequency of xds_f
-    f=f-median(f(br:end-br));
+    f=abs(f)-median(f);
     Ain = (Ain - mean(Ain))./abs(Ain);
     nn = 1:(NSamples-1);
     

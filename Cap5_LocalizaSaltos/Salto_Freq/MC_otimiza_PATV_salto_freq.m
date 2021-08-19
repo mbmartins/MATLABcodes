@@ -24,14 +24,15 @@ nbits = 16;
 % %CASE 3 - salto de frequencia
 h_a = 0.0; %[degrees]
 h_x = -0.; % [relative step]
-h_f = -1; %[Hz]
+h_f = -0.5; %[Hz]
 
 %limiar para detector com PATV
-Lr= 1e-7;
+Lr= 1e-17;
 % 
 
 % parametro para PATV_HE
-lambda = 0.02:0.001:0.2;
+lambda = 0.02:0.01:0.15;
+%lambda = 0.1:0.1:0.5;
 for k = 1:length(lambda); %para d=0
 
 %lambda = 1.; %para d=1;
@@ -42,7 +43,7 @@ max_dt = 2;
 % ser em torno de 8
 % essa dispersão diminui a medida em que phi aumenta
 
-MCruns = 1000;
+MCruns = 100;
 
         %MC engine
         for r = 1:MCruns  %taking the eps errors for tau1 only
@@ -73,11 +74,12 @@ MCruns = 1000;
         eps_FD_PATV(k) = sum(crit_FD_PATV)*100/MCruns; % in [%]; 
     message = "lambda:" + lambda(k)
     dmax_p_min(k) = min(dmax_p);
+    dmax_p_mean(k) = mean(dmax_p);
     end
 
 %limiar_p_mean = mean(limiar_p)
 
-semilogy(lambda,dmax_p_min);
+semilogy(lambda,dmax_p_mean);
 
 
 beep
