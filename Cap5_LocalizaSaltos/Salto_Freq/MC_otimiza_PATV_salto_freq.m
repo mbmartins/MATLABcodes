@@ -1,6 +1,10 @@
 %generation of performance comparison
 clear all; close all; clc
 
+% roteiro: determinar primeiro o minimo salto que se deseja detectar, com
+% criterios fisicos: hf = 0,5Hz. Daí, calcular o Lf desse salto minimo em funçao de lambda.
+% Escolher depois um lambda que otimize o desempenho para o salto nominal.
+
 %OBS: resultados pessimos para o FD, não vale a pena insistir muito
 % apostar no PATV
 
@@ -8,7 +12,7 @@ SNR = 60;
 
 %angulo phi_0, fixo ou tabela
 %Pss = 0;  %pior caso para salto de freq é phi0 = 0;
-Pss = 45;  %pior caso para determinar Lr parece ser 45;
+Pss = 0;  %pior caso para determinar Lr parece ser 45;
 %Pss = 0:15:90;
 
 %fixed parameters
@@ -27,23 +31,23 @@ h_x = -0.; % [relative step]
 h_f = -0.5; %[Hz]
 
 %limiar para detector com PATV
-Lr= 1e-17;
+Lr= 1e-7;
 % 
 
 % parametro para PATV_HE
-lambda = 0.02:0.01:0.15;
-%lambda = 0.1:0.1:0.5;
+%lambda = 0.02:0.01:0.15;
+lambda = 0.06;
 for k = 1:length(lambda); %para d=0
 
 %lambda = 1.; %para d=1;
 
 %maximo erro de tau toleravel em dt
-max_dt = 2;
+max_dt = 8;
 % em phi = 0, temos uma maior distribuição dos erros entao max_dt tem que
 % ser em torno de 8
 % essa dispersão diminui a medida em que phi aumenta
 
-MCruns = 100;
+MCruns = 10000;
 
         %MC engine
         for r = 1:MCruns  %taking the eps errors for tau1 only
@@ -79,10 +83,8 @@ MCruns = 100;
 
 %limiar_p_mean = mean(limiar_p)
 
-semilogy(lambda,dmax_p_mean);
+semilogy(lambda,dmax_p_min);
 
-
-beep
 
 %graficos e analises antigas do HD e HD-PATV, verificar se pode ser util
 %dmax_min = min(dmax)
