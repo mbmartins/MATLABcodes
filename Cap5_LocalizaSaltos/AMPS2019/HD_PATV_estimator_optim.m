@@ -1,4 +1,4 @@
-function [tau_error,FE, dmax] = PATV_HE_estimator(SNR,KxS,KaS,Ps,tau1,SAG_cycles,lambda_a,lambda_theta)
+function [tau1,dmax] = HD_PATV_estimator_optim(Signal,lambda_a,lambda_theta,Lm,Lf)
 % estimates frequency and tau_errors using NLHE estimator
 %clear all; close all; clc;
 
@@ -23,8 +23,9 @@ NCycles = 6;
 %KaS = 0; %[degrees]
 %KxS = -0.2; % [relative step]
 
-Lm = 2.5e-3; 
-Lf = 4.0e-3; %thresholds for detection
+% Lm = .7e-3; 
+% Lf = 1.0e-3; %thresholds for detection
+
 %km = 2e7;
 %kf = 100e9;
 
@@ -38,18 +39,19 @@ samples_cycle = Fs/F0;
 br_mask = ones(1,NSamples); %mask to ignore samples
 br_mask(1:floor(br*NSamples)) = 0; 
 br_mask(floor((1-br)*NSamples):NSamples) = 0; 
-tau2 = tau1+SAG_cycles*(Fs/F0)/NSamples; % time to end SAG in [%]
+%tau2 = tau1+SAG_cycles*(Fs/F0)/NSamples; % time to end SAG in [%]
 
 n = 1:NSamples;
 th_a_i_v(1:NSamples) = Lm; %threshold for magnitude detection
 th_fi_v(1:NSamples) = Lf; %threshold for frequency detection
 
-Signal = SigGEN(F0,F1,Fs,Ps,NCycles,tau1,tau2,SNR,KaS, KxS);
+%Signal = SigGEN(F0,F1,Fs,Ps,NCycles,tau1,tau2,SNR,KaS, KxS);
 %SigGEN(F0,F1,SampleRate,Ps,NCycles,tau1,tau2,SNR, KaS, KxS)
 
 %calculate instantaneous freq and magnitude by Hilbert Transform
 z=hilbert(Signal');  % calculates the analytic signal associated with Signal
 theta_i = unwrap(angle(z)); a_i = abs(z);
+phi_0 = theta_i(1)*180/pi; % in degrees
 
 % figure(1)
 % plot(Signal,'.k'); ylabel('Sampled signal x[n] [V]'); xlabel('Samples')
@@ -137,18 +139,17 @@ limiar_fase = Lf;
 
 %testes para determinar o limiar
 eta_a = a_i - p_a_i - x_a_i;
-var_eta_a = std(eta_a)
+var_eta_a = std(eta_a);
 eta_theta = theta_i - p_theta_i - x_theta_i;
-var_eta_theta = std(eta_theta)
-ratio_etas = var_eta_a/var_eta_theta
+var_eta_theta = std(eta_theta);
+ratio_etas = var_eta_a/var_eta_theta;
 
 % DETECTION OF FIRST PEAK
 [ga_i_max(1),imax_a_i(1)] = maxk(detector_a_i,1);
 [gtheta_i_max(1),imax_theta_i(1)] = maxk(detector_theta_i,1); %detects first peak
 
-%dmax = ga_i_max(1); % valor a ser retornado para tentar compensar o efeito sistemático
+dmax = max(ga_i_max(1),gtheta_i_max(1)); % valor a ser retornado para tentar compensar o efeito sistemático
 %dmax = median(abs(detector_a_i));
-dmax = gtheta_i_max(1);
 
 % subplot(2,1,2)
 % plot(n,detector_a_i,'b');  ylabel('Detection signal')
@@ -205,12 +206,12 @@ dmax = gtheta_i_max(1);
 [tau_est_a_i, a_i_ind] = sort(imax_a_i); %error in samples
 tau_est_a_i(ga_i_max(a_i_ind) < limiar_mag) = NaN; % check if estimates are valid
 [tau_est_a_i,a_i_ind] = sort(tau_est_a_i(a_i_ind));
-tau_error_a_i = (tau_est_a_i - [tau1 tau2]*NSamples); %error in [dt]
+%tau_error_a_i = (tau_est_a_i - [tau1 tau2]*NSamples); %error in [dt]
 
 [tau_est_theta_i,theta_i_ind] = sort(imax_theta_i); %tau estimated in [samples]
 tau_est_theta_i(gtheta_i_max(theta_i_ind) < limiar_fase) = NaN; % check if estimates are valid
 [tau_est_theta_i,theta_i_ind] = sort(tau_est_theta_i(theta_i_ind));
-tau_error_theta_i = (tau_est_theta_i - [tau1 tau2]*NSamples); %error in [dt]
+%tau_error_theta_i = (tau_est_theta_i - [tau1 tau2]*NSamples); %error in [dt]
 
 %criterio de escolha mag x freq com denoising: usar a maior diferença para 
 % o limiar ??
@@ -222,19 +223,21 @@ crit = ga_i_max(a_i_ind)/limiar_mag > gtheta_i_max(theta_i_ind)/limiar_fase;
 tau_est(crit) = tau_est_a_i(crit);
 tau_est(~crit) = tau_est_theta_i(~crit);
 %tau_error = tau_est -2 - [tau1 tau2]*NSamples;
-tau_error = tau_est - [tau1 tau2]*NSamples;
+%tau_error = tau_est - [tau1 tau2]*NSamples;
 
-if abs(tau_error(1))>2
-    %false positive
-    ratio_a = ga_i_max(a_i_ind)/limiar_mag;
-    ratio_f = gtheta_i_max(theta_i_ind)/limiar_fase;
-    if ratio_a > ratio_f
-        tau_est;
-    end
-end
-if isnan(tau_error(1))
-    tau_est;
-end
+tau1 = tau_est(1)/Fs;
+
+% if abs(tau_error(1))>2
+%     %false positive
+%     ratio_a = ga_i_max(a_i_ind)/limiar_mag;
+%     ratio_f = gtheta_i_max(theta_i_ind)/limiar_fase;
+%     if ratio_a > ratio_f
+%         tau_est;
+%     end
+% end
+% if isnan(tau_error(1))
+%     tau_est;
+% end
 
 
 
@@ -248,33 +251,33 @@ f_i2 = gradient(theta_i)*Fs/(2*pi);
 
 %f_i = diff(p_theta_i)*Fs/(2*pi);
 f_est1 = median(f_i);
-f_est2 = mean(f_i2);
-
-%other PATV for frequency estimation
-[x_theta_i, p_theta_i, cost_theta_i, u_theta_i, v_theta_i,a] = patv_MM_modified(theta_i, d_theta_i, lambda_theta_i, Nit);
-f_i3 = gradient(p_theta_i)*Fs/(2*pi);
-f_est3 = median(f_i3);
-
-f_est = f_est3;
-
-phi_0_est = p_theta_i(1)*180/pi
-
-%fazer função para correção sistemática
-%freq_corr = 0.00298276140145513; %phi0 = 0
-% freq_corr = 0.00296409387030716; %phi0 = 15
-% freq_corr = 0.00296598890104022; %phi0 = 30
-% freq_corr = 0.00306010061155422; %phi0 = 45
-% freq_corr = 0.00323290947446844; %phi0 = 60
-% freq_corr = 0.00338467357633335; %phi0 = 75
-% freq_corr = 0.00342652604283979; %phi0 = 90
-freq_corr = 0;
-
-FE = (f_est - F1 - freq_corr*F1); %Hz
-
-
-
-
-tau_est = (tau_est)/Fs;
+% f_est2 = mean(f_i2);
+% 
+% %other PATV for frequency estimation
+% [x_theta_i, p_theta_i, cost_theta_i, u_theta_i, v_theta_i,a] = patv_MM_modified(theta_i, d_theta_i, lambda_theta_i, Nit);
+% f_i3 = gradient(p_theta_i)*Fs/(2*pi);
+% f_est3 = median(f_i3);
+% 
+% f_est = f_est3;
+% 
+% phi_0_est = p_theta_i(1)*180/pi
+% 
+% %fazer função para correção sistemática
+% %freq_corr = 0.00298276140145513; %phi0 = 0
+% % freq_corr = 0.00296409387030716; %phi0 = 15
+% % freq_corr = 0.00296598890104022; %phi0 = 30
+% % freq_corr = 0.00306010061155422; %phi0 = 45
+% % freq_corr = 0.00323290947446844; %phi0 = 60
+% % freq_corr = 0.00338467357633335; %phi0 = 75
+% % freq_corr = 0.00342652604283979; %phi0 = 90
+% freq_corr = 0;
+% 
+% %FE = (f_est - F1 - freq_corr*F1); %Hz
+% 
+% 
+% 
+% 
+% tau_est = (tau_est)/Fs;
 
 
 %problemas: 

@@ -12,7 +12,7 @@ SNR = 60;
 
 %angulo phi_0, fixo ou tabela
 %Pss = 0;  %pior caso para salto de freq é phi0 = 0;
-Pss = 0;  %pior caso para determinar Lr parece ser 45;
+Pss = 45;  %pior caso para determinar Lr parece ser 45;
 %Pss = 0:15:90;
 
 %fixed parameters
@@ -29,7 +29,7 @@ nbits = 16;
 h_a = 0.0; %[degrees]
 h_x = -0.; % [relative step]
 %h_f = -1.0; %[Hz]
-h_f = -0.5; %[Hz]
+h_f = [-0.5 -0.7 -0.9]; %[Hz]
 
 %limiar para detector com PATV
 Lr= 0;
@@ -38,6 +38,7 @@ Lr= 0;
 % parametro para PATV_HE
 %lambda = 0.02:0.01:0.4;
 lambda = 0.11;
+
 for k = 1:length(lambda); %para d=0
 
 %lambda = 1.; %para d=1;
@@ -58,13 +59,19 @@ MCruns = 1000;
             % Fixed phi_0, from table
             Ps = Pss;
             
-            Signal = SigGEN2(F0,F1,Fs,Ps,NCycles,tau,tau2,SNR,h_a,h_x,h_f,nbits);
-             
-            [tau_ep,dmax_p(r),limiar_p(r)] = FD_PATV_estimator(Signal,Lr,lambda(k)); 
+            Signal1 = SigGEN2(F0,F1,Fs,Ps,NCycles,tau,tau2,SNR,h_a,h_x,h_f(1),nbits);
+            [tau_ep,dmax_p1(r),limiar_p1(r)] = FD_PATV_estimator(Signal1,Lr,lambda(k)); 
 
+            Signal2 = SigGEN2(F0,F1,Fs,Ps,NCycles,tau,tau2,SNR,h_a,h_x,h_f(2),nbits);
+            [tau_ep,dmax_p2(r),limiar_p2(r)] = FD_PATV_estimator(Signal2,Lr,lambda(k)); 
+            
+            Signal3 = SigGEN2(F0,F1,Fs,Ps,NCycles,tau,tau2,SNR,h_a,h_x,h_f(3),nbits);
+            [tau_ep,dmax_p3(r),limiar_p3(r)] = FD_PATV_estimator(Signal3,Lr,lambda(k)); 
+            
+            
             %tau_e é dado em dt
             %tau_e = tau_e/Fs; dt=1/Fs;
-            NSamples = length(Signal);
+            NSamples = length(Signal1);
             tau_error_FD_PATV(r) = (tau_ep - floor(tau*NSamples)); %erro desta rodada de MC
             
         
@@ -90,8 +97,12 @@ MCruns = 1000;
         eps_FD_PATV_8(k) = sum(crit_FD_PATV_8)*100/MCruns; % in [%]; 
         
     message = "lambda:" + lambda(k)
-    dmax_p_min(k) = min(dmax_p);
-    dmax_p_mean(k) = mean(dmax_p);
+    dmax_p_min1(k) = min(dmax_p1);
+    dmax_p_mean1(k) = mean(dmax_p1);
+    dmax_p_min2(k) = min(dmax_p2);
+    dmax_p_mean2(k) = mean(dmax_p2);
+    dmax_p_min3(k) = min(dmax_p3);
+    dmax_p_mean3(k) = mean(dmax_p3);
 end
 
 %save('otimiza_lambda_r.mat')    

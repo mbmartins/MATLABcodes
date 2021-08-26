@@ -6,8 +6,8 @@ SNR = 60:-10:30;
 %SNR = 90:-10:30;
 
 %angulo phi_0, fixo ou tabela
-Pss = 0;
-%Pss = 0:15:90;
+%Pss = 0;
+Pss = 0:15:90;
 
 %fixed parameters
 f0 = 60.0;
@@ -19,16 +19,16 @@ SAG_cycles = 10; %duration of SAG
 %   KxS = -0.1; % [relative step]
 
 % %CASE 2
-KaS = 10.0; %[degrees]
-KxS = -0.; % [relative step]
+% KaS = 10.0; %[degrees]
+% KxS = -0.; % [relative step]
 
 %CASE 2
-%KaS = 10.0; %[degrees]
-%KxS = -0.; % [relative step]
+% KaS = 10.0; %[degrees]
+% KxS = -0.; % [relative step]
 
 %CASE 3
-%  KaS = 10.0; %[degrees]
-%  KxS = -0.1; % [relative step]
+ KaS = 10.0; %[degrees]
+ KxS = -0.1; % [relative step]
 
 %limiares para HE
 km = 3;
@@ -38,11 +38,6 @@ kf = 3; % a partir de 8 praticamente fase não atua...
 lambda_a = 2.;
 lambda_theta = 2.5;
 
-%relatado no primeiro draft: lambda_a = .5; lambda_theta = 1.
-lambda_a = 2.;
-%lambda_theta = 2.5;
-lambda_theta = 2.5; %para freq, melhor lambda pequeno
-
 MCruns = 10000;
 
 for ps = 1:length(Pss) % loop for different initial phases
@@ -50,11 +45,11 @@ for ps = 1:length(Pss) % loop for different initial phases
         %MC engine
         for r = 1:MCruns  %taking the eps errors for tau1 only
             % Fixed phi_0
-            %Ps = Pss(ps);
+            Ps = Pss(ps);
             
             % random phi_0 from uniform distribution
-             Ps_rand(r) = 90*rand(1,1);
-             Ps = Ps_rand(r);
+%              Ps_rand(r) = 90*rand(1,1);
+%              Ps = Ps_rand(r);
             
             [tau_error_HE(r,:),FE_HE(r,:)] = HE_estimator(SNR(s),KxS,KaS,Ps,tau1,SAG_cycles,km,kf);
             [tau_error_PATV_HE(r,:),FE_PATV_HE(r,:),dmax(r,:)] = PATV_HE_estimator(SNR(s),KxS,KaS,Ps,tau1,SAG_cycles,lambda_a,lambda_theta);

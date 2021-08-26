@@ -34,7 +34,7 @@ i = 1;
 Ain(i,:) = Vm(i);
 Ain(i,t1 >= 0 & t2<=0) = Ain(i,t1 >= 0 & t2<=0) * (1 + KxS(i));
 
-%Freq step
+% %Freq step
 Wf(i,1:NSamples) = Wf1;
 Wf(i,t1 >= 0 & t2<=0) = Wf(i,t1 >= 0 & t2<=0) + KRS*2*pi;
 

@@ -25,12 +25,12 @@ nbits = 16;
 % %CASE 3 - salto de frequencia
 h_a = 0.0; %[degrees]
 h_x = -0.; % [relative step]
-h_f = -1; %[Hz]
+h_f = -1.; %[Hz]
 
 %fator de multiplicação para limiares de detecção
 kr = 3; % para salto de frequencia pq 10x??
 %limiar para detector com PATV
-Lr = 1e-7;
+Lr = 1e-6;
 % 
 % parametro para PATV_HE
 lambda = 0.11; %para d=0
@@ -98,7 +98,7 @@ dmax_mean = mean(dmax)
 limiar_p_mean = mean(limiar_p)
 dmax_p_mean = mean(dmax_p)
 
-save("MC_localiza_salto_freq"+MCruns+"eps"+max_dt)
+%save("MC_localiza_salto_freq"+MCruns+"eps"+max_dt)
 
 beep
 

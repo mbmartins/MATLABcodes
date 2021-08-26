@@ -23,8 +23,9 @@ NCycles = 6;
 %KaS = 0; %[degrees]
 %KxS = -0.2; % [relative step]
 
-th_a_i = .7e-3; 
-th_fi = 1.0e-3; %thresholds for detection
+Lm = .7e-3; 
+Lf = 1.0e-3; %thresholds for detection
+
 %km = 2e7;
 %kf = 100e9;
 
@@ -41,8 +42,8 @@ br_mask(floor((1-br)*NSamples):NSamples) = 0;
 %tau2 = tau1+SAG_cycles*(Fs/F0)/NSamples; % time to end SAG in [%]
 
 n = 1:NSamples;
-th_a_i_v(1:NSamples) = th_a_i; %threshold for magnitude detection
-th_fi_v(1:NSamples) = th_fi; %threshold for frequency detection
+th_a_i_v(1:NSamples) = Lm; %threshold for magnitude detection
+th_fi_v(1:NSamples) = Lf; %threshold for frequency detection
 
 %Signal = SigGEN(F0,F1,Fs,Ps,NCycles,tau1,tau2,SNR,KaS, KxS);
 %SigGEN(F0,F1,SampleRate,Ps,NCycles,tau1,tau2,SNR, KaS, KxS)
@@ -133,8 +134,8 @@ detector_theta_i = br_mask'.*grad_theta_i;
 
 %limiar_mag=km*median(abs(detector_a_i));
 %limiar_fase=kf*median(abs(detector_theta_i));
-limiar_mag = th_a_i; 
-limiar_fase = th_fi;
+limiar_mag = Lm; 
+limiar_fase = Lf;
 
 %testes para determinar o limiar
 eta_a = a_i - p_a_i - x_a_i;
