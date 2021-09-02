@@ -8,15 +8,15 @@ p = 241 + 4*480 +1;
 q = 240 + 5*480 +1;
 
 WholeSignal = [%D.Dig_t0.SS_0';
-                 D.Dig_t1.MS_p_120';
-                 D.Dig_t2.MS_p_120';
-                 D.Dig_t3.MS_p_120';
-                 D.Dig_t4.MS_p_120';
-                 D.Dig_t5.MS_p_120';
-                 D.Dig_t6.MS_p_120';
-                 D.Dig_t7.MS_p_120';
-                 D.Dig_t8.MS_p_120';
-                 D.Dig_t9.MS_p_120';
+                 D.Dig_t1.PS_p_120';
+                 D.Dig_t2.PS_p_120';
+                 D.Dig_t3.PS_p_120';
+                 D.Dig_t4.PS_p_120';
+                 D.Dig_t5.PS_p_120';
+                 D.Dig_t6.PS_p_120';
+                 D.Dig_t7.PS_p_120';
+                 D.Dig_t8.PS_p_120';
+                 D.Dig_t9.PS_p_n120';
 ];
 
 % Nominal values
@@ -26,9 +26,9 @@ Vm = 1; %70*sqrt(2) =~ 100;
 Xm = Vm;
 Ps = 120; %phase in degrees (use 360 instead of zero)
 Ph = Ps*pi/180;% Phase in radians
-KxS = 0.1;   % magnitude step index: 0.1 
+KxS = 0.0;   % magnitude step index: 0.1 
 Vm = Vm/(1 + KxS);
-KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
+KaS = 10;   % IEEE Std phase (angle) step index: 10 degrees
 Wf = 2*pi*F1;  % fundamental frequency
 SampleRate = 4800; %Hz
 dt = 1/SampleRate;
