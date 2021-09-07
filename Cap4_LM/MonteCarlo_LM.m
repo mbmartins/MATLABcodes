@@ -18,7 +18,7 @@ Ph = Ps*pi/180;% Phase in radians
 KaS = -10;   % IEEE Std phase (angle) step index: 10 degrees
 KxS = 0;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
-SNR = 50; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+SNR = 60; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 %Aruido = Vm/10^(SNR/20);
 
 for ti = 1:9
@@ -55,10 +55,10 @@ for ti = 1:9
 
     % Nonlinear fit
     % Monte Carlo analysis
-    Niter = 1000;
+    MCruns = 1000;
     x0 = xnom;  %x0 is fixed - first guess are the nominal values
     
-    for k = 1:Niter
+    for k = 1:MCruns
         %first guess
         k
         %uncertainties of parameters in signal generation
@@ -237,11 +237,12 @@ for ti = 1:9
     
     %Freq_err_per_std(ti,1) = ERR_MAX(2)/STDEV_ERR(2);
 
-
+    fprintf("ti = "+ ti);
     
 end    
 
 beep
+save("resultadosMC\MC_LM_"+MCruns)
 
 % if KaS ~= 0
 %     plot(errors(:,3),errors(:,4),'.')

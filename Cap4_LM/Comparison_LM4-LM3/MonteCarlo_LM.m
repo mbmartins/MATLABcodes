@@ -72,7 +72,7 @@ for ti = 1:9
         rng('shuffle');
         rn = (rand(1,length(xnom))-0.5);
         xr = xnom.*(1+2*(par_var/100).*rn);
-        freq_rand = xr(3)/(2*pi)
+        freq_rand = xr(3)/(2*pi);
         
         %uncertainties of tau estimation
         utau = 2;  %number of dts 

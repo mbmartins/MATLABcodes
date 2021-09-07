@@ -4,7 +4,7 @@
 % Phase step
 clear all; close all; clc;
 
-%% Initial parameters
+% Initial parameters
 F0 = 60; %Hz
 F1 = 60; %Hz
 SampleRate = 5000; %Hz
@@ -21,16 +21,16 @@ KaS = -10;   % IEEE Std phase (angle) step index: 10 degrees
 KxS = 0;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
 
-%% 
+ 
 for ti = 5
-    %%% time vectors
+    % time vectors
     tau_pp = 0.1*ti; % relative time of step in percent of total time 
     tau_0 = (tau_pp - 0.5)*NSamples; %discrete time displacement
     n = -NSamples/2:(NSamples/2-1); %discrete time vector
     n = n - tau_0;
     t = n*dt; %time vector
 
-    %% step funtion 
+    % step funtion 
     u = zeros(length(Xm),length(t));  tau = 0;
     u(length(Xm),t >= tau) = u(length(Xm),t >= tau) + 1;
     
