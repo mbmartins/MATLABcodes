@@ -92,7 +92,8 @@ for ti=1:size(WholeSignal,1)
         tol = 1e-7;
         OPTIONS = optimoptions('lsqnonlin', 'Algorithm','levenberg-marquardt','OptimalityTolerance',tol);
         OPTIONS.StepTolerance = 1e-12;
-        [X,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err,xr,[],[],OPTIONS);
+        OPTIONS.Display = 'iter';
+        [X,RESNORM,RESIDUAL,exitflag,output,lambda,jacobian] = lsqnonlin(err,xr,[],[],OPTIONS);
         Y = f(X);
     
     figure(ti)
