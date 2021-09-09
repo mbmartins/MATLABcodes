@@ -95,6 +95,8 @@ for ti=1:size(WholeSignal,1)
         OPTIONS.Display = 'iter';
         [X,RESNORM,RESIDUAL,exitflag,output,lambda,jacobian] = lsqnonlin(err,xr,[],[],OPTIONS);
         Y = f(X);
+        Hessian_final = jacobian'*jacobian
+        grad_final = jacobian'*(Signal - Y)'
     
     figure(ti)
     subplot(2,1,1); plot(nn,Signal,'.'); hold on; plot(nn,Y,'-'); grid on;
