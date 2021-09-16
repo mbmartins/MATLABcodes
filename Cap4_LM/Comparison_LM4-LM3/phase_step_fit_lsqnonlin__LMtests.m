@@ -3,18 +3,19 @@
 clear all; close all; clc;
 
 %signal generation
-F0 = 60; %Hz
-F1 = 60; %Hz
-SampleRate = 4800; %Hz
-dt = 1/SampleRate;
-AnalysisCycles = 6;
-NSamples = floor(AnalysisCycles*SampleRate/F0);
+F0 = 50; %Hz
+F1 = 50; %Hz
+SNR = 93.5; %dB
+fs = 5000; %Hz
+dt = 1/fs;
+AnalysisCycles = 3;
+NSamples = floor(AnalysisCycles*fs/F0);
 n = -NSamples/2:(NSamples/2-1); %discrete time vector
 tau_0 = 0; %discrete time displacement
 n = n + tau_0;
 t = n*dt; %time vector
-Vm = 100; %70*sqrt(2);
-Ps = 120; %phase in degrees
+Vm = 1; %70*sqrt(2);
+Ps = 360; %phase in degrees
 
 % Phase in radians
 Ph = Ps*pi/180;
@@ -44,16 +45,16 @@ tau = 0;
 u(length(Xm),t >= tau) = u(length(Xm),t >= tau) + 1;
 
 %modelo 1 - LM4
-%f = @(x) x(1)*cos(x(2)*t + x(3) + x(4)*(pi/180)*u);
+f = @(x) x(1)*cos(x(2)*t + x(3) + x(4)*(pi/180)*u);
 %modelo 2 - LM3 - frequencia fixa
-f = @(x) x(1)*cos(Wf*t + x(2) + x(3)*(pi/180)*u);
+% f = @(x) x(1)*cos(Wf*t + x(2) + x(3)*(pi/180)*u);
 %modelo 3 - LM2 - frequencia e fase fixas
 %f = @(x) x(1)*cos(Wf*t + Ph + x(2)*(pi/180)*u);
 
 
 err = @(x) (Signal - f(x)).^2;
 %first estimates for x
-SNR = 60; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+% SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 Aruido = Vm/10^(SNR/20);
 
 xnom1 = [Vm 2*pi*F1 Ph KaS];
@@ -61,7 +62,7 @@ xnom2 = [Vm Ph KaS];
 xnom3 = [Vm KaS];
 
 %acertar x com o modelo escolhido
-x = xnom2;
+x = xnom1;
 
 %estimated signal
 y = f(x);
@@ -90,15 +91,15 @@ plot(t,Signal,'.b',t,y,'r')
 
 % Nonlinear fit
 % Monte Carlo analysis
-xnom = xnom2;
+xnom = xnom1;
 Niter = 1000
 x0 = xnom;  %x0 is fixed - first guess are the nominal values
 for n = 1:Niter;
     %first guess
     % MODELO 1         X1  w   ph  x2
-    %par_var = [0.02 0.01 0.02 0.01]; % parameter variation in percent related to nominal
+    par_var = [0.02 0.01 0.02 0.01]; % parameter variation in percent related to nominal
     % MODELO 2  X1  ph  x2
-    par_var = [0.02 0.02 0.02]; % parameter variation in percent related to nominal
+    %par_var = [0.02 0.02 0.02]; % parameter variation in percent related to nominal
     
     xr = xnom.*(1+(par_var/100).*(rand(1,length(xnom))-0.5));
     
@@ -130,14 +131,17 @@ for n = 1:Niter;
     tol = 1e-7;
     OPTIONS = optimoptions('lsqnonlin', 'Algorithm','levenberg-marquardt','OptimalityTolerance',tol);
     OPTIONS.StepTolerance = 1e-12;
-    OPTIONS.Display = 'iter-detailed';
+    OPTIONS.Display = 'off';
     [X,RESNORM,RESIDUAL,exitflag,output,lambda,jacobian] = lsqnonlin(err,x0,[],[],OPTIONS);
     Y = f(X);
+    ferrHz(n) = X(2)/(2*pi) - F1;
     errors(n,:) = (xr - X)./xr;
     n
 end
 
 ERR_MAX = max(abs(errors))*100'   %erros maximos em %
+
+
 
 figure
 for k = 1:2
@@ -149,5 +153,6 @@ MEAN_ERR = mean(errors)
 STDEV_ERR = std(errors)
 %hold on; plot(X(2),X(1),'rx', x0(2), x0(1), 'ro')
 
-freq_err = ERR_MAX(2)
+%freq_err = ERR_MAX(2)*F1/(2*pi)
+ferrHz_max = max(abs(ferrHz))
     

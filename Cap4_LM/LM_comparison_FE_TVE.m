@@ -1,4 +1,4 @@
-function [FE_LM, FE_SS, TVE_LM, TVE_SS] = LM_comparison_FE_TVE(SNR,F1,Ps, KxS, KaS)
+function [FE_LM, FE_SS, TVE_LM, TVE_SS] = LM_comparison_FE_TVE(SNR,F1,Ps, hm, ha)
 
 % Estimation of Sincrophasors with discontinuities
 % using MATLAB optimization toolbox 
@@ -23,6 +23,19 @@ Ph = Ps*pi/180;% Phase in radians
 %KxS = -0.1;   % magnitude step index: 0.1
 Wf = 2*pi*F1;  % fundamental frequency
 %SNR = 80; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
+
+%uncertainties of parameters in signal generation
+if ha ~= 0
+% phase         X1  w    ph   x3 (KaS)
+    par_var = [1   0.05 1 1]; % parameter variation in percent related to nominal
+else
+% mag          x1  x2(KxS)  wf    ph  
+    par_var = [1   1     0.05  1]; % parameter variation in percent related to nominal            
+end
+
+
+
+
 
 %%%% parameters for the LM window
         LM_cycles = 12;
@@ -55,16 +68,16 @@ ti = 5;     % change ti to control the tau parameter:
     % x = [x1,w,phi,x3] for phase step
     % x = [x1,x2,w,phi] for mag step
     % xnom contains the nominal values set in the beggining
-    if KaS ~= 0
+    if ha ~= 0
         % Phase step
         % Model: f(x) = x1*cos(w*t + phi + x3*u(t - tau)) 
         f = @(x,lmi,lmf) x(1)*cos(x(2)*t(lmi:lmf) + x(3) + 2*pi + x(4)*(pi/180)*u(lmi:lmf));
-        xnom = [Vm 2*pi*F1 Ph KaS];
+        xnom = [Vm 2*pi*F1 Ph ha];
     else %if not, it is a magnitude step
         % Mag step
         % model: f(x) = x1(1+x2*u(t-tau))*cos(w*t + phi)
         f = @(x,lmi,lmf) x(1)*(1+x(2)*u(lmi:lmf)).*cos(x(3)*t(lmi:lmf) + x(4));
-        xnom = [Vm KxS 2*pi*F1 Ph];
+        xnom = [Vm hm 2*pi*F1 Ph];
     end
     
 %%%%%% Generating the Signal %%%%%%%
@@ -73,11 +86,14 @@ ti = 5;     % change ti to control the tau parameter:
     % xr can be the nominal values or something slightly different, to
     % simulate the uncertainty in the generation
     xr = xnom;  %xr is fixed - first guess are the nominal values: change if you want
+    rng('shuffle');
+    rn = (rand(1,length(xnom))-0.5);
+    xr = xnom.*(1+2*(par_var/100).*rn);
     k = 1;  %it would be the kth Monte Carlo run
  
     %%%%%% Signal parameters %%%%%
             p = 1; Xm = xr(1); 
-            if KaS ~= 0
+            if ha ~= 0
                 Wf(p) = xr(2); 
                 Ph(p) = xr(3);
                 KxS_(p) = 0;
@@ -137,6 +153,7 @@ ti = 5;     % change ti to control the tau parameter:
         tol = 1e-7;
         OPTIONS = optimoptions('lsqnonlin', 'Algorithm','levenberg-marquardt','OptimalityTolerance',tol);
         OPTIONS.StepTolerance = 1e-12;
+                    OPTIONS.Display = 'off';
 %        [X2,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err2,x0,[],[],OPTIONS);
         [X5,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err5,x0,[],[],OPTIONS);
 %        [X7,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err7,x0,[],[],OPTIONS);
@@ -151,7 +168,7 @@ ti = 5;     % change ti to control the tau parameter:
 %        tau_est2 = 0.25;
         tau_est5 = tau_pp + tau/NSamples + 2*dt/T;  %estimated tau/T (we can simulate errors in tau estimation)
 %        tau_est7 = 0.75;
-        if KaS ~= 0
+        if ha ~= 0
             %phase step
             Xe5_r = xr(1)/sqrt(2);   %reference magnitude (actual value xr)
             Xe5 = X5(1)/sqrt(2);      %estimated magnitude
@@ -207,7 +224,7 @@ ti = 5;     % change ti to control the tau parameter:
         corr = (F1-F0)*2*pi*(250/5000)/2;
         Ve_ref(1:10) = (xr(1)/sqrt(2))*exp(1i*Phe_r);
         Ve_ref(4) = Xe5_r.*exp(1i*Phe_r);        
-        if KaS ~= 0
+        if ha ~= 0
             Ve_ref(6:10) = xr(1)*exp(1i*(Phe_r + xr(4)));
         else
             Ve_ref(6:10) = ((xr(1)*(1+xr(2)))/sqrt(2))*exp(1i*Phe_r);
@@ -220,7 +237,7 @@ ti = 5;     % change ti to control the tau parameter:
         Ve(4) = [Ve5];
         Ve(5:10) = Synx_aw;
         Freq_LM(1:3) = Freq_bw;
-        if KaS ~= 0
+        if ha ~= 0
             Freq_LM(4) = [X5(2)/(2*pi)];
         else 
             Freq_LM(4) = [X5(3)/(2*pi)];
@@ -314,4 +331,5 @@ ti = 5;     % change ti to control the tau parameter:
         
         TVE_LM = TVE_refLM(4);
         TVE_SS = TVE_refSS(4);
+       
         

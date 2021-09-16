@@ -15,12 +15,21 @@ Vm = 1; %70*sqrt(2) =~ 100;
 Xm = Vm;
 Ps = -120; %phase in degrees
 Ph = Ps*pi/180;% Phase in radians
-KaS = -10;   % IEEE Std phase (angle) step index: 10 degrees
-KxS = 0;   % magnitude step index: 0.1 
+KaS = 0;   % IEEE Std phase (angle) step index: 10 degrees
+KxS = 0.1;   % magnitude step index: 0.1 
 Wf = 2*pi*F1;  % fundamental frequency
 SNR = 60; %dB SNR = 20 log_10 Asinal/Aruido => Aruido = Asinal/10^(SNR/20)
 %Aruido = Vm/10^(SNR/20);
-
+%uncertainties of parameters in signal generation
+if KaS ~= 0
+% phase         X1  w    ph   x3 (KaS)
+    par_var = 5*[1   0.05 1 1]; % parameter variation in percent related to nominal
+else
+% mag          x1  x2(KxS)  wf    ph  
+    par_var = 5*[1   1     0.05  1]; % parameter variation in percent related to nominal            
+end
+MCruns = 1000;
+    
 for ti = 1:9
     
     tau_pp = 0.1*ti; % relative time of step in percent of total time 
@@ -55,26 +64,14 @@ for ti = 1:9
 
     % Nonlinear fit
     % Monte Carlo analysis
-    MCruns = 1000;
     x0 = xnom;  %x0 is fixed - first guess are the nominal values
     
     for k = 1:MCruns
+    fprintf("ti = "+ ti + "; k = " + k + "\n");
         %first guess
-        k
-        %uncertainties of parameters in signal generation
-        if KaS ~= 0
-        % phase         X1  w    ph   x3 (KaS)
-            par_var = [1   0.05 1 1]; % parameter variation in percent related to nominal
-        else
-        % mag          x1  x2(KxS)  wf    ph  
-            par_var = [1   1     0.05  1]; % parameter variation in percent related to nominal            
-        end
-
         rng('shuffle');
         rn = (rand(1,length(xnom))-0.5);
-        xr = xnom.*(1+2*(par_var/100).*rn);
-        freq_rand = xr(3)/(2*pi)
-        
+        xr = xnom.*(1+2*(par_var/100).*rn);        
         %uncertainties of tau estimation
         utau = 2;  %number of dts 
         u = zeros(length(Xm),length(t));
@@ -128,6 +125,7 @@ for ti = 1:9
         tol = 1e-7;
         OPTIONS = optimoptions('lsqnonlin', 'Algorithm','levenberg-marquardt','OptimalityTolerance',tol);
         OPTIONS.StepTolerance = 1e-12;
+        OPTIONS.Display = 'off';
         [X,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err,x0,[],[],OPTIONS);
         Y = f(X);
         
@@ -237,12 +235,20 @@ for ti = 1:9
     
     %Freq_err_per_std(ti,1) = ERR_MAX(2)/STDEV_ERR(2);
 
-    fprintf("ti = "+ ti);
+
     
 end    
 
 beep
-save("resultadosMC\MC_LM_"+MCruns)
+if KaS ~= 0
+    save("resultadosMC\MC_LM_SF_U5x"+MCruns)
+else
+    save("resultadosMC\MC_LM_SM_U5x"+MCruns)
+end
+
+fprintf("Frequencia: " + max(Freq_stddev) + "\n")
+fprintf("Mag: " + max(Phasor_mag_errstdev) + "\n")
+fprintf("Fase: " + max(Phasor_ph_errstdev) + "\n")
 
 % if KaS ~= 0
 %     plot(errors(:,3),errors(:,4),'.')
