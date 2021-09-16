@@ -39,8 +39,8 @@ NSamples = length(Signal);
 T = NSamples*dt;
 nn = 1:NSamples;
 
-for ti=1:size(WholeSignal,1)           
-
+%for ti=1:size(WholeSignal,1)           
+for ti=5
     Signal = WholeSignal(ti,p:q);
     tau_pp = 0.1*ti; % relative time of step in percent of total time 
     tau_r = tau_pp*T;  % [s]
@@ -113,6 +113,15 @@ for ti=1:size(WholeSignal,1)
     Lb = ylabel('$x_o[n] - x_{P}[n]$'); Lb.Interpreter='latex'; Lb.FontSize = 14;
     xLb = xlabel('$n$'); xLb.FontSize = 14; xLb.Interpreter = 'latex';
     %yLb = ylabel('$V$'); yLb.Interpreter = 'latex';
+%     subplot(313)
+%     h = histogram(Res(5,:))
+%     var_res = (std(Res(5,:)))^2;
+%     yLb = ylabel('Frequência relativa');
+%     xLbh = xlabel('$x_o[n] - x_{P}[n]$'); xLbh.FontSize = 14; xLbh.Interpreter = 'latex';
+    var_signal = 1; 
+    %h.NumBins = 10;
+    SNR_res = 20*log10(var_signal/var_res)
+    
     
     % Weighted mean reference Phasor
     tau_est = tau_e/T;
@@ -137,9 +146,4 @@ for ti=1:size(WholeSignal,1)
    
 end
 
-figure
-h = histogram(Res(5,:))
-var_res = (std(Res(5,:)))^2;
-var_signal = 1/2; 
-%h.NumBins = 10;
-SNR_res = 20*log10(var_signal/var_res)
+
