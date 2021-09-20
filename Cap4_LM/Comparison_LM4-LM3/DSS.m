@@ -31,5 +31,5 @@ Signal_B = Signal(NSamples/2-1:end);
 F = mean([Freq_aw,Freq_bw]); % in Hz
 Mag = abs(Synx_aw);
 dt = 1/fs; T = NSamples*dt;
-corr_fase = -90; % in deg;
+corr_fase = +90; % in deg;
 Fase = angle(Synx_aw)*180/pi + corr_fase; % in degrees

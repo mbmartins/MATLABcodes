@@ -134,7 +134,7 @@ for n = 1:Niter;
     tol = 1e-7;
     OPTIONS = optimoptions('lsqnonlin', 'Algorithm','levenberg-marquardt','OptimalityTolerance',tol);
     OPTIONS.StepTolerance = 1e-12;
-    OPTIONS.Display = 'off';
+    OPTIONS.Display = 'iter';
     [X,RESNORM,RESIDUAL,exitflag,output,lambda,jacobian] = lsqnonlin(err,x0,[],[],OPTIONS);
     Y = f(X);
     
