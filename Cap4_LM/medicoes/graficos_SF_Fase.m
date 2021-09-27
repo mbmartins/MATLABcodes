@@ -18,7 +18,7 @@ phiLM = phi_P(5,:);
 
 diff = phi_nom - phiLM;
 
-um = 5e-3;
+um = 15e-3;
 Um = um*ones(1,length(phiLM));
 
 tau_rel = 0.1:0.1:0.9;

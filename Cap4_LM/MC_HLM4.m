@@ -63,13 +63,13 @@ if run == true
             fprintf("ti = "+ ti + "; k = " + k + "\n");
 
             %uncertainties of parameters in signal generation
-%             if ha ~= 0
-%             % phase         X1  w    ph   x3 (KaS)
-%                 par_var = [1   0.05 1 1]; % parameter variation in percent related to nominal
-%             else
-%             % mag          x1  x2(KxS)  wf    ph  
-%                 par_var = [1   1     0.05  1]; % parameter variation in percent related to nominal            
-%             end
+            if ha ~= 0
+            % phase         X1  w    ph   x3 (KaS)
+                par_var = [1   0.05 1 1]; % parameter variation in percent related to nominal
+            else
+            % mag          x1  x2(KxS)  wf    ph  
+                par_var = [1   1     0.05  1]; % parameter variation in percent related to nominal            
+            end
 
             rng('shuffle');
             rn = (rand(1,length(xnom))-0.5);
@@ -244,7 +244,7 @@ if run == true
     end    
 end
 
-filename = "Cap4_LM\resultadosMC\MC_LM_";
+filename = "MATLABcodes\Cap4_LM\resultadosMC\MC_LM_";
 filename = filename+"MCruns"+MCruns+"Fs"+Fs+"SNR"+SNR+"ha"+ha+"hm"+(hm*100)+"phi0"+phi0
 save(filename)
 

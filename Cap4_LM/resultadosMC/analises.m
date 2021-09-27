@@ -2,7 +2,7 @@
 
 clear all; close all; clc;
 load('Cap4_LM\resultadosMC\filenames.mat')
-
+clear run
 %analises salto de fase 1 a 6, 13 a 18
 
 

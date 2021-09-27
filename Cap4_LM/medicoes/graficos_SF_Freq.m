@@ -19,7 +19,7 @@ casos = DadosSFFreq.caso
 
 diff = freq_P;
 
-um = freq_nom*1e-5;
+um = freq_nom*3e-5;
 Um = um*ones(1,9);
 
 tau_rel = 0.1:0.1:0.9;
