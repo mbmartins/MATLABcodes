@@ -1,7 +1,7 @@
 function [F,Mag,Fase] = DSS(F1, F0, AnalysisCycles, fs,  Signal)
 NSamples = length(Signal);
 Signal_A = Signal(1:NSamples/2);
-Signal_B = Signal(NSamples/2-1:end);
+Signal_B = Signal(NSamples/2:end);
 
 %%%%% Adjacent window calculation
     SignalParams(1) = F1; SignalParams(2:8) = 0;
@@ -29,7 +29,12 @@ Signal_B = Signal(NSamples/2-1:end);
 );
 
 F = mean([Freq_aw,Freq_bw]); % in Hz
-Mag = abs(Synx_aw);
+
+xa = abs(Synx_aw); xb = abs(Synx_bw);
+Mag = mean([xa,xb]);
 dt = 1/fs; T = NSamples*dt;
-corr_fase = +90; % in deg;
-Fase = angle(Synx_aw)*180/pi + corr_fase; % in degrees
+corr_fase = -5.2374; % in deg;
+
+phia = angle(Synx_aw)*180/pi;
+phib = angle(Synx_bw)*180/pi;
+Fase = mean([phia,phib]) + corr_fase; % in degrees

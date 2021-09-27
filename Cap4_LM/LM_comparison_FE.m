@@ -137,6 +137,7 @@ ti = 5;     % change ti to control the tau parameter:
         tol = 1e-7;
         OPTIONS = optimoptions('lsqnonlin', 'Algorithm','levenberg-marquardt','OptimalityTolerance',tol);
         OPTIONS.StepTolerance = 1e-12;
+         OPTIONS.Display = 'off';
 %        [X2,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err2,x0,[],[],OPTIONS);
         [X5,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err5,x0,[],[],OPTIONS);
 %        [X7,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err7,x0,[],[],OPTIONS);

@@ -1,11 +1,10 @@
 %monte carlo FE
 clear all; close all; clc
 
-SNRset = 50:10:100;
-%SNRset = 93.5;
+SNRset = 50:10:90;
 MCruns = 1000;
-KxS = -0.1;
-KaS = 0;
+KxS = 0;
+KaS = 10;
 Ps = 0;
 F1 = 60.0; %Hz
 
@@ -19,7 +18,7 @@ for snr = 1:length(SNRset)
     
     for k = 1:MCruns
         fprintf("SNR= "+SNR+ "; k="+k+"\n")
-        [FE_LM, FE_SS, TVE_LM, TVE_SS] = LM_comparison_FE_TVE(SNR,F1,Ps, KxS,KaS);
+        [FE_LM, FE_SS, TVE_LM, TVE_SS] = LM_comparison_FE(SNR,F1,Ps, KxS,KaS);
         FE_LM_hist(snr,k) = FE_LM;
         FE_SS_hist(snr,k) = FE_SS;
         TVE_LM_hist(snr,k) = TVE_LM;
@@ -90,9 +89,5 @@ title('FE accuracy: average, @F_1 = 60.0 Hz')
 % hist(TVE_SS_hist(2,:)); title('TVE_{SS} @SNR = 60dB')
 % %xlim([-8e-6 8e-6])
 
-save("Cap4_LM\resultadosMC\comparisonHLM4_LM3_DSS_"+MCruns)
-fprintf("HLM4 sigma FE = "+ FE_LM_std + "\n")
-fprintf("DSS sigma FE = "+ FE_SS_std + "\n")
+save("Cap4_LM\Comparison_HLM4-DSS\comparisonHLM4_DSS_SF"+MCruns)
 
-fprintf("HLM4 sigma TVE = "+ TVE_LM_std + "\n")
-fprintf("DSS sigma TVE = "+ TVE_SS_std + "\n")
