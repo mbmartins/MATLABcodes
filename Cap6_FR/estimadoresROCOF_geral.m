@@ -19,7 +19,7 @@ phi_n = 0*ones(1,MCiter);
 %tau_vec = 0.1 + (0.8)*rand(1,MCiter); %distribuicao de tau
 
 %tau fixo em 0.5T
-tau_vec = 0.5*ones(1,MCiter);;
+tau_vec = 0.5*ones(1,MCiter);
 
 % MC loop
 for k = 1:MCiter
