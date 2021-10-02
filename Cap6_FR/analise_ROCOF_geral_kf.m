@@ -62,7 +62,7 @@ xlim([-0.5 1.5])
 legend('Afundamento','Salto Frequencia');
 %title('Limiar de detecção - EF6 - SNR = 60 dB')
 fname = convertStringsToChars("detector\histograma_kf_EF" + num2str(i) + "_SNR"+num2str(SNR)+".png");
-saveas(gcf,fname)
+%saveas(gcf,fname)
 end
 % NAO FICOU BOM
 % % separacao dos sinais em funcao de phi0
