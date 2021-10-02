@@ -50,14 +50,14 @@ f.Position = [293 478.6000 754.4000 283.2000];
     xlim([0 .1]); %ylim([-1e-2 1e-2]);
     ylb = ylabel('$\epsilon_{\phi_0} = (\hat{\phi_0} - \phi_0)$ [graus]','Interpreter','latex')
     ylb.FontSize = 14;
-
-figure(2)
-errorbar(tau_rel,diff(4,:),Um,'bo')
-hold on;
-errorbar(tau_rel,diff(5,:),Um,'ro')
-errorbar(tau_rel,diff(6,:),Um,'ko')
-legend(casos(4:6))
-grid on;
-xlabel('$\tau$ relativo a $T$','Interpreter','latex')
-xlim([0 1])
-ylabel('$\epsilon_{\phi} = (\phi_{nom} - \phi_{P})$ [graus]','Interpreter','latex')
+% 
+% figure(2)
+% errorbar(tau_rel,diff(4,:),Um,'bo')
+% hold on;
+% errorbar(tau_rel,diff(5,:),Um,'ro')
+% errorbar(tau_rel,diff(6,:),Um,'ko')
+% legend(casos(4:6))
+% grid on;
+% xlabel('$\tau$ relativo a $T$','Interpreter','latex')
+% xlim([0 1])
+% ylabel('$\epsilon_{\phi} = (\phi_{nom} - \phi_{P})$ [graus]','Interpreter','latex')

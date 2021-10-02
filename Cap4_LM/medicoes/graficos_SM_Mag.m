@@ -45,7 +45,7 @@ grid on;
 xlb = xlabel('$\tau$ [s]','Interpreter','latex')
 xlim([0 .1])
     xlb.FontSize = 14;
-ylb = ylabel('$\epsilon_{|X|} = (|\hat{X}| - |X_{ref|})$ [V]','Interpreter','latex')
+ylb = ylabel('$\epsilon_{|X|} = (|\hat{X}| - |X_{ref}|)$ [V]','Interpreter','latex')
 ylb.FontSize = 14;
 
 lg = legend('$\phi_0 = 0^o$',"$\mu$",'$\mu \pm \sigma$');
@@ -53,3 +53,6 @@ lg = legend('$\phi_0 = 0^o$',"$\mu$",'$\mu \pm \sigma$');
     lg.Location = 'eastoutside';
     lg.Orientation = 'vertical';
     lg.FontSize = 12;
+    
+f.PaperPositionMode = 'auto';
+print(f,'SM_Mag','-dpng','-r600')
