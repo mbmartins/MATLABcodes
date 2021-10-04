@@ -28,16 +28,16 @@ lim_vec = limiar*ones(1,length(tau_vec));
 
 f2 = figure(2); 
 plot(tau_vec(1,:)*T,lim_vec,'r'); hold on;
-plot(tau_vec(1,:)*T,kfest_sag(i,:),'b.')
+plot(tau_vec(1,:)*T,abs(kfest_sag(i,:)),'b.')
 hold on; 
-plot(tau_vec(1,:)*T,kfest_freq(i,:),'k.')
+plot(tau_vec(1,:)*T,abs(kfest_freq(i,:)),'k.')
 %p.Interpreter = 'latex'
 %p.Interpreter = 'latex'
 xlb = xlabel('$\tau_1$ [s]'); xlb.Interpreter = 'latex'; xlb.FontSize = 14;
 ylb = ylabel('$\hat{h}_f$ [Hz]'); ylb.Interpreter = 'latex'; ylb.FontSize = 14;
 lgd = legend('Limiar detecção','Afundamento','Salto Frequência');
 lgd.FontSize = 14;
-lgd.Location = 'south'
+lgd.Location = 'north'
 grid on;
 %title("h_f estimado por MedSF-PATV")
 
@@ -46,9 +46,14 @@ limiar= 0.5;
 
 % quantos pontos de salto de frequencia h_f < limiar?
 
-Falhas_freq = 100*sum(kfest_freq(i,:)<limiar)/MCiter  % em porcento
+Falhas_freq = 100*sum(abs(kfest_freq(i,:))<limiar)/MCiter  % em porcento
 
 % quantos pontos de afundamento teve h_f > limiar?
-Falhas_sag = 100*sum(kfest_sag(i,:)>limiar)/MCiter  % em porcento
+Falhas_sag = 100*sum(abs(kfest_sag(i,:))>limiar)/MCiter  % em porcento
 
 print(f2,'hf_disc','-dpng','-r600')
+
+Falhas_freq_restrito = 100*sum(abs(kfest_freq(i,:))<limiar)/MCiter  % em porcento
+
+% quantos pontos de afundamento teve h_f > limiar?
+Falhas_sag_restrito = 100*sum(abs(kfest_sag(i,:))>limiar)/MCiter  % em porcento
