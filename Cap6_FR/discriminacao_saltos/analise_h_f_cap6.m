@@ -15,32 +15,41 @@ tau_inicial = tau_vec(1,:); % de 0.1 a 0.9?? não faz sentido...
 % ciclo
 
 i = 5
-f1 = figure(1);
-h6 = histogram(kfest_sag(i,:), 'FaceAlpha',0.5); hold on;
-h4 = histogram(kfest_freq(i,:), 'FaceAlpha',0.5); hold on;
-h6.Normalization = 'probability';h6.BinWidth = 0.02;
-h4.Normalization = 'probability';h4.BinWidth = 0.02;
-xlim([-0.5 1.5])
-legend('Afundamento','Salto Frequencia');
-
 limiar = 0.5;
 lim_vec = limiar*ones(1,length(tau_vec));
 
-f2 = figure(2); 
+f2 = figure(2);
+% subplot(121)
+f2.Position = [ 143.4000  419.4000  624.0000  342.4000]
 plot(tau_vec(1,:)*T,lim_vec,'r'); hold on;
-plot(tau_vec(1,:)*T,abs(kfest_sag(i,:)),'b.')
+plot(tau_vec(1,:)*T,abs(kfest_mag(i,:)),'b.')
+plot(tau_vec(1,:)*T,abs(kfest_fase(i,:)),'m.')
 hold on; 
 plot(tau_vec(1,:)*T,abs(kfest_freq(i,:)),'k.')
 %p.Interpreter = 'latex'
 %p.Interpreter = 'latex'
-xlb = xlabel('$\tau_1$ [s]'); xlb.Interpreter = 'latex'; xlb.FontSize = 14;
+xlb = xlabel('$\tau$ [s]'); xlb.Interpreter = 'latex'; xlb.FontSize = 14;
 ylb = ylabel('$|\hat{h}_f|$ [Hz]'); ylb.Interpreter = 'latex'; ylb.FontSize = 14;
-lgd = legend('Limiar detecção','Afundamento','Salto Frequência');
-lgd.FontSize = 14;
+lgd = legend('Limiar detecção','Salto Magnitude','Salto Fase','Salto Frequência');
+lgd.FontSize = 12;
 lgd.Location = 'north'
 grid on;
-%title("h_f estimado por MedSF-PATV")
 
+% subplot(122)
+% f2.Position = [143.4000  324.2000  973.6000  437.6000]
+% plot(tau_vec(1,:)*T,lim_vec,'r'); hold on;
+% plot(tau_vec(1,:)*T,abs(kfest_fase(i,:)),'b.')
+% hold on; 
+% plot(tau_vec(1,:)*T,abs(kfest_freq(i,:)),'k.')
+% xlb = xlabel('$\tau$ [s]'); xlb.Interpreter = 'latex'; xlb.FontSize = 14;
+% ylb = ylabel('$|\hat{h}_f|$ [Hz]'); ylb.Interpreter = 'latex'; ylb.FontSize = 14;
+% lgd = legend('Limiar detecção','Salto Fase','Salto Frequência');
+% lgd.FontSize = 14;
+% lgd.Location = 'north'
+% grid on;
+
+%title("h_f estimado por MedSF-PATV")
+print(f2,'hf_discrim','-dpng','-r600')
 
 limiar= 0.5;
 
@@ -51,7 +60,7 @@ Falhas_freq = 100*sum(abs(kfest_freq(i,:))<limiar)/MCiter  % em porcento
 % quantos pontos de afundamento teve h_f > limiar?
 Falhas_sag = 100*sum(abs(kfest_sag(i,:))>limiar)/MCiter  % em porcento
 
-print(f2,'hf_disc_sag','-dpng','-r600')
+print(f2,'hf_disc','-dpng','-r600')
 
 Falhas_freq_restrito = 100*sum(abs(kfest_freq(i,:))<limiar)/MCiter  % em porcento
 

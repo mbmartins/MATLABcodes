@@ -60,11 +60,13 @@ tau1n = 240;
 [wav1_f1p,wav1_f2p,wav1_f_rp,wav1_h_fp] = MedSF_PATV(wav1, tau1n, Fs)
 
 % erros de fr
-FE_MedSF_caso3 = (wav1_f_r - F0)/F0
-FE_MedSF_caso3 = (wav1_f_rp - F0)/F0
+hf = -1;
+Fref = (F0 + (hf + F0))/2;
+
+FE_MedSF_caso3 = (wav1_f_r - Fref)
+FE_MedSF_caso3 = (wav1_f_rp - Fref)
 
 % erros de hf
-hf = -1;
 hfE_MedSF_caso3 = wav1_h_f - hf
 hfE_MedSF_caso3 = wav1_h_fp - hf
 
