@@ -50,8 +50,8 @@ for j = 1:ncurves
     tau_n1 = floor(tau*NSamples/T);
     
     %estimador EFx
-    [f1_est,f2_est,F_est,fu,ri] = EF4(Psi_i,az,Fs,tau_n1,lambda_n(k));
-    %[f1_est,f2_est,F_est,fu,ri] = EF5(f_i,az,tau_n1,lambda_n(k));
+    %[f1_est,f2_est,F_est,fu,ri] = EF4(Psi_i,az,Fs,tau_n1,lambda_n(k));
+    [f1_est,f2_est,F_est,fu,ri] = EF5(f_i,az,tau_n1,lambda_n(k));
     %[f1_est,f2_est,F_est,fu,ri] = EF6(f_i,az,tau_n1,lambda_n(k));
     
     
