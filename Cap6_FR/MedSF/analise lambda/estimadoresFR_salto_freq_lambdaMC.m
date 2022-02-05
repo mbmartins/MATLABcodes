@@ -22,9 +22,9 @@ tau_n1 = floor(tau1*N);
 % nbits = 16;
 
 % vetor de valores de lambda
- lambda_step = .1;
- n_lambdas = 50; 
- la_ini = .1;
+ lambda_step = .02;
+ n_lambdas = 100; 
+ la_ini = .01;
  lambda_n = la_ini+(0:lambda_step:(n_lambdas-1)*lambda_step);
 
 % --- grade fina, valores pequenos de lambda
@@ -77,7 +77,7 @@ for L=1:n_lambdas
         f_i=gradient(Psi_i)*Fs/(2*pi);% Hilbert estimate of the instantaneous frequency of z
         az = abs(z);
         %estimador
-        [f1_est(k),f2_est(k),F_est(k),fu,ri] = MedSF_PATV2(f_i,az,tau_n1,lambda_n(L));
+        [f1_est(k),f2_est(k),F_est(k),fu,ri] = MedSF_PATV(f_i,az,tau_n1,lambda_n(L));
         %sprintf('%d',k)
     end
 
@@ -104,35 +104,36 @@ HFE_std = std(hfE');
 HFEmean = abs(mean(hfE'));
 
 close all;
-%----- Figuras para FE x lambda
+% %----- Figuras para FE x lambda
+% 
+% figs(2) = figure(2);hold off
+% 
+% %subplot(131)
+% semilogy(lambda_n,abs(FEmean),'b.-');hold on; 
+% semilogy(lambda_n,abs(FEmean) + FE_std,'b-.');
+% semilogy(lambda_n,abs(FE1mean),'r.-'); hold on;
+% semilogy(lambda_n,abs(FE1mean)+FE1_std,'r-.');
+% semilogy(lambda_n,abs(FE2mean),'g.-'); hold on;
+% semilogy(lambda_n,abs(FE2mean)+FE2_std,'g-.');
+% semilogy(lambda_n,abs(HFEmean),'k.-'); hold on;
+% semilogy(lambda_n,abs(HFEmean)+HFE_std,'k-.');
 
-figs(2) = figure(2);hold off
+% xlabel('x','Interpreter','latex');
+% ylabel('y','Interpreter','latex');
+% xlabel('$\lambda$','Fontsize',16)
+% ylabel('$|FE|,|FE_1|,|h_fE|$ [Hz]','Fontsize',15)
+% legend('|\mu(FE)|','|\mu(FE)| + \sigma(FE)',...
+%        '|\mu(FE_1)|','|\mu(FE_1)| + \sigma(FE_1)',...
+%        '|\mu(FE_2)|','|\mu(FE_2)| + \sigma(FE_2)',...
+%        '|\mu(h_fE)|','|\mu(h_fE)| + \sigma(h_fE)')
+% legend('Location','eastoutside')
+% legend('Fontsize',12)
+% %xlabel('Fontsize',14)
+% %ylabel('Fontsize',14)
+% legend('Orientation','vertical')
+% grid on
+% %ylim([10e-5 1]);
+% %xlim([0.1 7])
 
-%subplot(131)
-semilogy(lambda_n,abs(FEmean),'b.-');hold on; 
-semilogy(lambda_n,abs(FEmean) + FE_std,'b-.');
-semilogy(lambda_n,abs(FE1mean),'r.-'); hold on;
-semilogy(lambda_n,abs(FE1mean)+FE1_std,'r-.');
-semilogy(lambda_n,abs(FE2mean),'g.-'); hold on;
-semilogy(lambda_n,abs(FE2mean)+FE2_std,'g-.');
-semilogy(lambda_n,abs(HFEmean),'k.-'); hold on;
-semilogy(lambda_n,abs(HFEmean)+HFE_std,'k-.');
-
-xlabel('x','Interpreter','latex');
-ylabel('y','Interpreter','latex');
-xlabel('$\lambda$','Fontsize',16)
-ylabel('$|FE|,|FE_1|,|h_fE|$ [Hz]','Fontsize',15)
-legend('|\mu(FE)|','|\mu(FE)| + \sigma(FE)',...
-       '|\mu(FE_1)|','|\mu(FE_1)| + \sigma(FE_1)',...
-       '|\mu(FE_2)|','|\mu(FE_2)| + \sigma(FE_2)',...
-       '|\mu(h_fE)|','|\mu(h_fE)| + \sigma(h_fE)')
-legend('Location','eastoutside')
-legend('Fontsize',12)
-%xlabel('Fontsize',14)
-%ylabel('Fontsize',14)
-legend('Orientation','vertical')
-grid on
-%ylim([10e-5 1]);
-%xlim([0.1 7])
-
-save('last2_comp_mag_pretrunc.mat')
+save('consenso_MedSFPATV_sem_comp_low.mat')
+run('analise_lambda_corrigido')

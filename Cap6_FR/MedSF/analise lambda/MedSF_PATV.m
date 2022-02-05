@@ -1,5 +1,5 @@
 function [f1,f2,f_r,f_u,ri,ru] = MedSF_PATV(f_i, az, tau_n, lambda)
-% MedSF_PATV
+% MedSF_PATV sem compensacao de magnitude
 
     NSamples = length(f_i);
     br = 0.05;%80/480; % fraction of samples to be ignored 

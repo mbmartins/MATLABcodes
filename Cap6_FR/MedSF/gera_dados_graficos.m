@@ -8,11 +8,11 @@
 
 % gera dados
 clear all; clc; close all;
-MCiter = 10;
+MCiter = 10000;
 h_f =-1;
 pasta = gera_dados_MC(MCiter,h_f)
 %gera graficos
-% message = graficos_ALL_MedSF(pasta)
+message = graficos_ALL_MedSF(pasta)
 
 % ----- dados robustez -----
 
