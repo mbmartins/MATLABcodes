@@ -1,0 +1,26 @@
+incerteza definicional
+O termo está definido no documento luso-brasileiro VIM 2012.
+
+
+valor esperado
+
+o VIM nao trata de valor esperado.
+
+A norma 60255 (ver 4.3.2, NOTE 1) utiliza "expected value" para se referir ao valor de um mensurando em um dado instante de tempo (já que os mensurandos são definidos como funções do tempo). 
+
+O GUM trata de expectância para se referir a estimativa de uma grandeza, no contexto de propagação de incertezas estimada via MCM.
+
+valor verdadeiro vc valor de referencia
+
+O VIM e a norma 60255 utilizam o termo valor de referencia. Usualmente, em metrologia, o valor verdadeiro é considerado impossível ser conhecido em medições reais. Normalmente a abordagem do metrologista é inversa, parte-se de medições reais para estimar um valor que é desconhecido.
+
+No nosso caso, entendo que os 3 termos se referem ao mesmo valor. O valor de referência adotado nas simulações da tese é o valor verdadeiro, que pode ser conhecido nesse caso.
+
+Se nosso estimador fosse perfeito, o valor de referência deveria coincidir com o valor esperado, ao tratarmos o mensurando como uma v.a.. Para ser coerente com a norma 60255, utilizei o termo valor esperado no texto da tese.
+
+Mas concordo que, em nosso caso, por conhecermos os valores a priori, utilizar valor de referência ou mesmo valor verdadeiro seria mais apropriado. Até porque ainda estamos avaliando nosso estimador.
+
+
+validação
+
+ver no VIM se é aplicado no nosso caso
