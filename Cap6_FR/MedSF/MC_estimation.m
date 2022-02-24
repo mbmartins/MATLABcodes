@@ -17,8 +17,10 @@ for k = 1:MC_iterations
 %         % --- gerador alternativo
         w1 = 2*pi*F1/Fs; w2 = 2*pi*hf/Fs; Xm = 1;
         phi_0_rad=phi_n*pi/180; % phi_0 sorteado
+        phi_0_rad = phi_0_rad + 2*pi*(F0 - F1)*tau_n1/Fs; % fator de correção para F1 fora da nominal
         PHI=w1*n+w2.*(n-tau_n1).*(n>=tau_n1)+phi_0_rad; % fase instantanea
         x=Xm.*cos(PHI);  % sinal x[n] 
+        %plot(x); hold on; %plot(tau_n1,Xm,'rx')
         vx=var(x);  
         vruido=vx./(10^(SNR/10)); 
         xn=x+sqrt(vruido)*randn(size(n));  % sinal AC ruidoso]
