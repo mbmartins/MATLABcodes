@@ -6,7 +6,7 @@ c = ['k','b','c','r','m','g'];
 fsize = 16; %font sizes
 
 %for plot_type = 1:7
-for plot_type = 3
+for plot_type = 6
 % casos:
 % 1 - phi_0
 % 2 - tau
@@ -62,10 +62,10 @@ switch plot_type
     case 6 
         % ---- tamanho da janela T
         load(pasta+"estimadoresFR_salto_freq_T.mat");
-        VEC = Ncycles_vec;
-        sxlabel = 'T [ciclos]';
-        var = "T";
-        vxlim = [3 30];
+        VEC = Ncycles_vec*fsf1;
+        sxlabel = 'N [amostras]';
+        var = "N";
+        vxlim = [min(VEC) max(VEC)];
         KE = KFE;
      case 7 
         % ---- erro de estimação de tau

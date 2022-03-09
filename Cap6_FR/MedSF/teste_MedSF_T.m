@@ -32,7 +32,16 @@ tau_vec = 0.5;
 %tau_vec = (0.1:0.01:0.9);
 tau_n = floor(tau_vec*NSamples);
 
-Ncycles_vec = [3:30];
+tau_nA = 240;
+NA = 480;
+fsf1 = Fs/F1;
+
+for m = 1:13
+    tau_nB(m) = tau_nA + (m-2)*fsf1;
+    NB(m) = round(tau_nB(m)*(NA/tau_nA));
+end
+
+Ncycles_vec = NB/fsf1
 
 for j = 1:length(Ncycles_vec)
     %para acompanhamento
