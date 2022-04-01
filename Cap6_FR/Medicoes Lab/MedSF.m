@@ -19,9 +19,9 @@ function [f1,f2,f_r,h_f] = MedSF(Signal, tau_n,Fs)
     brn = floor(br*NSamples); % number of samples to be ignored
     brmask1 = [(brn+1:tau_n)];
     brmask2 = [(tau_n+1:NSamples-brn)];
-    brmask = [brmask1 brmask2];
-    f_u_trunc = f_i(brmask);
-    figure; plot(f_u_trunc); title('Frequencia instantanea')
+    %brmask = [brmask1 brmask2];
+    %f_u_trunc = f_i(brmask);
+    %figure; plot(f_u_trunc); title('Frequencia instantanea')
     
     %ri = zeros(NSamples,1);
     %ri(brmask) = gradient(f_u_trunc);

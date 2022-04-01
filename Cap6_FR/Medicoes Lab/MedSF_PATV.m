@@ -24,10 +24,10 @@ lambda = 0.5;
     d = 0; %lambda = 2.5; 
     
     %exclui as amostras proximo as bordas
-    f_i2 = f_i(brmask);
+    %f_i2 = f_i(brmask);
    
     Nit = 20;
-    [x, f_u, cost, u, v] = patv_MM(f_i2, d, lambda, Nit);
+    [x, f_u, cost, u, v] = patv_MM(f_i(brmask), d, lambda, Nit);
     
     % s[n] + c[n] no texto
     f_i = f_u + x; 

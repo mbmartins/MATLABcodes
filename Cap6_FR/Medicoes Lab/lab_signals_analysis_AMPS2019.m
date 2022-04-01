@@ -76,8 +76,12 @@ FE2P_c = FE2P - corr(2)
 FE3P_c = FE3P - corr(3)
 
 % fazer medição de hf em wav1 e wav2
+tic
 [wav1_f1,wav1_f2,wav1_f_r,wav1_h_f] = MedSF(wav1, tau1n, Fs)
+time_MedSF = toc;
+tic
 [wav1_f1p,wav1_f2p,wav1_f_rp,wav1_h_fp] = MedSF_PATV(wav1, tau1n, Fs)
+time_MedSF_PATV = toc
 
 [wav2_f1,wav2_f2,wav2_f_r,wav2_h_f] = MedSF(wav2, tau2n, Fs)
 [wav2_f1p,wav2_f2p,wav2_f_rp,wav2_h_fp] = MedSF_PATV(wav2, tau2n, Fs)
@@ -98,7 +102,9 @@ hfE_MedSF_caso2 = wav2_h_fp
 %medições de fr com LM
 %salto mag: x0 = [Vm KxS 2*pi*F1 Ph];
 x1 = [1 -0.1 2*pi*F0 pi/2]; KaS = 0; KxS = -0.1;
+tic
 [params] = LM_estimator(wav1',x1,tau1n, KaS, KxS, Fs)
+time_LM = toc;
 fmed1 = params(3)/(2*pi)
 ferror1 = (fmed1 - F0)/F0
 

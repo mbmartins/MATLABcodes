@@ -1,4 +1,4 @@
-function [params] = LM_estimator(Signal,x0,tau_n, KaS, KxS, Fs)
+function [X] = LM_estimator(Signal,x0,tau_n, KaS, KxS, Fs)
 % x0 é o vetor com os valores iniciais dos parâmetros
 % para salto de fase: xnom = [Vm 2*pi*F1 Ph KaS];
 % para salto de magnitude: xnom = [Vm KxS 2*pi*F1 Ph];
@@ -34,7 +34,6 @@ err = @(x) (Signal - f(x));
 tol = 1e-7;
 OPTIONS = optimoptions('lsqnonlin', 'Algorithm','levenberg-marquardt','OptimalityTolerance',tol);
 OPTIONS.StepTolerance = 1e-12;
+OPTIONS.Display = 'off';
 [X,RESNORM,RESIDUAL,exitflag,output] = lsqnonlin(err,x0,[],[],OPTIONS);
-Y = f(X);
-
-params = X;
+%Y = f(X);
