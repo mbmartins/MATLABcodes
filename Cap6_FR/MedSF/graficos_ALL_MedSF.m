@@ -5,8 +5,8 @@ c = ['k','b','c','r','m','g'];
 %plot_type = 6; 
 fsize = 16; %font sizes
 
-%for plot_type = 1:7
-for plot_type = 6
+for plot_type = 6:7
+%for plot_type = 3
 % casos:
 % 1 - phi_0
 % 2 - tau

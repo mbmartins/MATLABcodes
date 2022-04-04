@@ -6,7 +6,7 @@ clear all; close all; clc
 SNR = 60;
 %fixed parameters
 F0 = 60.0; %nominal frequency
-F1 = 60; %fundamental frequency
+F1 = 58; %fundamental frequency
 KaS = 0.0; %[degrees]
 KxS = 0.0; % [relative magnitude step]
 hf = -1.; %[Hz] %size of frequency step
@@ -37,11 +37,15 @@ tau_n1 = floor(tau1*N);
 
 MCiter = 300;
 %phi_0v = 180*rand(1,MCiter); %distribuicao de phi_0
-phi_0v = 0*ones(1,MCiter);
 %tau_vec = 0.1 + (0.8)*rand(1,MCiter); %distribuicao de tau
-tau_vec = 0.5*ones(1,MCiter);
 %ert_vec = randi([-8 8],1,MCiter); % erros de tau_n de -8 a 8
+
+% valores fixos
+ phi_0v = 0*ones(1,MCiter);
+ tau_vec = 0.5*ones(1,MCiter);
 ert_vec = zeros(1,MCiter);
+
+
 
 n=0:N-1; n=n(:); %base de tempo
 
@@ -69,9 +73,10 @@ for L=1:n_lambdas
 %         % --- gerador alternativo
         w1 = 2*pi*F1/Fs; w2 = 2*pi*hf/Fs; Xm = 1;
         phi_0_rad=phi_0*pi/180; % phi_0 sorteado
+        phi_0_rad = phi_0_rad + 2*pi*(F0 - F1)*tau_n1/Fs; % fator de correção para F1 fora da nominal
         PHI=w1*n+w2.*(n-tau_n1).*(n>=tau_n1)+phi_0_rad; % fase instantanea
         x=Xm.*cos(PHI);  % sinal x[n] 
-        vx=var(x); SNR=60; vruido=vx./(10^(SNR/10)); 
+        vx=var(x); vruido=vx./(10^(SNR/10)); 
         xn=x+sqrt(vruido)*randn(size(n));  % sinal AC ruidoso]
         
         %plot(xn);hold on; plot(Signal)

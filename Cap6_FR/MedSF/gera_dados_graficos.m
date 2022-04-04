@@ -10,10 +10,10 @@
 clear all; clc; close all;
 MCiter = 10000;
 h_f =-1;
-%pasta = gera_dados_MC(MCiter,h_f)
+pasta = gera_dados_MC(MCiter,h_f)
 
 %gera graficos
-pasta = "figuras_hf_-1_10000\";
+%pasta = "figuras_hf_-1_"+MCiter+"\";
 message = graficos_ALL_MedSF(pasta)
 
 % ----- dados robustez -----

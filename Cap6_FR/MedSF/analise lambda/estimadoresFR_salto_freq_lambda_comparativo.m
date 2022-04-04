@@ -3,10 +3,10 @@
 % encontrar um lambda otimo para o PATV
 
 clear all; close all; clc
-SNR = 60;
+SNR = 100;
 %fixed parameters
 F0 = 60.0; %nominal frequency
-F1 = 60; %fundamental frequency
+F1 = 58; %fundamental frequency
 KaS = 0.0; %[degrees]
 KxS = 0.0; % [relative magnitude step]
 hf = -1.; %[Hz] %size of frequency step
@@ -35,17 +35,24 @@ tau_n1 = round(tau*N/T);
 % --- gerador sinal CA com salto frequencia
         w1 = 2*pi*F1/Fs; w2 = 2*pi*hf/Fs; Xm = 1;
         phi_0_rad=phi_0*pi/180; % phi_0 sorteado
+        phi_0_rad = phi_0_rad + 2*pi*(F0 - F1)*tau_n1/Fs; % fator de correção para F1 fora da nominal
         PHI=w1*n+w2.*(n-tau_n1).*(n>=tau_n1)+phi_0_rad; % fase instantanea
         x=Xm.*cos(PHI);  % sinal x[n] 
-        vx=var(x); SNR=60; vruido=vx./(10^(SNR/10)); 
+        vx=var(x); vruido=vx./(10^(SNR/10)); 
         xn=x+sqrt(vruido)*randn(size(n));  % sinal AC ruidoso]
           
         z=hilbert(xn);
+        zx = hilbert(x);
         %Psi_i = unwrap(angle(z)); %[rad]
         Psi_i = phase(z);
+        Psi_i_x = phase(zx);
+        f_ix = gradient(Psi_i_x)*Fs/(2*pi);
         f_i=gradient(Psi_i)*Fs/(2*pi);% Hilbert estimate of the instantaneous frequency of z
         az = abs(z);
-        %estimador
+        %estimadores
+                
+        
+        
         n = 1:N;
     br = 0.05;%80/480; % fraction of samples to be ignored 
     q = floor(br*N); % number of samples to be ignored
@@ -62,4 +69,19 @@ tau_n1 = round(tau*N/T);
         FE(2) = F_est(2) - Fref;
         %plot(n(brmask),f_i(brmask)); hold on;
         plot(brmask,fu,'k')
-        legend('f_i[n]','f_u[n] \lambda = 0.5','f_u[n] \lambda = 3')
+        grid on;
+        plot(brmask,f_ix(brmask),'b')
+        lg = legend('$f_i[n]$','$\hat{f}_i[n]$','$s[n]+c_f[n]$ $\lambda = 0,5$','$s[n]+c_f[n]$ $\lambda = 3$')
+        lg.Interpreter = 'latex';
+        lg.FontSize = 13;
+        xlb = xlabel('n'); 
+        ylb = ylabel('$\hat{f}_i[n]$ [Hz]');
+        xlb.Interpreter = 'latex';
+        xlb.FontSize = 13;
+        ylb.Interpreter = 'latex';
+        ylb.FontSize = 13;
+
+        [f1_est(3),f2_est(3),F_est(3),fu,~] = MedSF(f_i, tau_n1);
+        hf_est = f2_est(3) - f1_est(3);
+        hfE(3) = hf_est - hf;
+        FE(3) = F_est(3) - Fref;
