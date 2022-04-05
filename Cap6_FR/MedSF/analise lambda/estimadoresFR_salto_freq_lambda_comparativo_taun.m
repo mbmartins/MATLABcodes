@@ -13,8 +13,8 @@ hf = -1.; %[Hz] %size of frequency step
 Fs =4800;
 NCycles = 6;
 T = NCycles/F0;
-phi_0 = 100; %angle phi_0 [degrees]
-tau1 = 0.5;  % in proportion of T
+phi_0 = 0; %angle phi_0 [degrees]
+tau1 = 0.2;  % in proportion of T
 tau2 = 1.; % in proportion of T; set tau2 = 1 if you dont want two steps
 N = floor(NCycles*Fs/F0);
 tau_n1 = floor(tau1*N); 

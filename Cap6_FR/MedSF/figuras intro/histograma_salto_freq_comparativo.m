@@ -4,7 +4,7 @@ hf = -1;
 NCycles = 6;
 F0 = 60;
 Fs = 4800;
-F1 = 60.5;
+F1 = 60;
 phi_n = 90;
 tau1 = 0.5;
 SNR = 100;
@@ -18,10 +18,8 @@ tau_n1 = floor(tau1*NSamples);
 Fref = (tau1*T*F1 + (T - tau1*T)*(F1 + hf))/T; %one step only
 ROCOF_ref = (Fref - F1)/T;
 n = 1:NSamples;
-
-k = 1
-    %Signal = SigGEN2(F0,F1,Fs,phi_n,NCycles,tau1,tau2,SNR,KaS, KxS,KfS,nbits);
-        
+q = floor(0.01*NSamples)
+  
 %         % --- gerador alternativo
         w1 = 2*pi*F1/Fs; w2 = 2*pi*hf/Fs; Xm = 1;
         phi_0_rad=phi_n*pi/180; % phi_0 sorteado
@@ -40,13 +38,15 @@ k = 1
     %Psi_i = phase(z);
     f_i=gradient(Psi_i)*Fs/(2*pi);% Hilbert estimate of the instantaneous frequency of z
 n = 1:NSamples;
+ntrunc = q:NSamples-q;
 s1 = subplot(121)
-    p = plot(n,f_i)
-    axis([0 480 59.2 60.8])
+    p = plot(ntrunc,f_i(ntrunc))
+    %axis([0 480 59.2 60.8])
     xlabel({'Amostras';'a)'});
     ylb = ylabel('$f_i[n]$');
     ylb.Interpreter = 'latex';
     grid on
+ 
     s2 = subplot(122)
     h = histogram(f_i)
     h.Orientation = 'horizontal';
