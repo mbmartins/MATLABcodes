@@ -16,4 +16,4 @@ pasta = "figuras_hf_"+h_f+"_"+MCiter+"\";
 % %T
  file_T = teste_MedSF_T(MCiter,h_f,pasta);
 % %tau error
-% file_tau_error = teste_MedSF_tau_error(MCiter,h_f,pasta);
+ file_tau_error = teste_MedSF_tau_error(MCiter,h_f,pasta);

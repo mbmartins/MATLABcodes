@@ -5,8 +5,8 @@ c = ['k','b','c','r','m','g'];
 %plot_type = 6; 
 fsize = 16; %font sizes
 
-%for plot_type = 1:7
-for plot_type = 2
+for plot_type = 6:7
+%for plot_type = 3
 % casos:
 % 1 - phi_0
 % 2 - tau
@@ -121,7 +121,6 @@ k = 1; %MedSF = antigo EF1
         k=k+4; %next loop: MedSF-PATV antigo EF5, por isso k+4
         
     end
-    
     if plot_type == 2
         for i = 1:4
             subplot(220+i); hold on;

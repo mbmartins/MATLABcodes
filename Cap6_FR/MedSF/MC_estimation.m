@@ -37,9 +37,9 @@ for k = 1:MC_iterations
     [f1_est1(k),f2_est1(k),F_est1(k),fu1,ri1] = EF1(f_i,tau_n1);
     
         % salto de frequencia
-        lambdaEF5 = 0.5; %otimizado para min FE1
+        lambda = 0.5; %otimizado para min hfE
     
-    [f1_est5(k),f2_est5(k),F_est5(k),fu5,ri5,ru5] = MedSF_PATV2(f_i,az,tau_n1,lambdaEF5);
+    [f1_est5(k),f2_est5(k),F_est5(k),fu5,ri5,ru5] = MedSF_PATV(f_i,az,tau_n1,lambda);
     
     kf1(k) = f2_est1(k) - f1_est1(k);
     kf5(k) = f2_est5(k) - f1_est5(k);
