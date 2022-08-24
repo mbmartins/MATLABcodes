@@ -9,12 +9,14 @@ brmask = br:N-br-1;
 z=hilbert(Signal');  % calculates the analytic signal associated with Signal
 fi=gradient(unwrap(angle(z)));% Hilbert estimate of the instantaneous frequency of z
 ai = abs(z);
-ai = ai(brmask)/median(ai); %normalização
+%ai = ai(brmask)/median(ai); %normalização
 fi = fi(brmask);
 %compensação pela magnitude
 %fic = fi.*ai;
 
 ri = gradient(fi); %rocof de fi compensado
+%pd = fitdist(ri,'Normal');
+[h,p] = chi2gof(ri);
 
 d_r = abs(ri);
 

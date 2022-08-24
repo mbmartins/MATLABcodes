@@ -28,16 +28,16 @@ nbits = 16;
 % %CASE 3 - salto de frequencia
 h_a = 0.0; %[degrees]
 h_x = -0.; % [relative step]
-%h_f = -1.0; %[Hz]
-h_f = -0.5; %[Hz]
+h_f = -1.0; %[Hz]
+%h_f = -0.5; %[Hz]
 
 %limiar para detector com PATV
 Lr= 0;
 % 
 
 % parametro para PATV_HE
-%lambda = 0.02:0.01:0.4;
-lambda = 0.11;
+lambda = 0.02:0.01:0.4;
+%lambda = 0.11;
 for k = 1:length(lambda); %para d=0
 
 %lambda = 1.; %para d=1;
