@@ -39,6 +39,7 @@ ti = 5;     % change ti to control the tau parameter:
     n = n - tau_0;
     t = n*dt; %relative time vector
     % note that the relative time vector is displaced by tau
+    % note que tau_n acontece no meio do sinal (inteiro)
 
     %%%% Signal parameters estimation
     % Here, u represents a step function
@@ -202,10 +203,14 @@ ti = 5;     % change ti to control the tau parameter:
         TVE = @(Ve_r,Ve) 100*sqrt(((real(Ve_r) - real(Ve))^2 + (imag(Ve_r) - imag(Ve))^2 )/(real(Ve_r)^2 + imag(Ve_r)^2)) ;
 
         %rectangular Reference phasors
-        corr = (F1-F0)*2*pi*(250/5000)/2;
+        corr = (F1-F0)*2*pi*(250/5000)/2; % correção para cálculo das fases no meio da janela (na prática zero)
+        
         Ve_ref(1:10) = (xr(1)/sqrt(2))*exp(1i*Phe_r);
         Ve_ref(3:5) = [Xe7_r.*exp(1i*(Phe_r - corr)) Xe5_r.*exp(1i*Phe_r) Xe2_r.*exp(1i*(Phe_r + corr))];
         Ve_ref(6:10) = ((xr(1)*(1+xr(2)))/sqrt(2))*exp(1i*Phe_r);
+        
+        Ve_trad(1:10) = (xr(1)/sqrt(2))*exp(1i*Phe_r);
+        Ve_trad(5:10) = (xr(1)*(1+xr(2))/sqrt(2))*exp(1i*Phe_r);
         
         Ve2 = Xe2*exp(1i*(Phe2 + corr));
         Ve5 = Xe5*exp(1i*Phe5);
@@ -245,44 +250,83 @@ ti = 5;     % change ti to control the tau parameter:
             [V_pmu(pm), pmu_freq(pm)] = PMU_FFT(PMU_signal,SampleRate);
             %PMU/DFT comparison
             TVE_aw(pm) = TVE(Synx_ref(pm),V_pmu(pm));
-            TVE_ir(pm) = TVE(Ve(pm),V_pmu(pm))
+            TVE_INT_REF(pm) = TVE(Ve_ref(pm),V_pmu(pm)); % TVE do PMU com valores de referencia intermediarios sem estimador
+            TVE_TRAD_REF(pm) = TVE(Ve_trad(pm),V_pmu(pm)); % TVE do PMU com valores de referencia tradicionais, sem estimador
+            
+            % valores de referencia (sem estimadores) para magnitude e fase tradicional
+            Mag_Trad_REF(pm) = abs(Ve_trad(pm));
+            Fase_Trad_REF(pm) = angle(Ve_trad(pm));
+            % valores de referencia (sem estimadores) para magnitude e fase intermediarios
+            Mag_Int_REF(pm) = abs(Ve_ref(pm));
+            Fase_Int_REF(pm) = angle(Ve_ref(pm));
+            % valores estimados pelos sistemas de referencia
+            Mag_SistA(pm) = abs(Synx_ref(pm)); % com DSS
+            Mag_SistB(pm) = abs(Ve(pm)); %com LM
+            Mag_PMU(pm) = abs(V_pmu(pm)); % com DFT
+            Fase_SistA(pm) = angle(Synx_ref(pm)); % com DSS
+            Fase_SistB(pm) = angle(Ve(pm)); %com LM
+            Fase_PMU(pm) = angle(V_pmu(pm)); % com DFT
+            
+            
+            TVE_ir(pm) = TVE(Ve(pm),V_pmu(pm));
+            TVE_irREF(pm) = TVE(Ve_ref(pm),V_pmu(pm));
             
             %PMU/DFT with intermediate phasors from SS
-            TVE_irs(pm) = TVE(Ve_synx(pm),V_pmu(pm))
+            TVE_irs(pm) = TVE(Ve_synx(pm),V_pmu(pm));
             
             %comparison of estimators
-            TVE_refLM(pm) = TVE(Ve_ref(pm),Ve(pm))
-            TVE_refSS(pm) = TVE(Ve_ref(pm),Ve_synx(pm))
+            TVE_refLM(pm) = TVE(Ve_ref(pm),Ve(pm));
+            TVE_refSS(pm) = TVE(Ve_ref(pm),Ve_synx(pm));
             
             %comparison of frequency
-            FE_refSS(pm) = abs(Freq_SS(pm) - Freq_ref(pm))
-            FE_irs(pm) = abs(Freq_LM(pm) - Freq_ref(pm))
+            FE_refSS(pm) = abs(Freq_SS(pm) - Freq_ref(pm));
+            FE_irs(pm) = abs(Freq_LM(pm) - Freq_ref(pm));
            
         end
         tt = (1:10)*m/SampleRate;
         stdlimit = ones(1,10);
-        subplot(2,1,1)
-        plot(tt,stdlimit,'k',tt,TVE_aw,'k^--',tt,TVE_ir,'ro:'); ylabel('TVE[%]');xlabel('Time [s]');
-        ylim([-0.5 5.5])
-        title('TVE of a DFT PMU');
-        legend('Standard limit','Reference from adjacent windows','Reference from intermediate phasors')
-        subplot(2,1,2)
-        plot(tt,TVE_ir,'ro:'); ylabel('TVE[%]');xlabel('Time [s]');
+        
+        figure(1)
+        subplot(2,2,1)
+        plot(tt,Mag_Trad_REF,'kx-',tt,Mag_Int_REF,'bx-'); hold on;
+        plot(tt,Mag_SistA,'ko:', tt,Mag_SistB,'bo:'); %ylabel('TVE[%]');xlabel('Time [s]');
+        ylabel('Magnitude [V]');xlabel('Tempo [s]');
+        legend('Referência A','Referência B','Sistema A','Sistema B')
+        grid on
+        subplot(2,2,3)
+        plot(tt,Mag_SistA - Mag_Trad_REF,'ko-'); hold on;
+        plot(tt,Mag_SistB - Mag_Int_REF,'bo-'); hold on;
+        ylabel('Erro de magnitude [V]');xlabel('Tempo [s]');
+        legend('Sistema A','Sistema B')
+        grid on
+        subplot(2,2,2)
+        plot(tt,Fase_Trad_REF,'kx-',tt,Fase_Int_REF,'bx-'); hold on;
+        plot(tt,Fase_SistA,'ko:', tt,Fase_SistB,'bo:'); %ylabel('TVE[%]');xlabel('Time [s]');
+        ylabel('Fase [rad]');xlabel('Tempo [s]');
+        legend('Referência A','Referência B','Sistema A','Sistema B')
+        grid on
+        subplot(2,2,4)
+        plot(tt,Fase_SistA - Fase_Trad_REF,'ko-'); hold on;
+        plot(tt,Fase_SistB - Fase_Int_REF,'bo-'); hold on;
+        ylabel('Erro de fase [rad]');xlabel('Tempo [s]');
+        legend('Sistema A','Sistema B')
+        grid on
+
+        
+        
+        
+        figure(6)
+        plot(tt(3:5),TVE_refLM(3:5),'ro:',tt(3:5),TVE_refSS(3:5),'bx--'); ylabel('TVE[%]');xlabel('Time [s]');
+        %plot(tt(3:5),TVE_refLM(3:5),'ro:',tt(3:5)); ylabel('TVE[%]');xlabel('Time [s]');
+        
+        %ylim([1e-6 1e-1])
         legend('Reference from LM')
-        title('TVE of a DFT PMU with intermediate reference phasors');
-%  
-%         figure
-%         plot(tt(3:5),TVE_refLM(3:5),'ro:',tt(3:5),TVE_refSS(3:5),'bx--'); ylabel('TVE[%]');xlabel('Time [s]');
-%         %plot(tt(3:5),TVE_refLM(3:5),'ro:',tt(3:5)); ylabel('TVE[%]');xlabel('Time [s]');
-%         
-%         %ylim([1e-6 1e-1])
-%         legend('Reference from LM')
-%         title('TVE of estimators with intermediate reference phasors');
-%         
-%         figure
-%         plot(1:10,FE_irs,'ro:',1:10,FE_refSS,'bx--'); ylabel('FE[Hz]');xlabel('Time [s]');
-%         legend('F_{LM} - F1','F_{SS} - F1')
-%         title('FE of estimators with intermediate reference phasors');
+        title('TVE of estimators with intermediate reference phasors');
+        
+        figure
+        plot(1:10,FE_irs,'ro:',1:10,FE_refSS,'bx--'); ylabel('FE[Hz]');xlabel('Time [s]');
+        legend('F_{LM} - F1','F_{SS} - F1')
+        title('FE of estimators with intermediate reference phasors');
 
         Ve_s_ang = angle(Ve_synx)*180/pi;
         Ve_LM_ang = angle(Ve)*180/pi;
@@ -291,12 +335,27 @@ ti = 5;     % change ti to control the tau parameter:
         Ph_errorSS = Ve_s_ang(3:5) - Ve_ref_ang(3:5)
         Ph_errorLM = Ve_LM_ang(3:5) - Ve_ref_ang(3:5)
 
-%         figure
-%         plot(tt(3:5),Ph_errorSS,'o:',tt(3:5),Ph_errorLM ,'x--')
-%         title('Phase errors');legend('SS','LM')
+        figure
+        plot(tt(3:5),Ph_errorSS,'o:',tt(3:5),Ph_errorLM ,'x--')
+        title('Phase errors');legend('SS','LM')
         
         mag_SS = abs(Ve_synx);
         mag_LM = abs(Ve);
         mag_ref = abs(Ve_ref);
         Mag_errorSS = mag_SS - mag_ref
         Mag_errorLM = mag_LM - mag_ref
+        
+        figure
+        offset = 751;
+        xsig = Signal(offset:end);
+        plot(xsig,'.-'); hold on;
+        xlabel('Amostras');
+        wsize = 1000; %m = 250;
+        for pm=1:10
+            dimx = [pm*m pm*m+wsize]-250;
+            %dimx = dimx/max(dimx);
+            Lplot(pm) = line(dimx,[1 1] + pm/5);
+            Lplot(pm).Marker = 'x';
+            Lplot(pm).Color = 'k';
+        end        
+        

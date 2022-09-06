@@ -121,17 +121,40 @@ k = 1; %MedSF = antigo EF1
         k=k+4; %next loop: MedSF-PATV antigo EF5, por isso k+4
         
     end
+    if plot_type == 2
+        for i = 1:4
+            subplot(220+i); hold on;
+            x = cos(2*pi*F1*tau_n/Fs + phi_0);
+            pa = gca;
+            ypos = max(abs(pa.YLim));
+            yyaxis right;
+            ylabel('x[n]');
+            ylim([-1.5 1.5])
+            ax = gca; ax.YColor = 'blue';
+            pleg2(i) = plot(VEC,x,'b-.');
+        end
+    end
+    
+    
     k = 1;
     for i = 1:4
-        lgd(i) = legend([pleg(k) pleg(k+4)],"MedSF","MedSF-PATV");
+        
+        if plot_type == 2
+            lgd(i) = legend([pleg(k) pleg(k+4) pleg2(i)],"MedSF","MedSF-PATV",'$x[\tau_n]$');
+            lgd(i).Interpreter = 'latex';
+        else
+            lgd(i) = legend([pleg(k) pleg(k+4)],"MedSF","MedSF-PATV");    
+        end
         lgd(i).Location='south';
         lgd(i).Orientation='horizontal';
-        lgd(i).Box='off';
+        %lgd(i).Box='off';
         %legend('boxoff')
         lgd(i).FontSize = fsize;
         k = k+1;
     end
 
+
+    
 % --- salvar figuras
 savefig(figALL(plot_type),pasta+"salto_freq_ALL_"+var+"_MedSF")
 saveas(figALL(plot_type),pasta+"salto_freq_ALL_"+var+"_MedSF.png")

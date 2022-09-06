@@ -33,11 +33,11 @@ kr = 3; % para salto de frequencia pq 10x??
 Lr = 1e-6;
 % 
 % parametro para PATV_HE
-lambda = 0.11; %para d=0
+lambda = 0.08; %para d=0
 %lambda = 1.; %para d=1;
 
 %maximo erro de tau toleravel em dt
-max_dt = 7;
+max_dt = 8;
 %max_dt2 = 4;
 % em phi = 0, temos uma maior distribuição dos erros entao max_dt tem que
 % ser em torno de 8
